@@ -1,4 +1,4 @@
-# kirjasto-backend 📚
+# kirjasto-backend-v2📚
 
 # Description
 This is the backend repo for the Digitalents Academy Library Application 📚 Kirjasto is a Digitalents Academy project made by the workshop interns in collaboration. The main repositiory for the project is at [digitalents-academy/kirjasto](https://github.com/digitalents-academy/kirjasto)
