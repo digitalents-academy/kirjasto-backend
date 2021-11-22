@@ -1,7 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
-from pymongo.message import query
 from query import db_query, db_full_query, parse
 
 app = Flask(__name__)
@@ -12,8 +11,9 @@ api = Api(app)
 class Status(Resource):
 # Get the status for all of the books in the books collection
     def get(self):
-        pass
-
+        # Query books with book name id and loan status
+        return db_query()
+        
 class StatusID(Resource):            
     def get(self, book_id):    
         client = MongoClient("mongodb+srv://kirjastoAdmin:<PASSWORD>@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
@@ -32,7 +32,8 @@ class StatusID(Resource):
 class Books(Resource):
 # Get the details of all of the books in the books collection
     def get(self):
-        pass
+        # Query with full info
+        return db_full_query()
 
 class Loan (Resource):
 # Manipulate the loaning system for the books in the books collection
@@ -40,14 +41,6 @@ class Loan (Resource):
         # Require these args for the POST request.
         parser = reqparse.RequestParser()
         parser.add_argument('book_id', required = True)
-        parser.add_argument('name', required = True)
-        parser.add_argument('writer', required = True)
-        parser.add_argument('year', required = True)
-        parser.add_argument('isbn', required = True)
-        parser.add_argument('rating', required = True)
-        parser.add_argument('about', required = True)
-        parser.add_argument('tags', required = True)
-        parser.add_argument('description', required = True)
         parser.add_argument('loaner', required = True)
         parser.add_argument('loan_status', required = True)
         
@@ -57,13 +50,13 @@ class Loan (Resource):
         db = client['kirjasto-backend']
         collection = db['backendAPI']
         retrieved = list(collection.find({}, {'_id' : False}))
-        #iterate through retrieved and find if POST value "name" is the same as database value Name.
+        #iterate through retrieved and find if POST value "book_id" is the same as database value Book ID.
         #if true -> update. else throw errors.
-        for booknames in retrieved:
-            if args['name'] in booknames['Name']:
-                new_book = collection.find_one_and_update(booknames,{"$set": parse()})
-            elif args['name'] not in booknames['Name']:
-                return {'message': f"'{args['name']}' doesnt exist."
+        for booknumbers in retrieved:
+            if args['book_id'] in booknumbers['Book ID']:
+                new_book = collection.find_one_and_update(booknumbers,{"$set": parse()})
+            elif args['book_id'] != booknumbers['Book ID']:
+                return {'message': f"'{args['book_id']}' doesnt exist."
                 }, 401
             else:
                 return {
