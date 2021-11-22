@@ -81,6 +81,6 @@ api.add_resource(Comments, '/comments')
 api.add_resource(CommentsID, '/comments/<book_id>')
 api.add_resource(CommentsDeleteByID, '/comments/d/<comment_id>')
 
-# Runs on port 8080!!
+# Runs on port 8000!!
 if __name__ == "__main__":
     app.run( debug = True, host='127.0.0.1', port=8000 )
