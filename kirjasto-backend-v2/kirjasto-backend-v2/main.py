@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
 from query import db_query, db_full_query, parse
-from comments import get_comments
+from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
 
 app = Flask(__name__)
 api = Api(app)
@@ -70,6 +70,16 @@ class Loan (Resource):
 class Comments(Resource):
     def get(self):
         return get_comments(), 200
+    
+    def post(self):
+        return post_comments(), 200
+
+    def delete(self):
+        return delete_comments_by_id(), 200
+
+class CommentsID(Resource):
+    def get(self):
+        return get_comments_by_book_id(), 200
 
 
 api.add_resource(Status, '/status') 
@@ -77,6 +87,7 @@ api.add_resource(StatusID, '/status/<book_id>')
 api.add_resource(Books, '/books')
 api.add_resource(Loan, '/loan')
 api.add_resource(Comments, '/comments')
+api.add_resource(CommentsID, '/comments/<book_id>')
 
 
 # Runs on port 8080!!

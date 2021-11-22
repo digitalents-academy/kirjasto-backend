@@ -10,59 +10,60 @@ collection = db['comments']
 def get_comments():
     retrieved = list(collection.find({}, {'_id' : False}))
     return retrieved, 200
+    
+def get_comments_by_book_id(book_id):
 
+    retrievedID = list(collection.find({'Book ID' : book_id,}, {
+     '_id': False
+    }))
+    # Check if input is an int, otherwise throw an error
+    for booknumbers in retrievedID:
+        if int(book_id):
+            return retrievedID
+    else:
+        return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400
+        
 def post_comments():
     # Require these args for the POST request.
     parser = reqparse.RequestParser()
-    parser.add_argument('commenter', required = True)
-    parser.add_argument('message', required = True)
-
+    parser.add_argument('comment_id', required = True)
+    parser.add_argument('comment', required = True)
+    parser.add_argument('book_id', required = True)
+    parser.add_argument('user_id', required = True)
+    
     args = parser.parse_args()
 
     new_book = collection.insert_one({
-        'Commenter' : args['commenter'],
-        'Message' : args['message'],     
+        'User ID' : args['user_id'],
+        'Comment' : args['comment'],
+        'Book ID' : args['book_id'],
+        'Comment ID' : args['comment_id']     
     })    
     retrieved = list(collection.find({}, {'_id' : False}))
     return retrieved, 200
 
-def put_comments(self):
-    parser = reqparse.RequestParser()
-    parser.add_argument('commenter', required = True)
-    parser.add_argument('message', required = True)
 
-    args = parser.parse_args()
-
-    if args['name'] in list(collection['Name']):
-        client = MongoClient('localhost', 27017)
-        db = client['Laiberi']
-        collection = db['booksAvail']
-        updateBook = collection.find_one_and_replace({
-            'Commenter' : args['commenter'],
-            'Message' : args['message'],     
-    })    
-
-    retrieved = list(collection.find({}, {'_id' : False}))
-
-
-    return retrieved, 200
-
-def delete_comments_by_id(self):
+def delete_comments_by_id():
 # Require these args for the DELETE request.
 
     parser = reqparse.RequestParser()
-    parser.add_argument('commenter', required = True)
-    parser.add_argument('message', required = True)
+    parser.add_argument('comment_id', required = True)
+    parser.add_argument('comment', required = True)
+    parser.add_argument('book_id', required = True)
+    parser.add_argument('user_id', required = True)
+    
     args = parser.parse_args()
 
     client = MongoClient('localhost', 27017)
     db = client['Laiberi']
     collection = db['booksAvail']
     removeBook = collection.find_one_and_delete({
-        'Commenter' : args['commenter'],
-        'Message' : args['message'],          
+        'User ID' : args['user_id'],
+        'Comment' : args['comment'],
+        'Book ID' : args['book_id'],
+        'Comment ID' : args['comment_id']
+                  
     })    
     retrieved = list(collection.find({}, {'_id' : False}))
     return retrieved, 200
-    
     
