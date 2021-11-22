@@ -8,7 +8,6 @@ collection = db['comments']
 
 
 def get_comments():
-    # had to make id not show, because it threw a not json serializable error.
     retrieved = list(collection.find({}, {'_id' : False}))
     return retrieved, 200
 
