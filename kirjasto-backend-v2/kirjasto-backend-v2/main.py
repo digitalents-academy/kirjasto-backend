@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
-from query import db_query, db_full_query, parse
+from query import db_query, db_full_query, parse, status_query
 from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
 
 app = Flask(__name__)
@@ -21,16 +21,7 @@ class Status(Resource):
         
 class StatusID(Resource):            
     def get(self, book_id):
-        retrievedID = list(collection.find({'Book ID' : book_id,}, {
-         '_id': False
-        }))
-        # Check if input is an int, otherwise throw an error
-        for booknumbers in retrievedID:    
-            if int(book_id):
-                return retrievedID
-        else:
-            return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400
-            
+        return status_query(), 200
 class Books(Resource):
 # Get the details of all of the books in the books collection
     def get(self):
@@ -74,13 +65,13 @@ class Comments(Resource):
     def post(self):
         return post_comments(), 200
 
-    def delete(self):
-        return delete_comments_by_id(), 200
-
 class CommentsID(Resource):
-    def get(self):
-        return get_comments_by_book_id(), 200
+    def get(self, book_id):
+        return get_comments_by_book_id(book_id), 200
 
+class CommentsDeleteByID(Resource):
+    def delete(self, comment_id):
+        return delete_comments_by_id(comment_id), 200
 
 api.add_resource(Status, '/status') 
 api.add_resource(StatusID, '/status/<book_id>')
@@ -88,7 +79,7 @@ api.add_resource(Books, '/books')
 api.add_resource(Loan, '/loan')
 api.add_resource(Comments, '/comments')
 api.add_resource(CommentsID, '/comments/<book_id>')
-
+api.add_resource(CommentsDeleteByID, '/comments/d/<comment_id>')
 
 # Runs on port 8080!!
 if __name__ == "__main__":
