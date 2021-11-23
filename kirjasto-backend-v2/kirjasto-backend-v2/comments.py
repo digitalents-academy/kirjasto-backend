@@ -20,8 +20,8 @@ def get_comments_by_book_id(book_id):
     for booknumbers in retrievedID:
         if int(book_id):
             return retrievedID
-    #else:
-    #    return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400
+    else:
+        return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400
         
 def post_comments():
     # Require these args for the POST request.
@@ -53,13 +53,17 @@ def delete_comments_by_id(comment_id):
     parser.add_argument('user_id', required = False)
     
     args = parser.parse_args()
-    if int(comment_id):
-        removeBook = collection.find_one_and_delete({
-            'User ID' : args['user_id'],
-            'Comment' : args['comment'],
-            'Book ID' : args['book_id'],
-            'Comment ID' : args['comment_id']
-                      
-        }),    
-        return {"Deleted comment!"}, 200
+    retrievedID = list(collection.find({'Comment ID' : comment_id,}, { '_id': False}))
+
+    for commentnumbers in retrievedID:   
+        print(commentnumbers) 
+        if int(comment_id):
+            removeBook = collection.find_one_and_delete({
+               'User ID' : args['user_id'],
+               'Comment' : args['comment'],
+               'Book ID' : args['book_id'],
+               'Comment ID' : args['comment_id']
+                         
+           }),    
+            return {"Deleted comment!"}, 200
     
