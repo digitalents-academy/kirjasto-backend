@@ -71,7 +71,7 @@ class CommentsID(Resource):
 
 class CommentsDeleteByID(Resource):
     def delete(self, comment_id):
-        return delete_comments_by_id(comment_id), 200
+        return delete_comments_by_id(comment_id),  {"Deleted comment!"}, 200
 
 api.add_resource(Status, '/status') 
 api.add_resource(StatusID, '/status/<book_id>')

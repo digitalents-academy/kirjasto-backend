@@ -64,6 +64,5 @@ def delete_comments_by_id(comment_id):
                'Book ID' : args['book_id'],
                'Comment ID' : args['comment_id']
                          
-           }),    
-            return {"Deleted comment!"}, 200
+           })
     
