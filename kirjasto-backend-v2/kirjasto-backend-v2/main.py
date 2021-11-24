@@ -73,13 +73,13 @@ class CommentsDeleteByID(Resource):
     def delete(self, comment_id):
         return delete_comments_by_id(comment_id),  {"Deleted comment!"}, 200
 
-api.add_resource(Status, '/status') 
-api.add_resource(StatusID, '/status/<book_id>')
-api.add_resource(Books, '/books')
-api.add_resource(Loan, '/loan')
-api.add_resource(Comments, '/comments')
-api.add_resource(CommentsID, '/comments/<book_id>')
-api.add_resource(CommentsDeleteByID, '/comments/d/<comment_id>')
+api.add_resource(Status, '/api/status') 
+api.add_resource(StatusID, '/api/status/<book_id>')
+api.add_resource(Books, '/api/books')
+api.add_resource(Loan, '/api/loan')
+api.add_resource(Comments, '/api/comments')
+api.add_resource(CommentsID, '/api/comments/<book_id>')
+api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
 
 # Runs on port 8000!!
 if __name__ == "__main__":
