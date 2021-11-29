@@ -1,8 +1,9 @@
 from pymongo import ALL, MongoClient
 from flask_restful import reqparse
+import db_secret
 
 # Initiate connection to mongoDB
-client = MongoClient("mongodb+srv://kirjastoAdmin:s3yS2zcXETkqCM@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://"+ db_secret.secret_id +":"+ db_secret.secret_key +"@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = client['kirjasto-backend']
 collection = db['backendAPI']
 
