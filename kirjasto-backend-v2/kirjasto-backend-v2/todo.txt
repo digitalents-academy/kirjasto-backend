@@ -1,0 +1,21 @@
+Books:
+  - generate book_ids in ascending order.
+  - remove description field.
+  - have non string values in non string places in documents. Example: boolean should be a boolean not a string "false"
+
+Comments:
+  - Have comments be linked to the book they were commenting on.
+  - Have comments be linked to the user_id they were commented under.
+
+Users:
+  - Users should have ids that are bigger than for example 10000+ so it wont collide with book_ids.
+  - Users should have relationships between comments and ratings.
+
+Ratings:
+  - Ratings should be only posted to the book collection as mean score. So the conversion would be done before posting it there.
+
+Authentication:
+  - Users should have roles
+  - Start from simple authentication and build up on it.
+
+
