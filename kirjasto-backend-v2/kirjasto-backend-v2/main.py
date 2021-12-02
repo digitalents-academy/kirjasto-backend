@@ -1,11 +1,18 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
-from query import db_query, db_full_query, parse
+from query import db_query, db_full_query, parse, status_query
+from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
+from ratings import get_ratings
+import db_secret
 
 app = Flask(__name__)
 api = Api(app)
 
+# Initiate connection to mongoDB
+client = MongoClient("mongodb+srv://"+ db_secret.secret_id +":"+ db_secret.secret_key +"@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+db = client['kirjasto-backend']
+collection = db['backendAPI']
 
 
 class Status(Resource):
@@ -15,20 +22,8 @@ class Status(Resource):
         return db_query()
         
 class StatusID(Resource):            
-    def get(self, book_id):    
-        client = MongoClient("mongodb+srv://kirjastoAdmin:<PASSWORD>@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-        db = client['kirjasto-backend']
-        collection = db['backendAPI']
-        retrievedID = list(collection.find({'Book ID' : book_id,}, {
-         '_id': False
-        }))
-        # Check if input is an int, otherwise throw an error
-        for booknumbers in retrievedID:    
-            if int(book_id):
-                return retrievedID
-        else:
-            return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400
-            
+    def get(self, book_id):
+        return status_query(), 200
 class Books(Resource):
 # Get the details of all of the books in the books collection
     def get(self):
@@ -46,9 +41,6 @@ class Loan (Resource):
         
         args = parser.parse_args()
         # Checking if the book name already exists.        
-        client = MongoClient("mongodb+srv://kirjastoAdmin:<PASSWORD>@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-        db = client['kirjasto-backend']
-        collection = db['backendAPI']
         retrieved = list(collection.find({}, {'_id' : False}))
         #iterate through retrieved and find if POST value "book_id" is the same as database value Book ID.
         #if true -> update. else throw errors.
@@ -67,13 +59,41 @@ class Loan (Resource):
         retrieved = list(collection.find({}, {'_id' : False}))
         return retrieved, 200
  
+# Class for interacting with comments collection
+class Comments(Resource):
+    def get(self):
+        return get_comments(), 200
+    
+    def post(self):
+        return post_comments(), 200
 
-api.add_resource(Status, '/status')
-api.add_resource(StatusID, '/status/<book_id>')
-api.add_resource(Books, '/books')
-api.add_resource(Loan, '/loan')
+class CommentsID(Resource):
+    def get(self, book_id):
+        return get_comments_by_book_id(book_id), 200
 
+class CommentsDeleteByID(Resource):
+    def delete(self, comment_id):
+        return delete_comments_by_id(comment_id),  {"Deleted comment!"}, 200
 
-# Runs on port 8080!!
+class Ratings(Resource):
+    def get(self):
+        return get_ratings()
+
+    def post(self):
+        pass
+
+    def delete(self):
+        pass
+
+api.add_resource(Status, '/api/status') 
+api.add_resource(StatusID, '/api/status/<book_id>')
+api.add_resource(Books, '/api/books')
+api.add_resource(Loan, '/api/loan')
+api.add_resource(Comments, '/api/comments')
+api.add_resource(CommentsID, '/api/comments/<book_id>')
+api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
+api.add_resource(Ratings, '/api/ratings')
+
+# Runs on port 8000!!
 if __name__ == "__main__":
     app.run( debug = True, host='127.0.0.1', port=8000 )

@@ -1,12 +1,14 @@
 from pymongo import ALL, MongoClient
 from flask_restful import reqparse
+import db_secret
+
+# Initiate connection to mongoDB
+client = MongoClient("mongodb+srv://"+ db_secret.secret_id +":"+ db_secret.secret_key +"@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+db = client['kirjasto-backend']
+collection = db['backendAPI']
 
 def db_query():
-# Connecting to the database and returning query of values that include the following: Book ID, Name, Loan Status.
-        
-        client = MongoClient("mongodb+srv://kirjastoAdmin:<PASSWORD>@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-        db = client['kirjasto-backend']
-        collection = db['backendAPI']
+
         # had to make id not show, because it threw a not json serializable error.
         retrievedStatus = list(collection.find({}, {
             'Book ID' : True, 'Name' : True, 'Loan Status' : True, '_id': False 
@@ -14,12 +16,20 @@ def db_query():
 
         return retrievedStatus, 200 
 def db_full_query():
-    # Connecting to the database and returning query of all values.
-        client = MongoClient("mongodb+srv://kirjastoAdmin:<PASSWORD>@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-        db = client['kirjasto-backend']
-        collection = db['backendAPI']
         retrievedFull = list(collection.find({}, {'_id' : False}))
         return retrievedFull, 200       
+
+def status_query(book_id):
+    retrievedID = list(collection.find({'Book ID' : book_id,}, {
+     '_id': False
+    }))
+    # Check if input is an int, otherwise throw an error
+    for booknumbers in retrievedID:    
+        if int(book_id):
+            return retrievedID
+    else:
+        return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400
+        
 def parse():
 # Required values for the api requests. False would be optional
     parser = reqparse.RequestParser()
