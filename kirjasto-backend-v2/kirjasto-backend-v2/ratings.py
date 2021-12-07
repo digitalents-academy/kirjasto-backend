@@ -17,7 +17,22 @@ def get_mean_ratings():
     return retrieved, 200
 
 def post_ratings():
-    pass
+    collection = db['ratings']
+    # Require these args for the POST request.
+    parser = reqparse.RequestParser()
+    parser.add_argument('book_id', required = True)
+    parser.add_argument('rating', required = True)
+    parser.add_argument('user_id', required = True)
+    
+    args = parser.parse_args()
+# Insert if function here to check for duplicates.
+    new_book = collection.insert_one({
+        'User ID' : args['user_id'],
+        'Book ID' : args['book_id'],
+        'Rating' : args['rating']     
+    })    
+    retrieved = list(collection.find({}, {'_id' : False}))
+    return retrieved, 200
 
 def post_mean_ratings():
     pass
