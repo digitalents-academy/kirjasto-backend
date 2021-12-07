@@ -3,7 +3,7 @@ from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
 from query import db_query, db_full_query, parse, status_query
 from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
-from ratings import get_ratings
+from ratings import get_ratings, post_ratings
 import db_secret
 
 app = Flask(__name__)
@@ -75,15 +75,20 @@ class CommentsDeleteByID(Resource):
     def delete(self, comment_id):
         return delete_comments_by_id(comment_id),  {"Deleted comment!"}, 200
 
+# Class for interacting with the ratings collection
 class Ratings(Resource):
     def get(self):
         return get_ratings()
 
     def post(self):
+        return post_ratings()
+class RatingsMean(Resource):
+    def get(self):
+        pass
+class RatingsByID(Resource):
+    def get(self, book_id):
         pass
 
-    def delete(self):
-        pass
 
 api.add_resource(Status, '/api/status') 
 api.add_resource(StatusID, '/api/status/<book_id>')
@@ -93,6 +98,8 @@ api.add_resource(Comments, '/api/comments')
 api.add_resource(CommentsID, '/api/comments/<book_id>')
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
 api.add_resource(Ratings, '/api/ratings')
+api.add_resource(RatingsMean, '/api/ratings/mean')
+api.add_resource(RatingsByID, '/api/ratings/<book_id>')
 
 # Runs on port 8000!!
 if __name__ == "__main__":
