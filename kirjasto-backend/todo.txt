@@ -13,9 +13,18 @@ Users:
 
 Ratings:
   - Ratings should be only posted to the book collection as mean score. So the conversion would be done before posting it there.
+    - post score -> go to mean score -> convert -> post to database.
+    Add the scores of all the people who took the test.
+    Divide that total by the number of people.
+    Add a field to the db that counts the time people have posted ratings.
+    Constantly add onto both values with each posted rating
+    
+    post rating -> count +=1 score += score -> get count, score -> mean = score / count -> post mean
+
 
 Authentication:
   - Users should have roles
   - Start from simple authentication and build up on it.
+
 
 
