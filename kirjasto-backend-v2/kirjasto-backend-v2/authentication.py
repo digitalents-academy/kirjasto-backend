@@ -1,22 +1,17 @@
 from flask import Flask, request, render_template, redirect, url_for, flash, make_response, session
 from datetime import datetime
-from threading import Thread
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user, logout_user
-import json
 
 # Initiate contact wit the DB
 
-
 @app.route('/')
 def index():
-    return render_template('index.html', name='Jerry')
-
+    return render_template('index.html', name='Kirjasto')
 
 @app.route('/user/<int:user_id>/')
 def user_profile(user_id):
     return "Profile page of user #{}".format(user_id)
-
 
 @app.route('/login/', methods=['post', 'get'])
 def login():
