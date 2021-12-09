@@ -7,16 +7,13 @@ import json
 
 # Initiate contact wit the DB
 
-
 @app.route('/')
 def index():
-    return render_template('index.html', name='Jerry')
-
+    return render_template('index.html', name='Kirjasto')
 
 @app.route('/user/<int:user_id>/')
 def user_profile(user_id):
     return "Profile page of user #{}".format(user_id)
-
 
 @app.route('/login/', methods=['post', 'get'])
 def login():
@@ -53,7 +50,6 @@ def logout():
     logout_user()    
     flash("You have been logged out.")
     return redirect(url_for('login'))
-
 
 @app.route('/cookie/')
 def cookie():
