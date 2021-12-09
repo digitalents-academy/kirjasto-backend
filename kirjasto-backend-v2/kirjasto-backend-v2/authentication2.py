@@ -2,7 +2,6 @@ from flask import Flask, render_template, redirect, url_for, flash, session
 from forms import LoginForm
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user, logout_user
 
@@ -20,16 +19,16 @@ db = client['kirjasto-backend']
 collection = db['backendAPI']
 
 #Used to "connect" to mysql
-app.config['SECRET_KEY'] = 'a really really really really long secret key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1234@localhost/flask_app_db' # enter //<mysql:username>:<mysql:password>@
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#app.config['SECRET_KEY'] = 'a really really really really long secret key'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1234@localhost/flask_app_db' # enter //<mysql:username>:<mysql:password>@
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#db = SQLAlchemy(app)
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
 #Testing
+#Pretty sure this isn't important
 def user_profile(user_id):
     return "Profile page of user #{}".format(user_id), 200
 
@@ -39,15 +38,15 @@ def login():
         return redirect(url_for('admin'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = db.session.query(User).filter(User.username == form.username.data).first()
+        user = collection.session.query(User).filter(User.username == form.username.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember.data)
             return redirect(url_for('admin')), 200
 
-    #Testing Errors
         flash("Invalid username/password", 'error')
-        return redirect(url_for('login'))
-    return render_template('login.html', form=form)
+        return redirect(url_for('login')), 401
+    #return render_template('login.html', form=form), 200
+    return "logged in", 200
 
 #Testing
 @app.route('/logout/')
@@ -55,85 +54,31 @@ def login():
 def logout():
     logout_user()    
     flash("You have been logged out.")
-    return redirect(url_for('login')), 200
+    #return redirect(url_for('login')), 200
+    return "logged out", 200
 
 #Testing
 @app.route('/admin/')
 @login_required
 def admin():
-    return render_template('admin.html'), 200
+    #return render_template('admin.html'), 200
+    return "admin", 200
 
-class Category(db.Model):
-    __tablename__ = 'categories'
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    slug = db.Column(db.String(255), nullable=False)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    posts = db.relationship('Post', backref='category', cascade='all,delete-orphan')
-
-    def __repr__(self):
-        return "<{}:{}>".format(id, self.name)
-
-post_tags = db.Table('post_tags',
-    db.Column('post_id', db.Integer, db.ForeignKey('posts.id')),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'))
-)
-
-class Post(db.Model):
-    __tablename__ = 'posts'
-    id = db.Column(db.Integer(), primary_key=True)
-    title = db.Column(db.String(255), nullable=False)
-    slug = db.Column(db.String(255), nullable=False)
-    content = db.Column(db.Text(), nullable=False)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)    
-    category_id = db.Column(db.Integer(), db.ForeignKey('categories.id'))
-
-    def __repr__(self):
-        return "<{}:{}>".format(self.id, self.title[:10])
-
-class Tag(db.Model):
-    __tablename__ = 'tags'
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    slug = db.Column(db.String(255), nullable=False)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    posts = db.relationship('Post', secondary=post_tags, backref='tags')
-
-    def __repr__(self):
-        return "<{}:{}>".format(id, self.name)
-
-class Feedback(db.Model):
-    __tablename__ = 'feedbacks'
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(1000), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    message = db.Column(db.Text(), nullable=False)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-
-    def __repr__(self):
-        return "<{}:{}>".format(self.id, self.name)
-
-class Employee(db.Model):
-    __tablename__ = 'employees'
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    designation = db.Column(db.String(255), nullable=False)
-    doj = db.Column(db.Date(), nullable=False)  
-
+#Testing
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.query(User).get(user_id)
+    return collection.session.query(User).get(user_id), 200
 
-class User(db.Model, UserMixin):
+#Testing
+class User(collection.Model, UserMixin):
     __tablename__ = 'users'
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(100))
-    username = db.Column(db.String(50), nullable=False, unique=True)
-    email = db.Column(db.String(100), nullable=False, unique=True)
-    password_hash = db.Column(db.String(100), nullable=False)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    id = collection.Column(collection.Integer(), primary_key=True)
+    name = collection.Column(collection.String(100))
+    username = collection.Column(collection.String(50), nullable=False, unique=True)
+    email = collection.Column(collection.String(100), nullable=False, unique=True)
+    password_hash = collection.Column(collection.String(100), nullable=False)
+    created_on = collection.Column(collection.DateTime(), default=datetime.utcnow)
+    updated_on = collection.Column(collection.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return "<{}:{}>".format(self.id, self.username)

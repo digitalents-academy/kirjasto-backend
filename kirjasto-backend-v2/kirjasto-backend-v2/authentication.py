@@ -82,7 +82,6 @@ def delete_visits():
 def admin():
     return render_template('admin.html')
 
-#Is this in the right place?
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.query(User).get(user_id)
