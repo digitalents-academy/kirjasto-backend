@@ -17,24 +17,44 @@ retrieved = list(collection.find({}, {'_id': False}))
 
 
 def get_rating_count():
-    pass
+    retrieved = list(collection.find({}, {'_id': False}))
 
 
 def add_rating_count_score():
-
+    rated_counter = 0
+    score_counter = 0
+    has_rated = False
     parser = reqparse.RequestParser()
     parser.add_argument('book_id', required=True)
+    parser.add_argument('rating', required=True)
 
     args = parser.parse_args()
     retrieved = list(collection.find({}, {'_id': False}))
     for booknumbers in retrieved:
         if args['book_id'] in booknumbers['Book ID']:
+            has_rated = True
             new_book = collection.find_one_and_update(booknumbers,
                                                       {"$set": parse()})
         elif args['book_id'] != booknumbers['Book ID']:
             retrieved = list(collection.find({}, {'_id': False}))
 
+    if has_rated is True:
+        rated_counter += 1
+        score_counter += int(args['rating'])
+        has_rate = False
+
     return retrieved
+
+
+def post_counters():
+    parser = reqparse.RequestParser()
+    parser.add_argument('book_id', required=True)
+    parser.add_argument('rating', required=True)
+    args = parser.parse_args()
+    values = {
+        'Book ID': args['book_id'],
+        'Rating': int(args['rating']),
+    }
 
 
 def calc_mean_score():
@@ -48,14 +68,11 @@ def post_mean():
 def parse():
     parser = reqparse.RequestParser()
     parser.add_argument('book_id', required=True)
-    parser.add_argument('rating_count', required=True)
-    parser.add_argument('user_id', required=True)
-    parser.add_argument('rating_score', required=True)
+    parser.add_argument('rating', required=True)
     args = parser.parse_args()
     values = {
         'Book ID': args['book_id'],
-        'Rating Count': args['rating_count'],
-        'Rating Score': args['rating_score']
+        'Rating': int(args['rating']),
     }
 
     return values
