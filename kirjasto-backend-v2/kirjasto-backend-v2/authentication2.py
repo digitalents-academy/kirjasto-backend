@@ -6,8 +6,8 @@ from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user, logout_user
 
-#testing
-"""from flask_restful import Resource, Api, reqparse
+#Testing
+from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
 import db_secret
 
@@ -17,10 +17,7 @@ api = Api(app)
 # Initiate connection to mongoDB
 client = MongoClient("mongodb+srv://"+ db_secret.secret_id +":"+ db_secret.secret_key +"@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = client['kirjasto-backend']
-collection = db['backendAPI']"""
-
-#Testing
-app = Flask(__name__)
+collection = db['backendAPI']
 
 #Used to "connect" to mysql
 app.config['SECRET_KEY'] = 'a really really really really long secret key'
@@ -124,7 +121,6 @@ class Employee(db.Model):
     designation = db.Column(db.String(255), nullable=False)
     doj = db.Column(db.Date(), nullable=False)  
 
-#Is this in the right place?
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.query(User).get(user_id)
