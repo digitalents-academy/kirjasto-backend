@@ -8,3 +8,8 @@ Windows
 $ set FLASK_APP=app.py(sample)
 $ set FLASK_ENV=development
 $ flask run
+
+Key for app_secret_key
+app.secret_key = "key" (should be random?)
+Terminal
+-> python -c 'import os; print(os.urandom(16))'
