@@ -5,7 +5,6 @@ from query import db_query, db_full_query, parse, status_query
 from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
 from ratings import get_ratings
 #Testing
-from authentication2 import user_profile, login, logout, admin, load_user
 import db_secret
 
 app = Flask(__name__)
@@ -88,36 +87,6 @@ class Ratings(Resource):
         pass
 
 #Testing
-"""class Authentication(Resource):
-    def get(self):
-        return user_profile()
-    def get(self):
-        return login()
-    def get(self):
-        return logout()
-    def get(self):
-        return admin()"""
-
-#Testing
-class AuthenticationUserProfile(Resource):
-    def get(self):
-        return user_profile()
-
-class AuthenticationLogin(Resource):
-    def get(self):
-        return login()
-
-class AuthenticationLogout(Resource):
-    def get(self):
-        return logout()
-
-class AuthenticationAdmin(Resource):
-    def get(self):
-        return admin()
-
-class AuthenticationLoadUser(Resource):
-    def get(self):
-        return load_user()
 
 api.add_resource(Status, '/api/status') 
 api.add_resource(StatusID, '/api/status/<book_id>')
@@ -134,12 +103,6 @@ api.add_resource(Authentication, '/api/authentication/user/<int:user_id>/')
 api.add_resource(Authentication, '/api/authentication/login/', methods=['post', 'get'])
 api.add_resource(Authentication, '/api/authentication/logout/')
 api.add_resource(Authentication, '/api/authentication/admin/')"""
-
-api.add_resource(AuthenticationUserProfile, '/api/user/<int:user_id>/')
-api.add_resource(AuthenticationLogin, '/api/login/', methods=['post', 'get'])
-api.add_resource(AuthenticationLogout, '/api/logout/')
-api.add_resource(AuthenticationAdmin, '/api/admin/')
-api.add_resource(AuthenticationLoadUser, '/api/load_user/')
 
 # Runs on port 8000!!
 if __name__ == "__main__":
