@@ -4,7 +4,8 @@ from pymongo import ALL, MongoClient
 from query import db_query, db_full_query, parse, status_query
 from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
 from ratings import get_ratings
-#Testing
+from app import home, dashboard
+from user import routes
 import db_secret
 
 app = Flask(__name__)
@@ -56,7 +57,6 @@ class Loan (Resource):
                      'message': f" Unknown error."
                 }, 401
             
-
         retrieved = list(collection.find({}, {'_id' : False}))
         return retrieved, 200
  
@@ -86,7 +86,25 @@ class Ratings(Resource):
     def delete(self):
         pass
 
-#Testing
+class AuthenticationHome(Resource):
+    def get(self):
+        return home()
+
+class AuthenticationDashboard(Resource):
+    def get(self):
+        return dashboard()
+
+class AuthenticationSignup(Resource):
+    def post(self):
+        return routes.signup()
+
+class AuthenticationSignout(Resource):
+    def get(self):
+        return routes.signout()
+
+class AuthenticationLogin(Resource):
+    def post(self):
+        return routes.login()
 
 api.add_resource(Status, '/api/status') 
 api.add_resource(StatusID, '/api/status/<book_id>')
@@ -96,13 +114,11 @@ api.add_resource(Comments, '/api/comments')
 api.add_resource(CommentsID, '/api/comments/<book_id>')
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
 api.add_resource(Ratings, '/api/ratings')
-
-#Testing
-"""api.add_resource(Authentication, '/api/authentication')
-api.add_resource(Authentication, '/api/authentication/user/<int:user_id>/')
-api.add_resource(Authentication, '/api/authentication/login/', methods=['post', 'get'])
-api.add_resource(Authentication, '/api/authentication/logout/')
-api.add_resource(Authentication, '/api/authentication/admin/')"""
+api.add_resource(AuthenticationHome, '/api/authentication/home')
+api.add_resource(AuthenticationDashboard, '/api/authentication/dashboard')
+api.add_resource(AuthenticationSignup, '/api/authentication/signup', methods=['POST'])
+api.add_resource(AuthenticationSignout, '/api/authentication/signout')
+api.add_resource(AuthenticationLogin, '/api/authentication/login', methods=['POST'])
 
 # Runs on port 8000!!
 if __name__ == "__main__":

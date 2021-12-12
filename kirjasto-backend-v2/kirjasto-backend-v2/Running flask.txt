@@ -13,3 +13,11 @@ Key for app_secret_key
 app.secret_key = "key" (should be random?)
 Terminal
 -> python -c 'import os; print(os.urandom(16))'
+
+
+need to install
+
+pip install flask
+pip install pymongo
+pip install passlib
+python.exe -m pip install "pymongo[srv]"
