@@ -1,5 +1,0 @@
-Tehtävää
-
-ModuleNotFoundError: No module named 'forms'
-Selvitä mongodp yhdistys
-Kokeile toimiiko
