@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
 from query import db_query, db_full_query, parse, status_query
-from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
+from comments import delete_comments_by_id, get_comments_by_book_id, get_comments, post_comments
 from ratings import get_ratings, post_ratings
 import db_secret
 
@@ -10,28 +10,33 @@ app = Flask(__name__)
 api = Api(app)
 
 # Initiate connection to mongoDB
-client = MongoClient("mongodb+srv://"+ db_secret.secret_id +":"+ db_secret.secret_key +"@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key + "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = client['kirjasto-backend']
 collection = db['backendAPI']
+retrieved = list(collection.find({}, {'_id' : False}))
 
 
 class Status(Resource):
-# Get the status for all of the books in the books collection
+    # Get the status for all of the books in the books collection
     def get(self):
         # Query books with book name id and loan status
         return db_query()
-        
-class StatusID(Resource):            
+
+
+class StatusID(Resource):
     def get(self, book_id):
-        return status_query(), 200
+        return status_query(book_id), 200
+
+
 class Books(Resource):
-# Get the details of all of the books in the books collection
+    # Get the details of all of the books in the books collection
     def get(self):
         # Query with full info
         return db_full_query()
 
+
 class Loan (Resource):
-# Manipulate the loaning system for the books in the books collection
+    # Manipulate the loaning system for the books in the books collection
     def post(self):
         # Require these args for the POST request.
         parser = reqparse.RequestParser()
