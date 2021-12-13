@@ -14,19 +14,15 @@ Sakhi Hashmat ([Sakhi97](https://github.com/Sakhi97))
 - [Flask](https://flask.palletsprojects.com/en/2.0.x/)
 - [MongoDB](https://www.mongodb.com/)
 - [flask-restful](https://flask-restful.readthedocs.io/en/latest/)
-- Requests.txt
+- You can find required packets from Requirements.txt
+- Python 3.9
 
 ## Setup
-
-<b>Requirements</b>
-- Flask
-- Mongodp
-- Git clone
-- Requests.txt
+- pip install -r Requirements.txt
 
 ## Api endpoints:
 
-```python 
+```html 
 localhost:8000/api/
 ```
 
@@ -98,20 +94,24 @@ loaner | User which has loaned the book.
 rating_count | How many times people have rated the book.
 rating_score | Sum of all the ratings.
 
-For example: https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty
+For example: localhost:8000/api/status/7
 
 ```javascript
-{
-  "by" : "dhouston",
-  "descendants" : 71,
-  "id" : 8863,
-  "kids" : [ 8952, 9224, 8917, 8884, 8887, 8943, 8869, 8958, 9005, 9671, 8940, 9067, 8908, 9055, 8865, 8881, 8872, 8873, 8955, 10403, 8903, 8928, 9125, 8998, 8901, 8902, 8907, 8894, 8878, 8870, 8980, 8934, 8876 ],
-  "score" : 111,
-  "time" : 1175714200,
-  "title" : "My YC app: Dropbox - Throw away your USB drive",
-  "type" : "story",
-  "url" : "http://www.getdropbox.com/u/2/screencast.html"
-}
+    {
+        "Book ID": "7",
+        "Name": "Web security for developers",
+        "Writer": "Malcolm MCDonald",
+        "Year": "2020",
+        "ISBN": "978-1-59327-994-3",
+        "Rating": 4,
+        "About": "Networking & Cloud Computing",
+        "Tags": "tags",
+        "Description": "ksl",
+        "Loan Status": "False",
+        "Loaner": "None",
+        "Rating Count": "3",
+        "Rating Score": "11"
+    }
 ```
 
 ### Comments
@@ -124,19 +124,14 @@ comment | body of user message.
 comment_ID | The item's unique id.
 user_ID | The item's unique id.
 
-For example: https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty
+For example: localhost:8000/api/comments/7
 
 ```javascript
 {
-  "by" : "dhouston",
-  "descendants" : 71,
-  "id" : 8863,
-  "kids" : [ 8952, 9224, 8917, 8884, 8887, 8943, 8869, 8958, 9005, 9671, 8940, 9067, 8908, 9055, 8865, 8881, 8872, 8873, 8955, 10403, 8903, 8928, 9125, 8998, 8901, 8902, 8907, 8894, 8878, 8870, 8980, 8934, 8876 ],
-  "score" : 111,
-  "time" : 1175714200,
-  "title" : "My YC app: Dropbox - Throw away your USB drive",
-  "type" : "story",
-  "url" : "http://www.getdropbox.com/u/2/screencast.html"
+    "Book ID": "7",
+    "Comment": "I really love books",
+    "Comment ID": "1",
+    "User ID": "3000"
 }
 ```
 
@@ -147,20 +142,3 @@ Field | Description
 **id** | The item's unique id.
 user_ID | The item's unique id.
 user_name | The item's unique name.
-
-
-For example: https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty
-
-```javascript
-{
-  "by" : "dhouston",
-  "descendants" : 71,
-  "id" : 8863,
-  "kids" : [ 8952, 9224, 8917, 8884, 8887, 8943, 8869, 8958, 9005, 9671, 8940, 9067, 8908, 9055, 8865, 8881, 8872, 8873, 8955, 10403, 8903, 8928, 9125, 8998, 8901, 8902, 8907, 8894, 8878, 8870, 8980, 8934, 8876 ],
-  "score" : 111,
-  "time" : 1175714200,
-  "title" : "My YC app: Dropbox - Throw away your USB drive",
-  "type" : "story",
-  "url" : "http://www.getdropbox.com/u/2/screencast.html"
-}
-```
