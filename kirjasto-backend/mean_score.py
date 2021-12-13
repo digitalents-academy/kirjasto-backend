@@ -15,10 +15,12 @@ db = client['kirjasto-backend']
 collection = db['backendAPI']
 retrieved = list(collection.find({}, {'_id': False}))
 
-
 def get_rating_count():
-    retrieved = list(collection.find({}, {'_id': False}))
+    retrieved = list(collection.find({}, {'id_': False}))
 
+def get_rating_count_score(book_id):
+    retrieved = list(collection.find({'Book ID': book_id}, {'Rating': True, 'Rating Count': True,'Rating Score': True,'_id': False}))
+    return retrieved
 
 def add_rating_count_score():
     rated_counter = 0
@@ -35,14 +37,16 @@ def add_rating_count_score():
             has_rated = True
             new_book = collection.find_one_and_update(booknumbers,
                                                       {"$set": parse()})
-        elif args['book_id'] != booknumbers['Book ID']:
-            retrieved = list(collection.find({}, {'_id': False}))
 
     if has_rated is True:
+
         rated_counter += 1
         score_counter += int(args['rating'])
-        has_rate = False
+        get_rating_count_score(args['book_id'])
 
+        has_rate = False
+        print(get_rating_count_score("7"), rated_counter, score_counter)
+    retrieved = list(collection.find({}, {'_id': False}))
     return retrieved
 
 

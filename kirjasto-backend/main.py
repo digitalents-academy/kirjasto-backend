@@ -25,7 +25,7 @@ class Status(Resource):
 
 class StatusID(Resource):
     def get(self, book_id):
-        return status_query(), 200
+        return status_query(book_id), 200
 
 
 class Books(Resource):

@@ -24,7 +24,7 @@ def get_mean_ratings():
 
 def post_ratings():
     add_rating_count_score()
-    return retrieved, 200
+    return add_rating_count_score(), 200
 
 
 def post_mean_ratings():
