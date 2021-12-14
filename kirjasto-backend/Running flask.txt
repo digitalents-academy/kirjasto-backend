@@ -1,0 +1,11 @@
+Running flask
+
+Linux
+$ export FLASK_APP=app.py(sample)
+$ export FLASK_ENV=development
+$ flask run
+
+Windows
+$ set FLASK_APP=app.py(sample)
+$ set FLASK_ENV=development
+$ flask run
