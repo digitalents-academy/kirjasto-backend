@@ -57,15 +57,21 @@ localhost:8000/api/
     ```python 
     Posts one comment
     ```
+  - **/authentication/signup**
+    ```python 
+    Posts user data 
+    ```
+  - **/authentication/login**
+    ```python 
+    Posts user data 
+    ```
 <b>Delete</b>
   - **/comments/d/id**
     ```python 
-    Delete comment by comment id
+    Deletes comment by comment id
     ```
     
 <b>To do</b>
-- Authentication/Login/Userid + password
-- Authentication/Logout/Userid + password
 - Rating </br>
 -> Posts one rating
 
