@@ -26,7 +26,7 @@ class Status(Resource):
 
 class StatusID(Resource):
     def get(self, book_id):
-        return status_query(), 200
+        return status_query(book_id), 200
 
 
 class Books(Resource):
@@ -111,15 +111,24 @@ class AuthenticationLogin(Resource):
     def post(self):
         return routes.login()
 
-
+# works
 api.add_resource(Status, '/api/status')
+# works
 api.add_resource(StatusID, '/api/status/<book_id>')
+# works
 api.add_resource(Books, '/api/books')
+# not complete
 api.add_resource(Loan, '/api/loan')
+# works
 api.add_resource(Comments, '/api/comments')
+# works
 api.add_resource(CommentsID, '/api/comments/<book_id>')
+# not complete
+# post comment api path not made yet
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
+# not complete
 api.add_resource(Ratings, '/api/ratings')
+# dunno
 api.add_resource(AuthenticationSignup,
                  '/api/authentication/signup', methods=['POST'])
 api.add_resource(AuthenticationSignout, '/api/authentication/signout')

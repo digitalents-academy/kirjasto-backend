@@ -24,8 +24,8 @@ def status_query(book_id):
      '_id': False
     }))
     # Check if input is an int, otherwise throw an error
-    for booknumbers in retrievedID:    
-        if int(book_id):
+    for booknumber in retrievedID:
+        if booknumber["Book ID"] == book_id:
             return retrievedID
     else:
         return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400
