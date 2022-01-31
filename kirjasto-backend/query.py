@@ -17,6 +17,7 @@ def db_query():
         return retrievedStatus, 200 
 def db_full_query():
         retrievedFull = list(collection.find({}, {'_id' : False}))
+
         return retrievedFull, 200       
 
 def status_query(book_id):
@@ -24,8 +25,8 @@ def status_query(book_id):
      '_id': False
     }))
     # Check if input is an int, otherwise throw an error
-    for booknumber in retrievedID:
-        if booknumber["Book ID"] == book_id:
+    for booknumbers in retrievedID:    
+        if int(book_id):
             return retrievedID
     else:
         return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400

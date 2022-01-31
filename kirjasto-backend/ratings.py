@@ -1,4 +1,3 @@
-from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
 import db_secret
 from mean_score import add_rating_count_score
@@ -11,6 +10,7 @@ client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":"
 db = client['kirjasto-backend']
 collection = db['backendAPI']
 retrieved = list(collection.find({}, {'_id': False}))
+print(retrieved)
 
 
 def get_ratings():

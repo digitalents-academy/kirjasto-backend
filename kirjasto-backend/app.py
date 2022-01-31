@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 
 #Kirjasto Database
-client = MongoClient("mongodb+srv://"+ db_secret.secret_id +":"+ db_secret.secret_key +"@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key + "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = client['kirjasto-backend']
 collection = db['users']
 

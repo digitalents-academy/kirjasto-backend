@@ -1,0 +1,100 @@
+[
+    {
+        "_id": {
+            "$oid": "6183ce3a43e81d7918836ae3"
+        },
+        "Book ID": "6",
+        "Name": "Head First Java: 2nd Edition",
+        "Writer": "Kathy Sierra & Bert Bates",
+        "Year": "2005",
+        "ISBN": "978-0-59600-920-5",
+        "Rating": "0 out of 5 (0 ratings)",
+        "About": "Programming (Java)",
+        "Tags": "tags",
+        "Description": "ksl",
+        "Loan Status": "False",
+        "Loaner": ""
+    },
+    {
+        "_id": {
+            "$oid": "6183ce3a43e81d7918836ae1"
+        },
+        "Book ID": "4",
+        "Name": "CSS in depth",
+        "Writer": "Keith Grant",
+        "Year": "2018",
+        "ISBN": "978-1-61729-345-0",
+        "Rating": "0 out of 5 (0 ratings)",
+        "About": "Programming (CSS)",
+        "Tags": "tags",
+        "Description": "ksl",
+        "Loan Status": "False",
+        "Loaner": "None"
+    },
+    {
+        "_id": {
+            "$oid": "6183ce3a43e81d7918836add"
+        },
+        "Book ID": "7",
+        "Name": "Web security for developers",
+        "Writer": "Malcolm MCDonald",
+        "Year": "2020",
+        "ISBN": "978-1-59327-994-3",
+        "Rating": "4.7407407407407405 out of 5 (27 ratings)",
+        "About": "Networking & Cloud Computing",
+        "Tags": "tags",
+        "Description": "ksl",
+        "Loan Status": "False",
+        "Loaner": "None",
+        "Rating Count": "3",
+        "Rating Score": "11"
+    },
+    {
+        "_id": {
+            "$oid": "6183ce3a43e81d7918836ade"
+        },
+        "Book ID": "1",
+        "Name": "Eloquent Javascript",
+        "Writer": "Marjin Haverbeke",
+        "Year": "2011",
+        "ISBN": "978-1-59327-950-9",
+        "Rating": "0 out of 5 (0 ratings)",
+        "About": "Web Development & Design (Javascript)",
+        "Tags": "tags",
+        "Description": "ksl",
+        "Loan Status": "False",
+        "Loaner": "None"
+    },
+    {
+        "_id": {
+            "$oid": "6183ce3a43e81d7918836ae0"
+        },
+        "Book ID": "3",
+        "Name": "A smarter way to learn Javascript: The new approach that uses technology to cut your effort in half",
+        "Writer": "Mark Myers",
+        "Year": "2014",
+        "ISBN": "978-1-49740-818-0",
+        "Rating": "0 out of 5 (0 ratings)",
+        "About": "Computers % Technology (Javascript)",
+        "Tags": "tags",
+        "Description": "ksl",
+        "Loan Status": "False",
+        "Loaner": "None"
+    },
+    {
+        "_id": {
+            "$oid": "6183ce3a43e81d7918836ae2"
+        },
+        "Book ID": "5",
+        "Name": "Head First Design Patterns: Building Extensible and Maintainable Object-Oriented Software 2nd Edition",
+        "Writer": "Eric Freeman & Elizabeth Robson",
+        "Year": "2020",
+        "ISBN": "978-1-49207-800-5",
+        "Rating": "0 out of 5 (0 ratings)",
+        "About": "Programming",
+        "Tags": "tags",
+        "Description": "ksl",
+        "Loan Status": "False",
+        "Loaner": "None"
+    }
+]

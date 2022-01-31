@@ -13,13 +13,17 @@ class User:
         return user, 200
 
     def signup(self):
+
+        #If meanscore is needed then just add it here
         
         # Create the user object
         user = {
             "_id": uuid.uuid4().hex,
-            "name": request.form.get('name'),
+            "user_name": request.form.get('name'),
             "email": request.form.get('email'),
-            "password": request.form.get('password')
+            "password": request.form.get('password'),
+            #Changed to small letter
+            "mean_score": 0
         }
 
         # Encrypt the password

@@ -1,9 +1,8 @@
 from flask_restful import Resource, reqparse
 from pymongo.mongo_client import MongoClient
-import db_secret
+
 # Initiate connection to the comments db
-client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
-                     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://kirjastoAdmin:s3yS2zcXETkqCM@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = client['kirjasto-backend']
 collection = db['comments']
 

@@ -4,11 +4,13 @@ from pymongo import ALL, MongoClient
 from query import db_query, db_full_query, parse, status_query
 from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
 from ratings import get_ratings
+from rating_system import RatingSystem
 from user import routes
 import db_secret
 
 app = Flask(__name__)
 api = Api(app)
+rating_system = RatingSystem()
 
 # Initiate connection to mongoDB
 client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
@@ -26,7 +28,7 @@ class Status(Resource):
 
 class StatusID(Resource):
     def get(self, book_id):
-        return status_query(book_id), 200
+        return status_query(), 200
 
 
 class Books(Resource):
@@ -86,15 +88,32 @@ class CommentsDeleteByID(Resource):
         return delete_comments_by_id(comment_id),  {"Deleted comment!"}, 200
 
 
-class Ratings(Resource):
+class RatingBooks(Resource):
+
     def get(self):
-        return get_ratings()
+        rating_system.get_retrieved_book_collection()
 
     def post(self):
-        pass
+        rating_system.post_updated_book_collection()
 
-    def delete(self):
-        pass
+class RatingUsers(Resource):
+
+    def get(self):
+        rating_system.get_retrieved_user_collection()
+
+    def post(self):
+        rating_system.post_updated_user_collection()
+
+class Ratings(Resource):
+
+    def get(self):
+        rating_system.get_retrieved_rating_collection()
+
+    def post(self, rating_data):
+        rating_system.give_rating(rating_data)
+
+    def delete(self, user_id, book_id):
+        rating_system.delete_rating(user_id, book_id)
 
 
 class AuthenticationSignup(Resource):
@@ -111,24 +130,20 @@ class AuthenticationLogin(Resource):
     def post(self):
         return routes.login()
 
-# works
+
 api.add_resource(Status, '/api/status')
-# works
 api.add_resource(StatusID, '/api/status/<book_id>')
-# works
 api.add_resource(Books, '/api/books')
-# not complete
 api.add_resource(Loan, '/api/loan')
-# works
 api.add_resource(Comments, '/api/comments')
-# works
 api.add_resource(CommentsID, '/api/comments/<book_id>')
-# not complete
-# post comment api path not made yet
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
-# not complete
 api.add_resource(Ratings, '/api/ratings')
-# dunno
+
+api.add_resource(RatingBooks, '/api/ratings/books/')
+api.add_resource(RatingUsers, '/api/ratings/users/')
+api.add_resource(Ratings, '/api/ratings/')
+
 api.add_resource(AuthenticationSignup,
                  '/api/authentication/signup', methods=['POST'])
 api.add_resource(AuthenticationSignout, '/api/authentication/signout')

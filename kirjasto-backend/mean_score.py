@@ -45,7 +45,7 @@ def add_rating_count_score():
         score_counter += int(args['rating'])
         get_rating_count_score(args['book_id'])
         has_rated = False
-        print(rated_counter,score_counter)
+        print(rated_counter, score_counter)
     retrieved = list(collection.find({}, {'_id': False}))
     return retrieved
 
