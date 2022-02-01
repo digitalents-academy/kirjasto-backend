@@ -2,7 +2,12 @@ from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
 from query import db_query, db_full_query, parse, status_query
-from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
+from comments import (
+    delete_comments_by_id,
+    get_comments,
+    get_comments_by_book_id,
+    post_comments
+    )
 from rating_system import RatingSystem
 from user import routes
 import db_secret
@@ -12,8 +17,10 @@ api = Api(app)
 rating_system = RatingSystem()
 
 # Initiate connection to mongoDB
-client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
-                     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+client = MongoClient(
+    "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
+    "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+    )
 db = client['kirjasto-backend']
 collection = db['backendAPI']
 
@@ -49,7 +56,8 @@ class Loan (Resource):
         args = parser.parse_args()
         # Checking if the book name already exists.
         retrieved = list(collection.find({}, {'_id': False}))
-        # iterate through retrieved and find if POST value "book_id" is the same as database value Book ID.
+        # iterate through retrieved and find if POST value "book_id"
+        # is the same as database value Book ID.
         # if true -> update. else throw errors.
         for booknumbers in retrieved:
             if args['book_id'] in booknumbers['Book ID']:

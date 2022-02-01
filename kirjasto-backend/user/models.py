@@ -3,6 +3,7 @@ from passlib.hash import pbkdf2_sha256
 from app import collection
 import uuid
 
+
 class User:
 
     def start_session(self, user):
@@ -15,7 +16,7 @@ class User:
     def signup(self):
 
         #If meanscore is needed then just add it here
-        
+
         # Create the user object
         user = {
             "_id": uuid.uuid4().hex,
@@ -30,13 +31,13 @@ class User:
         user['password'] = pbkdf2_sha256.encrypt(user['password'])
 
         # Check for existing email address
-        if collection.find_one({ "email": user['email']}):
-            return { "error": "Email address already in use" }, 400
+        if collection.find_one({"email": user['email']}):
+            return {"error": "Email address already in use"}, 400
 
         if collection.insert_one(user):
             return self.start_session(user)
 
-        return { "error": "Signup failed"}, 400
+        return {"error": "Signup failed"}, 400
 
     def signout(self):
         session.clear()
@@ -48,7 +49,10 @@ class User:
             "email": request.form.get('email')
         })
 
-        if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
+        if user and pbkdf2_sha256.verify(
+            request.form.get('password'),
+            user['password']
+            ):
             return self.start_session(user)
 
-        return { "error": "Invalid login credentials" }, 401
+        return {"error": "Invalid login credentials"}, 401
