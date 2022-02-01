@@ -11,21 +11,21 @@ def db_query():
 
         # had to make id not show, because it threw a not json serializable error.
         retrievedStatus = list(collection.find({}, {
-            'Book ID' : True, 'Name' : True, 'Loan Status' : True, '_id': False 
+            'Book ID': True, 'Name': True, 'Loan Status': True, '_id': False
         }))
 
-        return retrievedStatus, 200 
+        return retrievedStatus, 200
 def db_full_query():
-        retrievedFull = list(collection.find({}, {'_id' : False}))
+        retrievedFull = list(collection.find({}, {'_id': False}))
 
-        return retrievedFull, 200       
+        return retrievedFull, 200
 
 def status_query(book_id):
-    retrievedID = list(collection.find({'Book ID' : book_id,}, {
+    retrievedID = list(collection.find({'Book ID': book_id}, {
      '_id': False
     }))
     # Check if input is an int, otherwise throw an error
-    for booknumbers in retrievedID:    
+    for booknumbers in retrievedID:
         if int(book_id):
             return retrievedID
     else:
@@ -34,18 +34,18 @@ def status_query(book_id):
 def parse():
 # Required values for the api requests. False would be optional
     parser = reqparse.RequestParser()
-    parser.add_argument('book_id', required = True)     
-#    parser.add_argument('name', required = True)
-#    parser.add_argument('writer', required = True)
-#    parser.add_argument('year', required = True)
-#    parser.add_argument('isbn', required = True)
-#    parser.add_argument('rating', required = True)
-#    parser.add_argument('about', required = True)
-#    parser.add_argument('tags', required = True)
-#    parser.add_argument('description', required = True)
-    parser.add_argument('loaner', required = True)
-    parser.add_argument('loan_status', required = True)
-    
+    parser.add_argument('book_id', required= True)
+#    parser.add_argument('name', required=True)
+#    parser.add_argument('writer', required=True)
+#    parser.add_argument('year', required=True)
+#    parser.add_argument('isbn', required=True)
+#    parser.add_argument('rating', required=True)
+#    parser.add_argument('about', required=True)
+#    parser.add_argument('tags', required=True)
+#    parser.add_argument('description', required=True)
+    parser.add_argument('loaner', required=True)
+    parser.add_argument('loan_status', required=True)
+
     args = parser.parse_args()
 
     values = {
@@ -59,7 +59,7 @@ def parse():
 #            'Tags' : args['tags'],            
 #            'Description' : args['description'],
             'Loaner' : args['loaner'],
-            'Loan Status' : args['loan_status']        
-        
+            'Loan Status' : args['loan_status']
+
             }
     return values

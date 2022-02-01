@@ -88,7 +88,7 @@ class CommentsDeleteByID(Resource):
         return delete_comments_by_id(comment_id),  {"Deleted comment!"}, 200
 
 
-class RatingBooks(Resource):
+class RatingsBooks(Resource):
 
     def get(self):
         rating_system.get_retrieved_book_collection()
@@ -96,13 +96,15 @@ class RatingBooks(Resource):
     def post(self):
         rating_system.post_updated_book_collection()
 
-class RatingUsers(Resource):
+
+class RatingsUsers(Resource):
 
     def get(self):
         rating_system.get_retrieved_user_collection()
 
     def post(self):
         rating_system.post_updated_user_collection()
+
 
 class Ratings(Resource):
 
@@ -131,19 +133,27 @@ class AuthenticationLogin(Resource):
         return routes.login()
 
 
+# works
 api.add_resource(Status, '/api/status')
+# works
 api.add_resource(StatusID, '/api/status/<book_id>')
+# works
 api.add_resource(Books, '/api/books')
+# not complete
 api.add_resource(Loan, '/api/loan')
+# works
 api.add_resource(Comments, '/api/comments')
+# works
 api.add_resource(CommentsID, '/api/comments/<book_id>')
+# post comment api path not made yet
+# not complete
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
-api.add_resource(Ratings, '/api/ratings')
-
-api.add_resource(RatingBooks, '/api/ratings/books/')
-api.add_resource(RatingUsers, '/api/ratings/users/')
+#Needs to be checked out
+#api.add_resource(Ratings, '/api/ratings')
+#dunno
+api.add_resource(RatingsBooks, '/api/ratings/books/')
+api.add_resource(RatingsUsers, '/api/ratings/users/')
 api.add_resource(Ratings, '/api/ratings/')
-
 api.add_resource(AuthenticationSignup,
                  '/api/authentication/signup', methods=['POST'])
 api.add_resource(AuthenticationSignout, '/api/authentication/signout')

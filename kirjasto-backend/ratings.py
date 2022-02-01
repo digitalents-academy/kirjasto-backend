@@ -4,9 +4,12 @@ from mean_score import add_rating_count_score
 
 
 # Initiate connection to mongoDB
-client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":"
-                     + db_secret.secret_key +
-                     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+client = MongoClient(
+    "mongodb+srv://" + db_secret.secret_id + ":"
+    + db_secret.secret_key +
+    "@cluster0.6se1s.mongodb.net/myFirstDatabase?" +
+    "retryWrites=true&w=majority"
+    )
 db = client['kirjasto-backend']
 collection = db['backendAPI']
 retrieved = list(collection.find({}, {'_id': False}))

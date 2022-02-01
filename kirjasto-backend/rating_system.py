@@ -3,11 +3,12 @@
 from pymongo.mongo_client import MongoClient
 import db_secret
 
-client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":"
-                     + db_secret.secret_key +
-                     "@cluster0.6se1s.mongodb.net/myFirstDatabase?" +
-                     "retryWrites=true&w=majority"
-                     )
+client = MongoClient(
+    "mongodb+srv://" + db_secret.secret_id + ":"
+    + db_secret.secret_key +
+    "@cluster0.6se1s.mongodb.net/myFirstDatabase?" +
+    "retryWrites=true&w=majority"
+    )
 db = client['kirjasto-backend']
 book_collection = db['backendAPI']
 user_collection = db['users']
@@ -33,21 +34,24 @@ class RatingSystem:
         Function that returns a dictionary called self.books
         that contains retrieved book collection.
         """
-        return self.books
+
+        return self.books, 200
 
     def get_retrieved_user_collection(self):
         """
         Function that returns a dictionary called self.users
         that contains retrieved user collection.
         """
-        return self.users
+
+        return self.users, 200
 
     def get_retrieved_rating_collection(self):
         """
         Function that returns a dictionary called self.user_ratings
         that contains retrieved rating collection.
         """
-        return self.user_ratings
+
+        return self.user_ratings, 200
 
     def has_the_user_already_rated_this_book(self, user_id, book_id):
         """Function that checks whether a user has already rated the book."""
@@ -57,6 +61,13 @@ class RatingSystem:
                 return True
         return False
 
+    #Everytime a rating is replaced also the ObjectID is replaced
+    #Maybe not a problem but good to know
+    #Therefore when the rating is added to the dictionary
+    #it doesn't have ObjectID so the question is:
+    #should the rating be stored in the dictionary from database?
+
+    #What is replace post??
     def replace_user_rating(self, new_rating):
         """Function that replaces old rating with a new one."""
 
@@ -69,7 +80,7 @@ class RatingSystem:
     def give_rating(self, user_id: int, book_id: int, rating: int):
         """
         Function that saves user's rating,
-        oid, user id, rated book's id and rating
+        user id, rated book's id and rating
         to a list called self.user_ratings.
         """
 
@@ -97,7 +108,8 @@ class RatingSystem:
                 rating_collection.remove(rating)
                 self.user_ratings.remove(rating)
 
-        #Needs to be updated some other way since now Object_id will be added aswell
+        #Needs to be updated some other way
+        #since now Object_id will be added aswell
         #self.update_books_dictionary_ratings()
         #self.update_users_dictionary_rating()
 
