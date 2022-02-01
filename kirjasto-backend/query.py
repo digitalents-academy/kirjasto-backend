@@ -30,6 +30,47 @@ def status_query(book_id):
             return retrievedID
     else:
         return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400
+
+
+def add_new_book(book_id, name, writer, year, isbn, rating, about, tags, description, loaner, loan_status):
+
+    collection.insert_one({
+        "Book_ID": book_id,
+        "Name": name,
+        "Writer": writer,
+        "Year": year,
+        "ISBN": isbn,
+        "Rating": rating,
+        "About": about,
+        "Tags": tags,
+        "Description": description,
+        "Loaner": loaner,
+        "Loan_Status": loan_status
+
+    })
+
+
+def update_book(book_id, name, writer, year, isbn, rating, about, tags, description, loaner, loan_status):
+    collection.update({'Book_ID':book_id},
+    {"$set":
+        {
+        "Name":name,
+        "Writer": writer,
+        "Year": year,
+        "ISBN": isbn,
+        "Rating": rating,
+        "About": about,
+        "Tags": tags,
+        "Description": description,
+        "Loaner": loaner,
+        "Loan_Status": loan_status
+        }
+    }
+    )
+
+
+def delete_book(book_id):
+    collection.delete_one({"Book_ID": book_id})
         
 def parse():
 # Required values for the api requests. False would be optional
