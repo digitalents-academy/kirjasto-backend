@@ -1,8 +1,13 @@
-from flask_restful import Resource, reqparse
+from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
+import db_secret
 
-# Initiate connection to the comments db
-client = MongoClient("mongodb+srv://kirjastoAdmin:s3yS2zcXETkqCM@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+client = MongoClient(
+    "mongodb+srv://" + db_secret.secret_id + ":"
+    + db_secret.secret_key +
+    "@cluster0.6se1s.mongodb.net/myFirstDatabase?" +
+    "retryWrites=true&w=majority"
+    )
 db = client['kirjasto-backend']
 collection = db['comments']
 
@@ -14,56 +19,59 @@ def get_comments():
 
 def get_comments_by_book_id(book_id):
 
-    retrievedID = list(collection.find({'Book ID': book_id}, {
-     '_id': False
-    }))
+    retrievedID = list(
+        collection.find({'Book_ID': book_id}, {'_id': False})
+        )
+
     # Check if input is an int, otherwise throw an error
-    for booknumbers in retrievedID:
-        if int(book_id):
-            return retrievedID
-    else:
-        return 'error: Not a valid BookID! Book ID must be an int and the book must exist!', 400
+    if book_id.is_integer():
+        return retrievedID, 200
+    return (
+        'error: Not a valid BookID!' +
+        'Book ID must be an int and the book must exist!',
+        400
+        )
 
 
-def post_comments():
-    # Require these args for the POST request.
-    parser = reqparse.RequestParser()
-    parser.add_argument('comment_id', required=True)
-    parser.add_argument('comment', required=True)
-    parser.add_argument('book_id', required=True)
-    parser.add_argument('user_id', required=True)
+def post_comments(user_id, comment, book_id, comment_id):
 
-    args = parser.parse_args()
-
-    new_book = collection.insert_one({
-        'User ID': args['user_id'],
-        'Comment': args['comment'],
-        'Book ID': args['book_id'],
-        'Comment ID': args['comment_id']
+    collection.insert_one({
+        'User_ID': user_id,
+        'Comment': comment,
+        'Book_ID': book_id,
+        'Comment_ID': comment_id
     })
+    #Needed?
     retrieved = list(collection.find({}, {'_id': False}))
     return retrieved, 200
 
 
 def delete_comments_by_id(comment_id):
-# Require these args for the DELETE request.
+    """Function that deletes comment by comment id."""
 
-    parser = reqparse.RequestParser()
-    parser.add_argument('comment_id', required=False)
-    parser.add_argument('comment', required=False)
-    parser.add_argument('book_id', required=False)
-    parser.add_argument('user_id', required=False)
+    if comment_id.is_integer():
+        parser = reqparse.RequestParser()
+        parser.add_argument('comment_id', required=False)
+        parser.add_argument('comment', required=False)
+        parser.add_argument('book_id', required=False)
+        parser.add_argument('user_id', required=False)
 
-    args = parser.parse_args()
-    retrievedID = list(collection.find({'Comment ID': comment_id}, {'_id': False}))
+        args = parser.parse_args()
+        retrievedID = list(
+            collection.find(
+                {'Comment_ID': comment_id},
+                {'_id': False}
+                )
+            )
 
-    for commentnumbers in retrievedID:
-        print(commentnumbers)
-        if int(comment_id):
-            removeBook = collection.find_one_and_delete({
-               'User ID': args['user_id'],
-               'Comment': args['comment'],
-               'Book ID': args['book_id'],
-               'Comment ID': args['comment_id']
-
-           })
+        for data in retrievedID:
+            if data["Comment_ID"] == comment_id:
+                collection.find_one_and_delete(
+                    {"Comment_ID": comment_id},
+                    {
+                        'User_ID': args['user_id'],
+                        'Comment': args['comment'],
+                        'Book_ID': args['book_id'],
+                        'Comment_ID': args['comment_id']
+                        }
+                        )

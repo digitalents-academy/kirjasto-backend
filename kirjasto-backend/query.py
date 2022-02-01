@@ -28,19 +28,23 @@ def db_full_query():
 
 
 def status_query(book_id):
-    retrievedID = list(collection.find({'Book ID': book_id}, {
-     '_id': False
-    }))
-    # Check if input is an int, otherwise throw an error
-    for booknumbers in retrievedID:
-        if int(book_id):
-            return retrievedID
-    else:
-        return (
-            'error: Not a valid BookID!' +
-            'Book ID must be an int and the book must exist!',
-            400
-            )
+    
+    correct_book_id = True
+    numbers = "0123456789"
+
+    for letter in book_id:
+        if letter not in numbers:
+            correct_book_id = False
+    if correct_book_id == True:
+        retrievedID = list(collection.find({'Book_ID': int(book_id)}, {
+        '_id': False
+        }))
+        return retrievedID
+    return (
+        'error: Not a valid BookID!' +
+        'Book ID must be an int and the book must exist!',
+        400
+        )
 
 
 def parse():
@@ -61,7 +65,7 @@ def parse():
     args = parser.parse_args()
 
     values = {
-            'Book ID': args['book_id'],
+            'Book_ID': args['book_id'],
 #            'Name': args['name'],
 #            'Writer': args['writer'],
 #            'Year': args['year'],
@@ -71,7 +75,7 @@ def parse():
 #            'Tags': args['tags'],
 #            'Description': args['description'],
             'Loaner': args['loaner'],
-            'Loan Status': args['loan_status']
+            'Loan_Status': args['loan_status']
 
             }
     return values
