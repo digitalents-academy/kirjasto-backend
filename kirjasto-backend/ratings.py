@@ -13,7 +13,7 @@ client = MongoClient(
 db = client['kirjasto-backend']
 collection = db['backendAPI']
 retrieved = list(collection.find({}, {'_id': False}))
-print(retrieved)
+
 
 
 def get_ratings():

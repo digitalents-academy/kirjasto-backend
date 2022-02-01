@@ -28,7 +28,7 @@ def db_full_query():
 
 
 def status_query(book_id):
-    
+
     correct_book_id = True
     numbers = "0123456789"
 
@@ -36,9 +36,10 @@ def status_query(book_id):
         if letter not in numbers:
             correct_book_id = False
     if correct_book_id == True:
-        retrievedID = list(collection.find({'Book_ID': int(book_id)}, {
-        '_id': False
-        }))
+        retrievedID = list(
+            collection.find({'Book_ID': int(book_id)},
+            {'_id': False})
+            )
         return retrievedID
     return (
         'error: Not a valid BookID!' +
@@ -46,7 +47,46 @@ def status_query(book_id):
         400
         )
 
+def add_new_book(book_id, name, writer, year, isbn, rating, about, tags, description, loaner, loan_status):
 
+    collection.insert_one({
+        "Book_ID": book_id,
+        "Name": name,
+        "Writer": writer,
+        "Year": year,
+        "ISBN": isbn,
+        "Rating": rating,
+        "About": about,
+        "Tags": tags,
+        "Description": description,
+        "Loaner": loaner,
+        "Loan_Status": loan_status
+
+    })
+
+
+def update_book(book_id, name, writer, year, isbn, rating, about, tags, description, loaner, loan_status):
+    collection.update({'Book_ID': book_id},
+    {"$set":
+        {
+        "Name": name,
+        "Writer": writer,
+        "Year": year,
+        "ISBN": isbn,
+        "Rating": rating,
+        "About": about,
+        "Tags": tags,
+        "Description": description,
+        "Loaner": loaner,
+        "Loan_Status": loan_status
+        }
+    }
+    )
+
+
+def delete_book(book_id):
+    collection.delete_one({"Book_ID": book_id})
+        
 def parse():
 # Required values for the api requests. False would be optional
     parser = reqparse.RequestParser()

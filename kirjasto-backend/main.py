@@ -1,13 +1,20 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
-from query import db_query, db_full_query, parse, status_query
+from query import (
+    db_query,
+    db_full_query,
+    parse,
+    status_query,
+    add_new_book
+    )
 from comments import (
     delete_comments_by_id,
     get_comments,
     get_comments_by_book_id,
     post_comments
     )
+from ratings import get_ratings
 from rating_system import RatingSystem
 from user import routes
 import db_secret
@@ -31,7 +38,10 @@ class Status(Resource):
         # Query books with book name id and loan status
         return db_query()
 
-#Not working
+    def post(self, book_id, name, writer, year, isbn, rating, about, tags, description, loaner, loan_status):
+        add_new_book(book_id, name, writer, year, isbn, rating, about, tags, description, loaner, loan_status)
+
+
 class StatusID(Resource):
     def get(self, book_id):
         return status_query(book_id), 200
@@ -158,6 +168,10 @@ api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
 #dunno
 api.add_resource(RatingsBooks, '/api/ratings/books/')
 api.add_resource(RatingsUsers, '/api/ratings/users/')
+#Needs to be checked out
+#api.add_resource(Ratings, '/api/ratings')
+
+
 api.add_resource(Ratings, '/api/ratings/')
 api.add_resource(AuthenticationSignup,
                  '/api/authentication/signup', methods=['POST'])
