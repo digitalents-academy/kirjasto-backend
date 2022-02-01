@@ -148,11 +148,18 @@ api.add_resource(CommentsID, '/api/comments/<book_id>')
 # post comment api path not made yet
 # not complete
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
+<<<<<<< HEAD
 #Needs to be checked out
 #api.add_resource(Ratings, '/api/ratings')
 #dunno
 api.add_resource(RatingsBooks, '/api/ratings/books/')
 api.add_resource(RatingsUsers, '/api/ratings/users/')
+=======
+#api.add_resource(Ratings, '/api/ratings')
+
+api.add_resource(RatingBooks, '/api/ratings/books/')
+api.add_resource(RatingUsers, '/api/ratings/users/')
+>>>>>>> b36e15e5cfe8f68b0f98b13a7b6e87bec9c9a244
 api.add_resource(Ratings, '/api/ratings/')
 api.add_resource(AuthenticationSignup,
                  '/api/authentication/signup', methods=['POST'])

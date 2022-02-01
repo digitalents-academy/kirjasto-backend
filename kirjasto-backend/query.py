@@ -11,7 +11,7 @@ def db_query():
 
         # had to make id not show, because it threw a not json serializable error.
         retrievedStatus = list(collection.find({}, {
-            'Book ID': True, 'Name': True, 'Loan Status': True, '_id': False
+             '_id': False 
         }))
 
         return retrievedStatus, 200
