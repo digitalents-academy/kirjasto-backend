@@ -138,7 +138,7 @@ api.add_resource(Loan, '/api/loan')
 api.add_resource(Comments, '/api/comments')
 api.add_resource(CommentsID, '/api/comments/<book_id>')
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
-api.add_resource(Ratings, '/api/ratings')
+#api.add_resource(Ratings, '/api/ratings')
 
 api.add_resource(RatingBooks, '/api/ratings/books/')
 api.add_resource(RatingUsers, '/api/ratings/users/')
