@@ -2,8 +2,19 @@ from urllib import response
 from flask import Flask, Response, render_template
 from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
-from query import db_query, db_full_query, parse, status_query, add_new_book
-from comments import delete_comments_by_id, get_comments, get_comments_by_book_id, post_comments
+from query import (
+    db_query,
+    db_full_query,
+    parse,
+    status_query,
+    add_new_book
+    )
+from comments import (
+    delete_comments_by_id,
+    get_comments,
+    get_comments_by_book_id,
+    post_comments
+    )
 from ratings import get_ratings
 from rating_system import RatingSystem
 from user import routes
@@ -15,8 +26,10 @@ api = Api(app)
 rating_system = RatingSystem()
 
 # Initiate connection to mongoDB
-client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
-                     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+client = MongoClient(
+    "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
+    "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+    )
 db = client['kirjasto-backend']
 collection = db['backendAPI']
 
@@ -33,7 +46,7 @@ class Status(Resource):
 
 class StatusID(Resource):
     def get(self, book_id):
-        return status_query(), 200
+        return status_query(book_id), 200
 
 
 class Books(Resource):
@@ -55,7 +68,8 @@ class Loan (Resource):
         args = parser.parse_args()
         # Checking if the book name already exists.
         retrieved = list(collection.find({}, {'_id': False}))
-        # iterate through retrieved and find if POST value "book_id" is the same as database value Book ID.
+        # iterate through retrieved and find if POST value "book_id"
+        # is the same as database value Book ID.
         # if true -> update. else throw errors.
         for booknumbers in retrieved:
             if args['book_id'] in booknumbers['Book ID']:
@@ -116,8 +130,8 @@ class Ratings(Resource):
     def get(self):
         rating_system.get_retrieved_rating_collection()
 
-    def post(self, rating_data):
-        rating_system.give_rating(rating_data)
+    def post(self, user_id: int, book_id: int, rating: int):
+        rating_system.give_rating(user_id, book_id, rating)
 
     def delete(self, user_id, book_id):
         rating_system.delete_rating(user_id, book_id)
@@ -151,7 +165,7 @@ api.add_resource(HomePage, '/')
 api.add_resource(Status, '/api/status')
 # works
 api.add_resource(StatusID, '/api/status/<book_id>')
-# works
+# works # works but same as /api/status/
 api.add_resource(Books, '/api/books')
 # not complete
 api.add_resource(Loan, '/api/loan')
@@ -162,11 +176,10 @@ api.add_resource(CommentsID, '/api/comments/<book_id>')
 # post comment api path not made yet
 # not complete
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
-#Needs to be checked out
-#api.add_resource(Ratings, '/api/ratings')
 #dunno
 api.add_resource(RatingsBooks, '/api/ratings/books/')
 api.add_resource(RatingsUsers, '/api/ratings/users/')
+#Needs to be checked out
 #api.add_resource(Ratings, '/api/ratings')
 
 

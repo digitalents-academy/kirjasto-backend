@@ -8,9 +8,10 @@ from pymongo import MongoClient
 import db_secret
 from flask_restful import reqparse
 
-client = MongoClient("mongodb+srv://" + db_secret.secret_id + ":"
-                     + db_secret.secret_key +
-                     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+client = MongoClient(
+    "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
+    "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+    )
 db = client['kirjasto-backend']
 collection = db['backendAPI']
 retrieved = list(collection.find({}, {'_id': False}))
@@ -21,7 +22,17 @@ def get_rating_count():
 
 
 def get_rating_count_score(book_id):
-    retrieved = list(collection.find({'Book ID': book_id}, {'Rating': True, 'Rating Count': True, 'Rating Score': True, '_id': False}))
+    retrieved = list(
+        collection.find(
+            {'Book ID': book_id},
+            {
+                'Rating': True,
+                'Rating Count': True,
+                'Rating Score': True,
+                '_id': False
+                }
+            )
+        )
     return retrieved
 
 
