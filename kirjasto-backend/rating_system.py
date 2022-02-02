@@ -35,7 +35,25 @@ class RatingSystem:
         that contains retrieved book collection.
         """
 
-        return self.books, 200
+        return self.books
+
+    def get_retrieved_book_by_id(self, book_id):
+        correct_book_id = True
+        numbers = "0123456789"
+
+        for letter in book_id:
+            if letter not in numbers:
+                correct_book_id = False
+        if correct_book_id:
+            retrieved_ID = list(
+                book_collection.find({'Book_ID': int(book_id)}, {'_id': False})
+                )
+            return retrieved_ID
+        return (
+            'error: Not a valid Book ID! ' +
+            'Book ID must be an int and the book must exist!',
+            400
+            )
 
     def get_retrieved_user_collection(self):
         """
@@ -43,7 +61,19 @@ class RatingSystem:
         that contains retrieved user collection.
         """
 
-        return self.users, 200
+        return self.users
+
+    def get_retrieved_user_by_id(self, user_name):
+        retrieved_ID = list(
+            user_collection.find({'user_name': user_name}, {'_id': False})
+            )
+        if len(retrieved_ID) > 0:
+            return retrieved_ID
+        return (
+            'error: Not a valid User ID! ' +
+            'User ID must be an int and the user must exist!',
+            400
+            )
 
     def get_retrieved_rating_collection(self):
         """
@@ -51,7 +81,45 @@ class RatingSystem:
         that contains retrieved rating collection.
         """
 
-        return self.user_ratings, 200
+        return self.user_ratings
+
+    def get_retrieved_ratings_by_username(self, user_name):
+        retrieved_ID = list(
+            user_collection.find(
+                {'User_ID': user_name}, {'_id': False}
+                )
+            )
+        if len(retrieved_ID) > 0:
+            return retrieved_ID
+        return (
+            'error: Not a valid Username! ' +
+            'Username must exist!',
+            400
+            )
+
+    def get_retrieved_rating_by_id(self, user_name, book_id):
+        correct_id = True
+        numbers = "0123456789"
+
+        for letter in book_id:
+            if letter not in numbers:
+                correct_id = False
+        if correct_id:
+            retrieved_ID = list(
+                user_collection.find(
+                    {
+                        'User_ID': user_name,
+                        'Book_ID': int(book_id)
+                        }, {'_id': False}
+                    )
+                )
+            return retrieved_ID
+        return (
+            'error: Not a valid User or Book ID! ' +
+            'Username must exist and Book ID must be an int. ' +
+            'Also the rating must exist!',
+            400
+            )
 
     def has_the_user_already_rated_this_book(self, user_id, book_id):
         """Function that checks whether a user has already rated the book."""
@@ -61,13 +129,12 @@ class RatingSystem:
                 return True
         return False
 
-    #Everytime a rating is replaced also the ObjectID is replaced
-    #Maybe not a problem but good to know
-    #Therefore when the rating is added to the dictionary
-    #it doesn't have ObjectID so the question is:
-    #should the rating be stored in the dictionary from database?
+    # Everytime a rating is replaced also the ObjectID is replaced
+    # Maybe not a problem but good to know
+    # Therefore when the rating is added to the dictionary
+    # it doesn't have ObjectID so the question is:
+    # should the rating be stored in the dictionary from database?
 
-    #What is replace post??
     def replace_user_rating(self, new_rating):
         """Function that replaces old rating with a new one."""
 
@@ -108,10 +175,10 @@ class RatingSystem:
                 rating_collection.remove(rating)
                 self.user_ratings.remove(rating)
 
-        #Needs to be updated some other way
-        #since now Object_id will be added aswell
-        #self.update_books_dictionary_ratings()
-        #self.update_users_dictionary_rating()
+        # Needs to be updated some other way
+        # since now Object_id will be added aswell
+        # self.update_books_dictionary_ratings()
+        # self.update_users_dictionary_rating()
 
     def get_books_rating_data(self, book_id):
         """
@@ -258,7 +325,7 @@ if __name__ == "__main__":
     rating_system.post_updated_book_collection()
     rating_system.post_updated_user_collection()
 
-    #ObjectID is added after the new addition
-    #rating_system.delete_rating(1, 1)
+    # ObjectID is added after the new addition
+    # rating_system.delete_rating(1, 1)
 
     print(rating_system.get_retrieved_rating_collection())

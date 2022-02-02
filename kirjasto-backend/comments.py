@@ -19,21 +19,25 @@ def get_comments():
 
 def get_comments_by_book_id(book_id):
 
-    retrievedID = list(
-        collection.find({'Book_ID': book_id}, {'_id': False})
-        )
+    correct_book_id = True
+    numbers = "0123456789"
 
-    # Check if input is an int, otherwise throw an error
-    if book_id.is_integer():
-        return retrievedID, 200
+    for letter in book_id:
+        if letter not in numbers:
+            correct_book_id = False
+    if correct_book_id:
+        retrieved_ID = list(
+            collection.find({'Book_ID': book_id}, {'_id': False})
+            )
+        return retrieved_ID, 200
     return (
-        'error: Not a valid BookID!' +
+        'error: Not a valid Book ID !' +
         'Book ID must be an int and the book must exist!',
         400
         )
 
 
-def post_comments(user_id, comment, book_id, comment_id):
+def post_comment(user_id, comment, book_id, comment_id):
 
     collection.insert_one({
         'User_ID': user_id,
@@ -41,15 +45,18 @@ def post_comments(user_id, comment, book_id, comment_id):
         'Book_ID': book_id,
         'Comment_ID': comment_id
     })
-    #Needed?
-    retrieved = list(collection.find({}, {'_id': False}))
-    return retrieved, 200
 
 
 def delete_comments_by_id(comment_id):
     """Function that deletes comment by comment id."""
 
-    if comment_id.is_integer():
+    correct_book_id = True
+    numbers = "0123456789"
+
+    for letter in comment_id:
+        if letter not in numbers:
+            correct_book_id = False
+    if correct_book_id:
         parser = reqparse.RequestParser()
         parser.add_argument('comment_id', required=False)
         parser.add_argument('comment', required=False)
@@ -57,14 +64,14 @@ def delete_comments_by_id(comment_id):
         parser.add_argument('user_id', required=False)
 
         args = parser.parse_args()
-        retrievedID = list(
+        retrieved_ID = list(
             collection.find(
                 {'Comment_ID': comment_id},
                 {'_id': False}
                 )
             )
 
-        for data in retrievedID:
+        for data in retrieved_ID:
             if data["Comment_ID"] == comment_id:
                 collection.find_one_and_delete(
                     {"Comment_ID": comment_id},

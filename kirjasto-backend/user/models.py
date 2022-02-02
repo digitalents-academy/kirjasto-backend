@@ -1,7 +1,8 @@
-from flask import Flask, jsonify, request, session, redirect
+# from flask import Flask, jsonify
+import uuid
+from flask import request, session, redirect
 from passlib.hash import pbkdf2_sha256
 from app import collection
-import uuid
 
 
 class User:
@@ -10,12 +11,10 @@ class User:
         del user['password']
         session['logged_in'] = True
         session['user'] = user
-        #return jsonify(user), 200
+        # return jsonify(user), 200
         return user, 200
 
     def signup(self):
-
-        #If meanscore is needed then just add it here
 
         # Create the user object
         user = {
@@ -23,7 +22,6 @@ class User:
             "user_name": request.form.get('name'),
             "email": request.form.get('email'),
             "password": request.form.get('password'),
-            #Changed to small letter
             "mean_score": 0
         }
 
@@ -50,9 +48,8 @@ class User:
         })
 
         if user and pbkdf2_sha256.verify(
-            request.form.get('password'),
-            user['password']
-            ):
+                request.form.get('password'),
+                user['password']):
             return self.start_session(user)
 
         return {"error": "Invalid login credentials"}, 401
