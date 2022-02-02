@@ -1,14 +1,15 @@
 from flask import Flask, Response, render_template
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, Api
+#from flask_restful import reqparse
 #from pymongo import ALL
 from pymongo import MongoClient
 from query import (
     db_query,
-    parse,
     status_query,
     add_new_book,
     delete_book_by_id,
-    update_book
+    update_book,
+    loan_book_by_id
     )
 from comments import (
     delete_comments_by_id,
@@ -70,35 +71,10 @@ class StatusID(Resource):
         return status_query(book_id), 200
 
 
-class Loan (Resource):
-    # Manipulate the loaning system for the books in the books collection
-    def post(self):
-        # Require these args for the POST request.
-        parser = reqparse.RequestParser()
-        parser.add_argument('book_id', required=True)
-        parser.add_argument('loaner', required=True)
-        parser.add_argument('loan_status', required=True)
+class StatusLoan (Resource):
 
-        args = parser.parse_args()
-        # Checking if the book name already exists.
-        retrieved = list(collection.find({}, {'_id': False}))
-        # iterate through retrieved and find if POST value "book_id"
-        # is the same as database value Book ID.
-        # if true -> update. else throw errors.
-        for booknumbers in retrieved:
-            if args['book_id'] in booknumbers['Book ID']:
-                new_book = collection.find_one_and_update(
-                    booknumbers, {"$set": parse()})
-            elif args['book_id'] != booknumbers['Book ID']:
-                return {'message': f"'{args['book_id']}' doesnt exist."
-                        }, 401
-            else:
-                return {
-                    'message': f" Unknown error."
-                }, 401
-
-        retrieved = list(collection.find({}, {'_id': False}))
-        return retrieved, 200
+    def post(self, book_id):
+        return loan_book_by_id(book_id), 200
 
 
 class CommentsGet(Resource):
@@ -211,26 +187,38 @@ class HomePage(Resource):
     def get(self):
         return Response(response=render_template("index.html"))
 
+
 # works
 api.add_resource(HomePage, '/')
-# works 
+# works
 api.add_resource(StatusGetBooks, '/api/status')
 # not complete
-api.add_resource(StatusAddNewBook, '/api/status/add/<book_id>/<name>/<writer>/<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/<loan_status>')
+api.add_resource(
+    StatusAddNewBook,
+    '/api/status/add/<book_id>/<name>/<writer>/<year>/<isbn>/<rating>/' +
+    '<about>/<tags>/<description>/<loaner>/<loan_status>'
+    )
 # not complete
-api.add_resource(StatusUpdateBook, '/api/status/update/<book_id>/<name>/<writer>/<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/<loan_status>')
+api.add_resource(
+    StatusUpdateBook, '/api/status/update/<book_id>/<name>/<writer>/' +
+    '<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/' +
+    '<loan_status>'
+    )
 # not complete
 api.add_resource(StatusDeleteBookByID, '/api/status/d/<book_id>/')
 # works
 api.add_resource(StatusID, '/api/status/<book_id>')
 # not complete
-api.add_resource(Loan, '/api/loan')
+api.add_resource(StatusLoan, '/api/loan/<book_id>')
 # works
 api.add_resource(CommentsGet, '/api/comments/get')
 # works
 api.add_resource(CommentsGetByID, '/api/comments/get/<book_id>')
 # not complete
-api.add_resource(CommentsPost, '/api/comments/<user_id>/<comment>/<book_id>/<comment_id>')
+api.add_resource(
+    CommentsPost,
+    '/api/comments/<user_id>/<comment>/<book_id>/<comment_id>'
+    )
 # not complete
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
 # dunno

@@ -91,6 +91,29 @@ def delete_book_by_id(book_id):
     collection.delete_one({"Book_ID": book_id})
 
 
+def loan_book_by_id(book_id):
+
+    correct_book_id = True
+    numbers = "0123456789"
+
+    for letter in book_id:
+        if letter not in numbers:
+            correct_book_id = False
+    if correct_book_id:
+        retrieved = list(collection.find({'Book_ID': book_id}, {'_id': False}))
+    for data in retrieved:
+        if data['Book_ID'] == book_id:
+            return collection.find_one_and_update(
+                data, {"$set": parse()})
+        elif data['Book_ID'] != book_id:
+            return {'message': f"{book_id} doesn't exist."
+                    }, 401
+        else:
+            return {
+                'message': " Unknown error."
+            }, 401
+
+
 def parse():
     # Required values for the api requests. False would be optional
     parser = reqparse.RequestParser()
