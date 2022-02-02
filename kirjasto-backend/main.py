@@ -1,14 +1,14 @@
-from urllib import response
 from flask import Flask, Response, render_template
 from flask_restful import Resource, Api, reqparse
 #from pymongo import ALL
 from pymongo import MongoClient
 from query import (
     db_query,
-    db_full_query,
     parse,
     status_query,
-    add_new_book
+    add_new_book,
+    delete_book_by_id,
+    update_book
     )
 from comments import (
     delete_comments_by_id,
@@ -33,12 +33,14 @@ db = client['kirjasto-backend']
 collection = db['backendAPI']
 
 
-class Status(Resource):
+class StatusGetBooks(Resource):
     # Get the status for all of the books in the books collection
     def get(self):
         # Query books with book name id and loan status
         return db_query()
 
+
+class StatusAddNewBook(Resource):
     def post(
             self, book_id, name, writer, year, isbn, rating, about, tags,
             description, loaner, loan_status):
@@ -48,16 +50,24 @@ class Status(Resource):
             )
 
 
+class StatusUpdateBook(Resource):
+    def post(
+            self, book_id, name, writer, year, isbn, rating, about, tags,
+            description, loaner, loan_status):
+        update_book(
+            book_id, name, writer, year, isbn, rating, about, tags,
+            description, loaner, loan_status
+            )
+
+
+class StatusDeleteBookByID(Resource):
+    def delete(self, book_id):
+        return delete_book_by_id(book_id),  {"Deleted comment!"}, 200
+
+
 class StatusID(Resource):
     def get(self, book_id):
         return status_query(book_id), 200
-
-
-class Books(Resource):
-    # Get the details of all of the books in the books collection
-    def get(self):
-        # Query with full info
-        return db_full_query()
 
 
 class Loan (Resource):
@@ -196,22 +206,23 @@ class AuthenticationLogin(Resource):
     def post(self):
         return routes.login(), 200
 
+
 class HomePage(Resource):
     def get(self):
         return Response(response=render_template("index.html"))
 
-
-
-
-
-
-api.add_resource(HomePage, '/')
 # works
-api.add_resource(Status, '/api/status')
+api.add_resource(HomePage, '/')
+# works 
+api.add_resource(StatusGetBooks, '/api/status')
+# not complete
+api.add_resource(StatusAddNewBook, '/api/status/add/<book_id>/<name>/<writer>/<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/<loan_status>')
+# not complete
+api.add_resource(StatusUpdateBook, '/api/status/update/<book_id>/<name>/<writer>/<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/<loan_status>')
+# not complete
+api.add_resource(StatusDeleteBookByID, '/api/status/d/<book_id>/')
 # works
 api.add_resource(StatusID, '/api/status/<book_id>')
-# works but same as /api/status/
-api.add_resource(Books, '/api/books')
 # not complete
 api.add_resource(Loan, '/api/loan')
 # works
@@ -219,7 +230,7 @@ api.add_resource(CommentsGet, '/api/comments/get')
 # works
 api.add_resource(CommentsGetByID, '/api/comments/get/<book_id>')
 # not complete
-api.add_resource(CommentsPost, '/api/comments/post')
+api.add_resource(CommentsPost, '/api/comments/<user_id>/<comment>/<book_id>/<comment_id>')
 # not complete
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
 # dunno

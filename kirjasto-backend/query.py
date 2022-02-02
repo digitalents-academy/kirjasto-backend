@@ -14,18 +14,11 @@ collection = db['backendAPI']
 
 def db_query():
 
-    # had to make id not show, because it threw a not json serializable error.
     retrieved_status = list(collection.find({}, {
         '_id': False
     }))
 
     return retrieved_status, 200
-
-
-def db_full_query():
-    retrieved_full = list(collection.find({}, {'_id': False}))
-
-    return retrieved_full, 200
 
 
 def status_query(book_id):
@@ -94,7 +87,7 @@ def update_book(
         )
 
 
-def delete_book(book_id):
+def delete_book_by_id(book_id):
     collection.delete_one({"Book_ID": book_id})
 
 
