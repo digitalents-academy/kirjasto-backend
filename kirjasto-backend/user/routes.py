@@ -1,6 +1,15 @@
-from flask import Flask
+from flask import Flask, render_template
 from app import app
 from user.models import User
+from datetime import datetime
+
+
+
+
+
+
+
+
 
 @app.route('/user/signup', methods=['POST'])
 def signup():

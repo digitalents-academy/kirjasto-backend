@@ -1,4 +1,5 @@
-from flask import Flask
+from urllib import response
+from flask import Flask, Response, render_template
 from flask_restful import Resource, Api, reqparse
 from pymongo import ALL, MongoClient
 from query import db_query, db_full_query, parse, status_query, add_new_book
@@ -7,6 +8,7 @@ from ratings import get_ratings
 from rating_system import RatingSystem
 from user import routes
 import db_secret
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -135,7 +137,16 @@ class AuthenticationLogin(Resource):
     def post(self):
         return routes.login()
 
+class HomePage(Resource):
+    def get(self):
+        return Response(response=render_template("index.html"))
 
+
+
+
+
+
+api.add_resource(HomePage, '/')
 # works
 api.add_resource(Status, '/api/status')
 # works
