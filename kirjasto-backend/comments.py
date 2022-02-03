@@ -14,7 +14,7 @@ collection = db['comments']
 
 def get_comments():
     retrieved = list(collection.find({}, {'_id': False}))
-    return retrieved, 200
+    return retrieved
 
 
 def get_comments_by_book_id(book_id):
@@ -27,9 +27,9 @@ def get_comments_by_book_id(book_id):
             correct_book_id = False
     if correct_book_id:
         retrieved_ID = list(
-            collection.find({'Book_ID': book_id}, {'_id': False})
+            collection.find({'Book_ID': int(book_id)}, {'_id': False})
             )
-        return retrieved_ID, 200
+        return retrieved_ID
     return (
         'error: Not a valid Book ID !' +
         'Book ID must be an int and the book must exist!',
@@ -37,16 +37,18 @@ def get_comments_by_book_id(book_id):
         )
 
 
-def post_comment(user_id, comment, book_id, comment_id):
+def post_comment(user_name, comment, book_id, comment_id):
 
     collection.insert_one({
-        'User_ID': user_id,
+        'Username': user_name,
         'Comment': comment,
-        'Book_ID': book_id,
-        'Comment_ID': comment_id
+        'Book_ID': int(book_id),
+        'Comment_ID': int(comment_id)
     })
 
 
+#Need to be checked later
+#Not working
 def delete_comments_by_id(comment_id):
     """Function that deletes comment by comment id."""
 
@@ -61,7 +63,7 @@ def delete_comments_by_id(comment_id):
         parser.add_argument('comment_id', required=False)
         parser.add_argument('comment', required=False)
         parser.add_argument('book_id', required=False)
-        parser.add_argument('user_id', required=False)
+        parser.add_argument('user_name', required=False)
 
         args = parser.parse_args()
         retrieved_ID = list(
@@ -76,7 +78,7 @@ def delete_comments_by_id(comment_id):
                 collection.find_one_and_delete(
                     {"Comment_ID": comment_id},
                     {
-                        'User_ID': args['user_id'],
+                        'Username': args['user_name'],
                         'Comment': args['comment'],
                         'Book_ID': args['book_id'],
                         'Comment_ID': args['comment_id']

@@ -20,7 +20,7 @@ def db_query():
 
     return retrieved_status, 200
 
-
+# cannot see books that have string book_id
 def status_query(book_id):
 
     correct_book_id = True
@@ -49,12 +49,12 @@ def add_new_book(
         loaner, loan_status):
 
     collection.insert_one({
-        "Book_ID": book_id,
+        "Book_ID": int(book_id),
         "Name": name,
         "Writer": writer,
-        "Year": year,
+        "Year": int(year),
         "ISBN": isbn,
-        "Rating": rating,
+        "Rating": int(rating),
         "About": about,
         "Tags": tags,
         "Description": description,
@@ -91,6 +91,8 @@ def delete_book_by_id(book_id):
     collection.delete_one({"Book_ID": book_id})
 
 
+#Need to be checked out
+#Doesn't work
 def loan_book_by_id(book_id):
 
     correct_book_id = True
