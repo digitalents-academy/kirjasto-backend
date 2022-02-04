@@ -1,5 +1,5 @@
 from flask import Flask, Response, render_template
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
 #from flask_restful import reqparse
 #from pymongo import ALL
 from pymongo import MongoClient
@@ -20,7 +20,9 @@ from comments import (
 from rating_system import RatingSystem
 from user import routes
 import db_secret
+from bson.objectid import ObjectId
 
+parser = reqparse.RequestParser()
 
 app = Flask(__name__)
 api = Api(app)
@@ -32,7 +34,24 @@ client = MongoClient(
     )
 db = client['kirjasto-backend']
 collection = db['backendAPI']
+testcollection = db["testerdata"]
 
+class TesterData(Resource):
+    # def get(self):
+    #     return list(testcollection.find())
+
+    def get(self, _id):
+        return testcollection.find_one({"_id": ObjectId(_id)})
+    
+    def post(self):
+        parser.add_argument("name", type=str)
+        parser.add_argument("writer", type=str)
+        parser.add_argument("year", type=int)
+        args = parser.parse_args()
+
+        item = {"name": args["name"], "writer": args["writer"], "year": args["year"]}
+        testcollection.insert_one(item)
+        return "Nice!"
 
 class StatusGetBooks(Resource):
     # Get the status for all of the books in the books collection
@@ -187,7 +206,7 @@ class HomePage(Resource):
     def get(self):
         return Response(response=render_template("index.html"))
 
-
+api.add_resource(TesterData, "/api/testerdata/<_id>")
 # works
 api.add_resource(HomePage, '/')
 # works
