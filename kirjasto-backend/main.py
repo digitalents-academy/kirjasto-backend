@@ -20,7 +20,8 @@ from comments import (
 from rating_system import RatingSystem
 from user import routes
 import db_secret
-from bson.objectid import ObjectId
+#from bson.objectid import ObjectId
+from app import login_required, home, dashboard
 
 parser = reqparse.RequestParser()
 
@@ -68,10 +69,11 @@ class StatusAddNewBook(Resource):
             book_id, name, writer, year, isbn, rating, about, tags,
             description, loaner, loan_status
             )
+        return " Adding new book was succesful!"
 
 
 class StatusUpdateBook(Resource):
-    def post(
+    def put(
             self, book_id, name, writer, year, isbn, rating, about, tags,
             description, loaner, loan_status):
         update_book(
@@ -82,7 +84,8 @@ class StatusUpdateBook(Resource):
 
 class StatusDeleteBookByID(Resource):
     def delete(self, book_id):
-        return delete_book_by_id(book_id),  {"Deleted comment!"}, 200
+        delete_book_by_id(book_id)
+        return "Deleted comment!", 200
 
 
 class StatusID(Resource):
@@ -91,7 +94,6 @@ class StatusID(Resource):
 
 
 class StatusLoan (Resource):
-
     def post(self, book_id):
         return loan_book_by_id(book_id), 200
 
@@ -102,8 +104,8 @@ class CommentsGet(Resource):
 
 
 class CommentsPost(Resource):
-    def post(self, user_id, comment, book_id, comment_id):
-        return post_comment(user_id, comment, book_id, comment_id), 200
+    def post(self, user_name, comment, book_id, comment_id):
+        return {"task": post_comment(user_name, comment, book_id, comment_id)}, 200
 
 
 class CommentsGetByID(Resource):
@@ -113,7 +115,8 @@ class CommentsGetByID(Resource):
 
 class CommentsDeleteByID(Resource):
     def delete(self, comment_id):
-        return delete_comments_by_id(comment_id),  {"Deleted comment!"}, 200
+        delete_comments_by_id(comment_id)
+        return "Deleted comment!", 200
 
 
 class RatingsGetBooks(Resource):
@@ -168,9 +171,9 @@ class RatingsGetRatingsByUsername(Resource):
 
 class RatingsGetRatingByID(Resource):
 
-    def get(self, user_id, book_id):
+    def get(self, user_name, book_id):
         return rating_system.get_retrieved_rating_by_id(
-            user_id,
+            user_name,
             book_id
             ), 200
 
@@ -202,28 +205,49 @@ class AuthenticationLogin(Resource):
         return routes.login(), 200
 
 
+class AuthenticationLoginRequired(Resource):
+    def get(self):
+        return login_required(), 200
+
+
+class AuthenticationHome(Resource):
+    def get(self):
+        return home(), 200
+
+
+class AuthenticationDashBoard(Resource):
+    def get(self):
+        return dashboard(), 200
+
+
 class HomePage(Resource):
     def get(self):
         return Response(response=render_template("index.html"))
 
 api.add_resource(TesterData, "/api/testerdata/<_id>")
 # works
-api.add_resource(HomePage, '/')
+#api.add_resource(HomePage, '/')
+# testing
+#api.add_resource(AuthenticationLoginRequired, )
+# testing
+api.add_resource(AuthenticationHome, '/')
+# testing
+api.add_resource(AuthenticationDashBoard, '/dashboard/')
 # works
 api.add_resource(StatusGetBooks, '/api/status')
-# not complete
+# works
 api.add_resource(
     StatusAddNewBook,
     '/api/status/add/<book_id>/<name>/<writer>/<year>/<isbn>/<rating>/' +
     '<about>/<tags>/<description>/<loaner>/<loan_status>'
     )
-# not complete
+# works
 api.add_resource(
     StatusUpdateBook, '/api/status/update/<book_id>/<name>/<writer>/' +
     '<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/' +
     '<loan_status>'
     )
-# not complete
+# works
 api.add_resource(StatusDeleteBookByID, '/api/status/d/<book_id>/')
 # works
 api.add_resource(StatusID, '/api/status/<book_id>')
@@ -233,25 +257,31 @@ api.add_resource(StatusLoan, '/api/loan/<book_id>')
 api.add_resource(CommentsGet, '/api/comments/get')
 # works
 api.add_resource(CommentsGetByID, '/api/comments/get/<book_id>')
-# not complete
+# works
 api.add_resource(
     CommentsPost,
-    '/api/comments/<user_id>/<comment>/<book_id>/<comment_id>'
+    '/api/comments/<user_name>/<comment>/<book_id>/<comment_id>'
     )
 # not complete
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
-# dunno
+#Works but is this needed?
 api.add_resource(RatingsGetBooks, '/api/ratings/get/books/')
+#Works but is this needed?
 api.add_resource(RatingsGetBookByID, '/api/ratings/get/books/<book_id>/')
+# Not sure
 api.add_resource(RatingsPostBooks, '/api/ratings/post/books/')
+# Works
 api.add_resource(RatingsGetUsers, '/api/ratings/get/users/')
+# Works
 api.add_resource(
     RatingsGetUserByUsername,
     '/api/ratings/get/users/<user_name>/'
     )
+# Not sure
 api.add_resource(RatingsPostUsers, '/api/ratings/post/users/')
+# Works
 api.add_resource(RatingsGetRatings, '/api/ratings/get/ratings/')
-# not complete
+# Works
 api.add_resource(
     RatingsGetRatingsByUsername,
     '/api/ratings/get/ratings/<user_name>'
@@ -261,7 +291,7 @@ api.add_resource(
     RatingsGetRatingByID,
     '/api/ratings/get/ratings/user_name/book_id/'
     )
-# not complete
+# Works
 api.add_resource(
     RatingsPostRating,
     '/api/ratings/post/<user_name>/<book_id>/<rating>/'

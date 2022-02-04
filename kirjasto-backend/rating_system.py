@@ -85,8 +85,8 @@ class RatingSystem:
 
     def get_retrieved_ratings_by_username(self, user_name):
         retrieved_ID = list(
-            user_collection.find(
-                {'User_ID': user_name}, {'_id': False}
+            rating_collection.find(
+                {'Username': str(user_name)}, {'_id': False}
                 )
             )
         if len(retrieved_ID) > 0:
@@ -100,6 +100,7 @@ class RatingSystem:
     def get_retrieved_rating_by_id(self, user_name, book_id):
         correct_id = True
         numbers = "0123456789"
+        print("here")
 
         for letter in book_id:
             if letter not in numbers:
@@ -108,7 +109,7 @@ class RatingSystem:
             retrieved_ID = list(
                 user_collection.find(
                     {
-                        'User_ID': user_name,
+                        'Username': user_name,
                         'Book_ID': int(book_id)
                         }, {'_id': False}
                     )
@@ -121,11 +122,11 @@ class RatingSystem:
             400
             )
 
-    def has_the_user_already_rated_this_book(self, user_id, book_id):
+    def has_the_user_already_rated_this_book(self, user_name, book_id):
         """Function that checks whether a user has already rated the book."""
 
         for rating in self.user_ratings:
-            if rating["User_ID"] == user_id and rating["Book_ID"] == book_id:
+            if rating["Username"] == user_name and rating["Book_ID"] == book_id:
                 return True
         return False
 
@@ -139,12 +140,12 @@ class RatingSystem:
         """Function that replaces old rating with a new one."""
 
         for rating in self.user_ratings:
-            if rating["User_ID"] == new_rating["User_ID"] and \
+            if rating["Username"] == new_rating["Username"] and \
                     rating["Book_ID"] == new_rating["Book_ID"]:
                 self.user_ratings.remove(rating)
         self.user_ratings.append(new_rating)
 
-    def give_rating(self, user_id: int, book_id: int, rating: int):
+    def give_rating(self, user_name, book_id, rating):
         """
         Function that saves user's rating,
         user id, rated book's id and rating
@@ -152,12 +153,12 @@ class RatingSystem:
         """
 
         new_rating = {
-            "User_ID": user_id,
-            "Book_ID": book_id,
-            "Rating": rating
+            "Username": user_name,
+            "Book_ID": int(book_id),
+            "Rating": int(rating)
             }
 
-        if self.has_the_user_already_rated_this_book(user_id, book_id):
+        if self.has_the_user_already_rated_this_book(user_name, book_id):
             rating_collection.replace_one(
                 self.get_reimbursable_user_rating(new_rating),
                 new_rating
@@ -167,11 +168,11 @@ class RatingSystem:
             self.user_ratings.append(new_rating)
             rating_collection.insert_one(new_rating)
 
-    def delete_rating(self, user_id: int, book_id: int):
+    def delete_rating(self, user_name: int, book_id: int):
         """Function that deletes a rating and updates data after."""
 
         for rating in self.user_ratings:
-            if rating["User_ID"] == user_id and rating["Book_ID"] == book_id:
+            if rating["Username"] == user_name and rating["Book_ID"] == book_id:
                 rating_collection.remove(rating)
                 self.user_ratings.remove(rating)
 
@@ -198,7 +199,7 @@ class RatingSystem:
         else:
             return (rating_sum / count, count)
 
-    def get_users_mean_score(self, user_id):
+    def get_users_mean_score(self, user_name):
         """
         Function that returns single user's mean score
         and the amount that the user has rated books.
@@ -207,8 +208,8 @@ class RatingSystem:
         count = 0
         rating_sum = 0
         for rating in self.user_ratings:
-            if rating["User_ID"] == user_id:
-                if rating["User_ID"]:
+            if rating["Username"] == user_name:
+                if rating["Username"]:
                     count += 1
                     rating_sum += int(rating["Rating"])
         if rating_sum == 0:
@@ -231,10 +232,10 @@ class RatingSystem:
         """Function that updates mean score in the dictionary called users."""
 
         for score in self.books:
-            user_id = score["Book_ID"]
+            user_name = score["Book_ID"]
             score["Mean_score"] = (
-                f"{self.get_users_mean_score(user_id)[0]} "
-                f"out of 5 ({self.get_users_mean_score(user_id)[1]} "
+                f"{self.get_users_mean_score(user_name)[0]} "
+                f"out of 5 ({self.get_users_mean_score(user_name)[1]} "
                 f"ratings)"
                 )
 
@@ -268,7 +269,7 @@ class RatingSystem:
         """
 
         for retrieved_rating in retrieved_rating_collection:
-            if retrieved_rating["User_ID"] == rating["User_ID"]:
+            if retrieved_rating["Username"] == rating["Username"]:
                 return retrieved_rating
 
     def post_updated_book_collection(self):
