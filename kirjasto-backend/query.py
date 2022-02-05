@@ -2,6 +2,7 @@
 from pymongo import MongoClient
 from flask_restful import reqparse
 import db_secret
+import user
 
 # Initiate connection to mongoDB
 client = MongoClient(
@@ -10,6 +11,7 @@ client = MongoClient(
     )
 db = client['kirjasto-backend']
 collection = db['backendAPI']
+retrieved_book_collection = list(collection.find({}, {'_id': False}))
 
 
 def db_query():
@@ -19,6 +21,7 @@ def db_query():
     }))
 
     return retrieved_status, 200
+
 
 # cannot see books that have string book_id
 def status_query(book_id):
@@ -43,27 +46,49 @@ def status_query(book_id):
         400
         )
 
-
+#Works but needs to be edited
+#If book is updated data needs to be checked from database
 def add_new_book(
-        book_id, name, writer, year, isbn, rating, about, tags, description,
-        loaner, loan_status):
+        book_id, name, writer, year, isbn, about, tags, description):
+    for book in retrieved_book_collection:
+        if book_id == book["Book_ID"]:
+            collection.update(
+                {'Book_ID': book_id},
+                {
+                    "$set": {
+                        "Name": name,
+                        "Writer": writer,
+                        "Year": year,
+                        "ISBN": isbn,
+                        "Rating": "Check_database",
+                        "About": about,
+                        "Tags": tags,
+                        "Description": description,
+                        "Loaner": "Check_database",
+                        "Loan_Status": "Check_database"
+                        }
+                    }
+                )
+            return
+        else:
+            collection.insert_one({
+                "Book_ID": int(book_id),
+                "Name": name,
+                "Writer": writer,
+                "Year": int(year),
+                "ISBN": isbn,
+                "Rating": 0,
+                "About": about,
+                "Tags": tags,
+                "Description": description,
+                "Loaner": None,
+                "Loan_Status": False
 
-    collection.insert_one({
-        "Book_ID": int(book_id),
-        "Name": name,
-        "Writer": writer,
-        "Year": int(year),
-        "ISBN": isbn,
-        "Rating": int(rating),
-        "About": about,
-        "Tags": tags,
-        "Description": description,
-        "Loaner": loaner,
-        "Loan_Status": loan_status
-
-    })
+            })
+        return
 
 
+#Needed?
 def update_book(
         book_id, name, writer, year, isbn, rating, about, tags, description,
         loaner, loan_status):
@@ -88,12 +113,6 @@ def update_book(
 
 
 def delete_book_by_id(book_id):
-    collection.delete_one({"Book_ID": book_id})
-
-
-#Need to be checked out
-#Doesn't work
-def loan_book_by_id(book_id):
 
     correct_book_id = True
     numbers = "0123456789"
@@ -102,18 +121,50 @@ def loan_book_by_id(book_id):
         if letter not in numbers:
             correct_book_id = False
     if correct_book_id:
-        retrieved = list(collection.find({'Book_ID': book_id}, {'_id': False}))
-    for data in retrieved:
-        if data['Book_ID'] == book_id:
-            return collection.find_one_and_update(
-                data, {"$set": parse()})
-        elif data['Book_ID'] != book_id:
-            return {'message': f"{book_id} doesn't exist."
-                    }, 401
-        else:
-            return {
-                'message': " Unknown error."
-            }, 401
+        collection.delete_one({"Book_ID": int(book_id)})
+
+
+#Need to be checked out
+#Doesn't work
+def loan_book_by_id(user_name, book_id):
+
+    correct_book_id = True
+    numbers = "0123456789"
+
+    for letter in book_id:
+        if letter not in numbers:
+            correct_book_id = False
+    if correct_book_id:
+        for book in retrieved_book_collection:
+            if book["Book_ID"] == int(book_id):
+                if book['Loan_Status'] is False:
+                    new_book = {
+                        'Book_ID': book['Book_ID'],
+                        'Name': book['Name'],
+                        'Writer': book['Writer'],
+                        'Year': book['Year'],
+                        'ISBN': book['ISBN'],
+                        'Rating': book['Rating'],
+                        'About': book['About'],
+                        'Tags': book['Tags'],
+                        'Description': book['Description'],
+                        'Loaner': None,
+                        'Loan_Status': True
+                    }
+                    collection.replace_one(book, new_book)
+
+    #     retrieved = list(collection.find({'Book_ID': book_id}, {'_id': False}))
+    # for data in retrieved:
+    #     if data['Book_ID'] == book_id:
+    #         return collection.find_one_and_update(
+    #             data, {"$set": parse()})
+    #     elif data['Book_ID'] != book_id:
+    #         return {'message': f"{book_id} doesn't exist."
+    #                 }, 401
+    #     else:
+    #         return {
+    #             'message': " Unknown error."
+    #         }, 401
 
 
 def parse():

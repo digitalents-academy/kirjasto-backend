@@ -100,7 +100,6 @@ class RatingSystem:
     def get_retrieved_rating_by_id(self, user_name, book_id):
         correct_id = True
         numbers = "0123456789"
-        print("here")
 
         for letter in book_id:
             if letter not in numbers:
@@ -126,7 +125,8 @@ class RatingSystem:
         """Function that checks whether a user has already rated the book."""
 
         for rating in self.user_ratings:
-            if rating["Username"] == user_name and rating["Book_ID"] == book_id:
+            if rating["Username"] == user_name and \
+                    rating["Book_ID"] == book_id:
                 return True
         return False
 
@@ -136,15 +136,18 @@ class RatingSystem:
     # it doesn't have ObjectID so the question is:
     # should the rating be stored in the dictionary from database?
 
-    def replace_user_rating(self, new_rating):
+    def replace_user_rating(self, user_name, book_id, new_rating):
         """Function that replaces old rating with a new one."""
 
-        for rating in self.user_ratings:
-            if rating["Username"] == new_rating["Username"] and \
-                    rating["Book_ID"] == new_rating["Book_ID"]:
-                self.user_ratings.remove(rating)
-        self.user_ratings.append(new_rating)
+        count = 0
 
+        for rating in self.user_ratings:
+            if rating["Username"] == user_name and \
+                    rating["Book_ID"] == int(book_id):
+                self.user_ratings[count]["Rating"] == int(new_rating)
+                count += 1
+
+    # replace doesn't work
     def give_rating(self, user_name, book_id, rating):
         """
         Function that saves user's rating,
@@ -168,11 +171,25 @@ class RatingSystem:
             self.user_ratings.append(new_rating)
             rating_collection.insert_one(new_rating)
 
-    def delete_rating(self, user_name: int, book_id: int):
+        #Where should the data be updated?
+        #---------------------------------------------------------------------
+        self.update_books_dictionary_ratings()
+
+        for book in self.books:
+            book_collection.replace_one(self.get_reimbursable_book(book), book)
+
+        self.update_users_dictionary_rating()
+
+        for user in self.users:
+            book_collection.replace_one(self.get_reimbursable_user(user), user)
+        #---------------------------------------------------------------------
+
+    def delete_rating(self, user_name: int, book_id):
         """Function that deletes a rating and updates data after."""
 
         for rating in self.user_ratings:
-            if rating["Username"] == user_name and rating["Book_ID"] == book_id:
+            if rating["Username"] == user_name and \
+                    rating["Book_ID"] == book_id:
                 rating_collection.remove(rating)
                 self.user_ratings.remove(rating)
 
@@ -190,10 +207,9 @@ class RatingSystem:
         count = 0
         rating_sum = 0
         for rating in self.user_ratings:
-            if rating["Book_ID"] == book_id:
-                if rating["Book_ID"]:
-                    count += 1
-                    rating_sum += int(rating["Rating"])
+            if rating["Book_ID"] == int(book_id):
+                count += 1
+                rating_sum += rating["Rating"]
         if rating_sum == 0:
             return (0, 0)
         else:
@@ -293,40 +309,3 @@ class RatingSystem:
 
         for user in self.users:
             book_collection.replace_one(self.get_reimbursable_user(user), user)
-
-
-if __name__ == "__main__":
-
-    rating_system = RatingSystem()
-
-    rating_system.give_rating(
-        1,
-        1,
-        1
-        )
-
-    rating_system.give_rating(
-        2,
-        2,
-        2
-        )
-
-    rating_system.give_rating(
-        3,
-        3,
-        3
-        )
-
-    rating_system.give_rating(
-        4,
-        4,
-        4
-        )
-
-    rating_system.post_updated_book_collection()
-    rating_system.post_updated_user_collection()
-
-    # ObjectID is added after the new addition
-    # rating_system.delete_rating(1, 1)
-
-    print(rating_system.get_retrieved_rating_collection())

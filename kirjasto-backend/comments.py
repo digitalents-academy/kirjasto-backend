@@ -48,7 +48,6 @@ def post_comment(user_name, comment, book_id, comment_id):
 
 
 #Need to be checked later
-#Not working
 def delete_comments_by_id(comment_id):
     """Function that deletes comment by comment id."""
 
@@ -59,28 +58,31 @@ def delete_comments_by_id(comment_id):
         if letter not in numbers:
             correct_book_id = False
     if correct_book_id:
-        parser = reqparse.RequestParser()
-        parser.add_argument('comment_id', required=False)
-        parser.add_argument('comment', required=False)
-        parser.add_argument('book_id', required=False)
-        parser.add_argument('user_name', required=False)
+        collection.delete_one({"Comment_ID": int(comment_id)})
 
-        args = parser.parse_args()
-        retrieved_ID = list(
-            collection.find(
-                {'Comment_ID': comment_id},
-                {'_id': False}
-                )
-            )
+#Maybe needed when the front is ready?
+    #     parser = reqparse.RequestParser()
+    #     parser.add_argument('comment_id', required=False)
+    #     parser.add_argument('comment', required=False)
+    #     parser.add_argument('book_id', required=False)
+    #     parser.add_argument('user_name', required=False)
 
-        for data in retrieved_ID:
-            if data["Comment_ID"] == comment_id:
-                collection.find_one_and_delete(
-                    {"Comment_ID": comment_id},
-                    {
-                        'Username': args['user_name'],
-                        'Comment': args['comment'],
-                        'Book_ID': args['book_id'],
-                        'Comment_ID': args['comment_id']
-                        }
-                        )
+    #     args = parser.parse_args()
+    #     retrieved_ID = list(
+    #         collection.find(
+    #             {'Comment_ID': comment_id},
+    #             {'_id': False}
+    #             )
+    #         )
+
+    #     for data in retrieved_ID:
+    #         if data["Comment_ID"] == comment_id:
+    #             collection.find_one_and_delete(
+    #                 {"Comment_ID": comment_id},
+    #                 {
+    #                     'Username': args['user_name'],
+    #                     'Comment': args['comment'],
+    #                     'Book_ID': args['book_id'],
+    #                     'Comment_ID': args['comment_id']
+    #                     }
+    #                     )

@@ -20,7 +20,7 @@ from comments import (
 from rating_system import RatingSystem
 from user import routes
 import db_secret
-#from bson.objectid import ObjectId
+from bson.objectid import ObjectId
 from app import login_required, home, dashboard
 
 parser = reqparse.RequestParser()
@@ -37,22 +37,28 @@ db = client['kirjasto-backend']
 collection = db['backendAPI']
 testcollection = db["testerdata"]
 
+
 class TesterData(Resource):
     # def get(self):
     #     return list(testcollection.find())
 
     def get(self, _id):
         return testcollection.find_one({"_id": ObjectId(_id)})
-    
+
     def post(self):
         parser.add_argument("name", type=str)
         parser.add_argument("writer", type=str)
         parser.add_argument("year", type=int)
         args = parser.parse_args()
 
-        item = {"name": args["name"], "writer": args["writer"], "year": args["year"]}
+        item = {
+            "name": args["name"],
+            "writer": args["writer"],
+            "year": args["year"]
+            }
         testcollection.insert_one(item)
         return "Nice!"
+
 
 class StatusGetBooks(Resource):
     # Get the status for all of the books in the books collection
@@ -63,13 +69,13 @@ class StatusGetBooks(Resource):
 
 class StatusAddNewBook(Resource):
     def post(
-            self, book_id, name, writer, year, isbn, rating, about, tags,
-            description, loaner, loan_status):
+            self, book_id, name, writer, year, isbn, about, tags,
+            description):
         add_new_book(
-            book_id, name, writer, year, isbn, rating, about, tags,
-            description, loaner, loan_status
+            book_id, name, writer, year, isbn, about, tags,
+            description
             )
-        return " Adding new book was succesful!"
+        return " Book was added succesfully!"
 
 
 class StatusUpdateBook(Resource):
@@ -80,149 +86,148 @@ class StatusUpdateBook(Resource):
             book_id, name, writer, year, isbn, rating, about, tags,
             description, loaner, loan_status
             )
+        return "Book was added succesfully!"
 
 
 class StatusDeleteBookByID(Resource):
     def delete(self, book_id):
         delete_book_by_id(book_id)
-        return "Deleted comment!", 200
+        return "Book was deleted succesfully!"
 
 
 class StatusID(Resource):
     def get(self, book_id):
-        return status_query(book_id), 200
+        return status_query(book_id)
 
 
 class StatusLoan (Resource):
-    def post(self, book_id):
-        return loan_book_by_id(book_id), 200
+    def post(self, user_name, book_id):
+        loan_book_by_id(user_name, book_id)
+        return "Book was loaned succesfully!"
 
 
 class CommentsGet(Resource):
     def get(self):
-        return get_comments(), 200
+        return get_comments()
 
 
 class CommentsPost(Resource):
     def post(self, user_name, comment, book_id, comment_id):
-        return {"task": post_comment(user_name, comment, book_id, comment_id)}, 200
+        post_comment(user_name, comment, book_id, comment_id)
+        return "Comment was posted succesfully!"
 
 
 class CommentsGetByID(Resource):
     def get(self, book_id):
-        return get_comments_by_book_id(book_id), 200
+        return get_comments_by_book_id(book_id)
 
 
 class CommentsDeleteByID(Resource):
     def delete(self, comment_id):
         delete_comments_by_id(comment_id)
-        return "Deleted comment!", 200
+        return "Comment was deleted succesfully!"
 
 
-class RatingsGetBooks(Resource):
-
-    def get(self):
-        return rating_system.get_retrieved_book_collection(), 200
-
-
-class RatingsGetBookByID(Resource):
-
-    def get(self, book_id):
-        return rating_system.get_retrieved_book_by_id(book_id), 200
-
-
-class RatingsPostBooks(Resource):
-
-    def post(self):
-        rating_system.post_updated_book_collection(), 200
-
-
+#Not needed in rating system?
+#-----------------------------------------------------------------------------
+#Needed in user file
 class RatingsGetUsers(Resource):
 
     def get(self):
-        return rating_system.get_retrieved_user_collection(), 200
+        return rating_system.get_retrieved_user_collection()
 
 
 class RatingsGetUserByUsername(Resource):
 
     def get(self, user_name):
-        return rating_system.get_retrieved_user_by_id(user_name), 200
+        return rating_system.get_retrieved_user_by_id(user_name)
 
 
 class RatingsPostUsers(Resource):
 
     def post(self):
-        rating_system.post_updated_user_collection(), 200
+        rating_system.post_updated_user_collection()
+        return ""
+#-----------------------------------------------------------------------------
 
 
 class RatingsGetRatings(Resource):
 
     def get(self):
-        return rating_system.get_retrieved_rating_collection(), 200
+        return rating_system.get_retrieved_rating_collection()
 
 
+#every users ratings
 class RatingsGetRatingsByUsername(Resource):
 
     def get(self, user_name):
         return rating_system.get_retrieved_ratings_by_username(
             user_name
-            ), 200
+            )
 
 
+#users rating for single book
 class RatingsGetRatingByID(Resource):
 
     def get(self, user_name, book_id):
         return rating_system.get_retrieved_rating_by_id(
             user_name,
             book_id
-            ), 200
+            )
 
 
-class RatingsPostRating(Resource):
+class RatingsAddRating(Resource):
 
     def post(self, user_name: int, book_id: int, rating: int):
-        rating_system.give_rating(user_name, book_id, rating), 200
+        rating_system.give_rating(user_name, book_id, rating)
+        return "Rating was posted succesfully!"
 
 
 class RatingsDeleteRating(Resource):
 
     def delete(self, user_name, book_id):
-        rating_system.delete_rating(user_name, book_id), 200
+        rating_system.delete_rating(user_name, book_id)
+        return "Rating was deleted succesfully!"
 
 
+#Not working
+#-----------------------------------------------------------------------------
 class AuthenticationSignup(Resource):
     def post(self):
-        return routes.signup(), 200
+        routes.signup()
+        return "User was added succesfully!"
 
 
 class AuthenticationSignout(Resource):
     def get(self):
-        return routes.signout(), 200
+        return routes.signout()
 
 
 class AuthenticationLogin(Resource):
     def post(self):
-        return routes.login(), 200
+        return routes.login()
 
 
 class AuthenticationLoginRequired(Resource):
-    def get(self):
-        return login_required(), 200
+    def get(self, f):
+        return login_required(f)
 
 
 class AuthenticationHome(Resource):
     def get(self):
-        return home(), 200
+        return home()
 
 
 class AuthenticationDashBoard(Resource):
     def get(self):
-        return dashboard(), 200
+        return dashboard()
 
 
 class HomePage(Resource):
     def get(self):
         return Response(response=render_template("index.html"))
+#-----------------------------------------------------------------------------
+
 
 api.add_resource(TesterData, "/api/testerdata/<_id>")
 # works
@@ -238,21 +243,20 @@ api.add_resource(StatusGetBooks, '/api/status')
 # works
 api.add_resource(
     StatusAddNewBook,
-    '/api/status/add/<book_id>/<name>/<writer>/<year>/<isbn>/<rating>/' +
-    '<about>/<tags>/<description>/<loaner>/<loan_status>'
+    '/api/status/add/<book_id>/<name>/<writer>/<year>/<isbn>/' +
+    '<about>/<tags>/<description>'
     )
-# works
+# works but is this needed?
 api.add_resource(
     StatusUpdateBook, '/api/status/update/<book_id>/<name>/<writer>/' +
-    '<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/' +
-    '<loan_status>'
+    '<year>/<isbn>/<about>/<tags>/<description>/'
     )
 # works
 api.add_resource(StatusDeleteBookByID, '/api/status/d/<book_id>/')
 # works
 api.add_resource(StatusID, '/api/status/<book_id>')
 # not complete
-api.add_resource(StatusLoan, '/api/loan/<book_id>')
+api.add_resource(StatusLoan, '/api/loan/<user_name>/<book_id>')
 # works
 api.add_resource(CommentsGet, '/api/comments/get')
 # works
@@ -262,14 +266,8 @@ api.add_resource(
     CommentsPost,
     '/api/comments/<user_name>/<comment>/<book_id>/<comment_id>'
     )
-# not complete
+# Works
 api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
-#Works but is this needed?
-api.add_resource(RatingsGetBooks, '/api/ratings/get/books/')
-#Works but is this needed?
-api.add_resource(RatingsGetBookByID, '/api/ratings/get/books/<book_id>/')
-# Not sure
-api.add_resource(RatingsPostBooks, '/api/ratings/post/books/')
 # Works
 api.add_resource(RatingsGetUsers, '/api/ratings/get/users/')
 # Works
@@ -279,7 +277,7 @@ api.add_resource(
     )
 # Not sure
 api.add_resource(RatingsPostUsers, '/api/ratings/post/users/')
-# Works
+# Works but when book is added doesn't work after reboot?
 api.add_resource(RatingsGetRatings, '/api/ratings/get/ratings/')
 # Works
 api.add_resource(
@@ -293,8 +291,8 @@ api.add_resource(
     )
 # Works
 api.add_resource(
-    RatingsPostRating,
-    '/api/ratings/post/<user_name>/<book_id>/<rating>/'
+    RatingsAddRating,
+    '/api/ratings/add/<user_name>/<book_id>/<rating>/'
     )
 # not complete
 api.add_resource(RatingsDeleteRating, '/api/ratings/d/<book_id>/user_name/')
