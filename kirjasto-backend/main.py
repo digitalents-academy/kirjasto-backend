@@ -170,8 +170,11 @@ class RatingsGetUsers(Resource):
         """Function that returns user data depending on the url."""
 
         if user_name is not None:
+            if rating_system.get_retrieved_user_by_username(user_name) is None:
+                return 'error: Not a valid username! username must exist!'
             return rating_system.get_retrieved_user_by_username(user_name)
         return rating_system.get_retrieved_user_collection()
+
 
 #Needed?
 class RatingsPostUsers(Resource):
@@ -186,6 +189,7 @@ class RatingsPostUsers(Resource):
         rating_system.post_updated_user_collection()
         return "User data was updated succesfully!"
 #-----------------------------------------------------------------------------
+
 
 #Editing this
 class Ratings(Resource):
@@ -295,7 +299,10 @@ api.add_resource(
 # works
 api.add_resource(BooksDeleteByID, '/api/books/d/<book_id>/')
 # not complete
-api.add_resource(BooksLoanByUsernameAndID, '/api/books/loan/<user_name>/<book_id>')
+api.add_resource(
+    BooksLoanByUsernameAndID,
+    '/api/books/loan/<user_name>/<book_id>'
+    )
 # works
 api.add_resource(
     Comments,
@@ -332,7 +339,10 @@ api.add_resource(
     '/api/ratings/add/<user_name>/<book_id>/<rating>'
     )
 # not complete
-api.add_resource(RatingsDeleteByUsernameAndBookID, '/api/ratings/d/<book_id>/user_name')
+api.add_resource(
+    RatingsDeleteByUsernameAndBookID,
+    '/api/ratings/d/<book_id>/user_name'
+    )
 api.add_resource(AuthenticationSignup,
                  '/api/authentication/signup', methods=['POST'])
 api.add_resource(AuthenticationSignout, '/api/authentication/signout')

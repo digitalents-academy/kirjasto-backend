@@ -15,16 +15,18 @@ retrieved_book_collection = list(collection.find({}, {'_id': False}))
 
 
 def get_books():
+    """Function that returns all books."""
 
     retrieved_status = list(collection.find({}, {
         '_id': False
     }))
 
-    return retrieved_status, 200
+    return retrieved_status
 
 
 # cannot see books that have string book_id
 def get_book_by_id(book_id):
+    """Function that returns book data depending on the book_id."""
 
     correct_book_id = True
     numbers = "0123456789"
@@ -33,17 +35,16 @@ def get_book_by_id(book_id):
         if letter not in numbers:
             correct_book_id = False
     if correct_book_id:
-        retrieved_ID = list(
+        retrieved = list(
             collection.find(
                 {'Book_ID': int(book_id)},
                 {'_id': False}
                 )
             )
-        return retrieved_ID
+        return retrieved
     return (
         'error: Not a valid Book ID! ' +
-        'Book ID must be an int and the book must exist!',
-        400
+        'Book ID must be an int and the book must exist!'
         )
 
 
@@ -51,6 +52,8 @@ def get_book_by_id(book_id):
 #If book is updated data needs to be checked from database
 def add_new_book(
         book_id, name, writer, year, isbn, about, tags, description):
+    """Function that posts new book to the database."""
+
     for book in retrieved_book_collection:
         if book_id == book["Book_ID"]:
             collection.update(
@@ -94,6 +97,7 @@ def add_new_book(
 def update_book(
         book_id, name, writer, year, isbn, rating, about, tags, description,
         loaner, loan_status):
+    """Function that posts updated book_data to the database."""
 
     collection.update(
         {'Book_ID': book_id},
@@ -115,6 +119,7 @@ def update_book(
 
 
 def delete_book_by_id(book_id):
+    """Function that deletes a book from the database."""
 
     correct_book_id = True
     numbers = "0123456789"
@@ -129,6 +134,7 @@ def delete_book_by_id(book_id):
 #Need to be checked out
 #Doesn't work
 def loan_book_by_username_and_id(user_name, book_id):
+    """Function that changes book's loan state."""
 
     correct_book_id = True
     numbers = "0123456789"

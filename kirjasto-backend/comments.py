@@ -13,11 +13,14 @@ collection = db['comments']
 
 
 def get_comments():
+    """Function that returns all comments."""
+
     retrieved = list(collection.find({}, {'_id': False}))
     return retrieved
 
 
 def get_comments_by_book_id(book_id):
+    """Function that returns comment by book_id."""
 
     correct_book_id = True
     numbers = "0123456789"
@@ -26,10 +29,10 @@ def get_comments_by_book_id(book_id):
         if letter not in numbers:
             correct_book_id = False
     if correct_book_id:
-        retrieved_ID = list(
+        retrieved = list(
             collection.find({'Book_ID': int(book_id)}, {'_id': False})
             )
-        return retrieved_ID
+        return retrieved
     return (
         'error: Not a valid Book ID !' +
         'Book ID must be an int and the book must exist!',
@@ -38,6 +41,7 @@ def get_comments_by_book_id(book_id):
 
 
 def post_comment(user_name, comment, book_id, comment_id):
+    """Function that posts new comment to the database."""
 
     collection.insert_one({
         'Username': user_name,
