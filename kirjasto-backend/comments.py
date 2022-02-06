@@ -10,6 +10,9 @@ client = MongoClient(
     )
 db = client['kirjasto-backend']
 collection = db['comments']
+user_collection = db['users']
+retrieved_comment_collection = list(collection.find({}, {'_id': False}))
+retrieved_user_collection = list(user_collection.find({}, {'_id': False}))
 
 
 def get_comments():
@@ -33,35 +36,53 @@ def get_comments_by_book_id(book_id):
             collection.find({'Book_ID': int(book_id)}, {'_id': False})
             )
         return retrieved
-    return (
-        'error: Not a valid Book ID !' +
-        'Book ID must be an int and the book must exist!',
-        400
-        )
+    return
 
-
+#Works but the comment_id could be same with the help of delete
+#so some new way to make ids is needed
+#Error handling is done correctly here, but nowhere else!
 def post_comment(user_name, comment, book_id, comment_id):
     """Function that posts new comment to the database."""
 
-    collection.insert_one({
-        'Username': user_name,
-        'Comment': comment,
-        'Book_ID': int(book_id),
-        'Comment_ID': int(len(get_comments()))
-    })
-
-
-#Need to be checked later
-def delete_comments_by_id(comment_id):
-    """Function that deletes comment by comment id."""
-
+    correct_user_name = False
     correct_book_id = True
     numbers = "0123456789"
 
-    for letter in comment_id:
+    for letter in book_id:
         if letter not in numbers:
             correct_book_id = False
-    if correct_book_id:
+    for user in retrieved_user_collection:
+        if user["user_name"] == user_name:
+            correct_user_name = True
+    if correct_book_id and correct_user_name:
+        collection.insert_one({
+            'Username': user_name,
+            'Comment': comment,
+            'Book_ID': int(book_id),
+            'Comment_ID': int(comment_id)
+        })
+    else:
+        return "Doesn't work"
+
+
+def delete_comments_by_id(user_name, book_id, comment_id):
+    """Function that deletes comment by comment id."""
+
+    correct_user_name = False
+    correct_book_id = True
+    correct_comment_id = True
+    numbers = "0123456789"
+
+    for letter in book_id:
+        if letter not in numbers:
+            correct_book_id = False
+    for letter in comment_id:
+        if letter not in numbers:
+            correct_comment_id = False
+    for comment in retrieved_comment_collection:
+        if comment["Username"] == user_name:
+            correct_user_name = True
+    if correct_user_name and correct_book_id and correct_comment_id:
         collection.delete_one({"Comment_ID": int(comment_id)})
 
 #Maybe needed when the front is ready?

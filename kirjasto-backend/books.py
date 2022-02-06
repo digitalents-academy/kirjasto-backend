@@ -48,36 +48,36 @@ def get_book_by_id(book_id):
         )
 
 
-#Works but needs to be edited
-#If book is updated data needs to be checked from database
+#Not complete
+#Unique Book_id needed
 def add_new_book(
         book_id, name, writer, year, isbn, about, tags, description):
     """Function that posts new book to the database."""
 
     for book in retrieved_book_collection:
-        if book_id == book["Book_ID"]:
+        if book["Book_ID"] == int(book_id):
             collection.update(
-                {'Book_ID': book_id},
+                {'Book_ID': int(book_id)},
                 {
                     "$set": {
                         "Name": name,
                         "Writer": writer,
                         "Year": year,
                         "ISBN": isbn,
-                        "Rating": "Check_database",
+                        "Rating": book["Rating"],
                         "About": about,
                         "Tags": tags,
                         "Description": description,
-                        "Loaner": "Check_database",
-                        "Loan_Status": "Check_database"
+                        "Loaner": book["Loaner"],
+                        "Loan_Status": book["Loan_Status"]
                         }
                     }
                 )
             return
         else:
             collection.insert_one({
-#                "Book_ID": len(retrieved_book_collection) + 1,
-                "Book_ID": int(book_id),
+                #"Book_ID": len(retrieved_book_collection) + 1,
+                "Book_ID": book_id,
                 "Name": name,
                 "Writer": writer,
                 "Year": int(year),

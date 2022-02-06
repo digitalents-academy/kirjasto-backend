@@ -145,18 +145,20 @@ class CommentsAddNewComment(Resource):
 
     def post(self, user_name, comment, book_id, comment_id):
         """Function that posts comment data to the database."""
+        if post_comment(user_name, comment, book_id, comment_id) != "Doesn't work":
+            post_comment(user_name, comment, book_id, comment_id)
+            return "Comment was posted succesfully!"
+        return 'error: Not a valid username or book_id! book_id and username must exist!'
 
-        post_comment(user_name, comment, book_id, comment_id)
-        return "Comment was posted succesfully!"
 
-
-class CommentsDeleteByID(Resource):
+class CommentsDelete(Resource):
     """Class for deleting comment data from the database."""
 
-    def delete(self, comment_id):
+    def delete(self, user_name, book_id, comment_id):
         """Function that deletes comment data from the database."""
+        print("here")
 
-        delete_comments_by_id(comment_id)
+        delete_comments_by_id(user_name, book_id, comment_id)
         return "Comment was deleted succesfully!"
 
 
@@ -285,7 +287,7 @@ api.add_resource(
     '/api/books',
     '/api/books/<book_id>'
     )
-# works
+# works needs to be edited
 api.add_resource(
     BooksAddNewBook,
     '/api/books/add/<book_id>/<name>/<writer>/<year>/<isbn>/' +
@@ -315,7 +317,10 @@ api.add_resource(
     '/api/comments/add/<user_name>/<comment>/<book_id>/<comment_id>'
     )
 # Works
-api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
+api.add_resource(
+    CommentsDelete,
+    '/api/comments/d/<user_name>/<book_id>/<comment_id>'
+    )
 # Works
 api.add_resource(
     RatingsGetUsers,

@@ -163,13 +163,15 @@ class RatingSystem:
     def replace_user_rating(self, user_name, book_id, new_rating):
         """Function that replaces old rating with a new one."""
 
-        count = 0
+        #Pretty sure count isn't needed here
+        #count = 0
 
         for rating in self.user_ratings:
             if rating["Username"] == user_name and \
                     rating["Book_ID"] == int(book_id):
-                self.user_ratings[count]["Rating"] = int(new_rating)
-                count += 1
+                #self.user_ratings[count]["Rating"] = int(new_rating)
+                rating["Rating"] = int(new_rating)
+                #count += 1
 
     # replace doesn't work
     def give_rating(self, user_name, book_id, rating):
