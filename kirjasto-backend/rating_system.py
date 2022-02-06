@@ -10,7 +10,7 @@ client = MongoClient(
     "retryWrites=true&w=majority"
     )
 db = client['kirjasto-backend']
-book_collection = db['backendAPI']
+book_collection = db['books']
 user_collection = db['users']
 rating_collection = db['ratings']
 retrieved_book_collection = list(book_collection.find({}, {'_id': False}))
@@ -38,6 +38,11 @@ class RatingSystem:
         return self.books
 
     def get_retrieved_book_by_id(self, book_id):
+        """
+        Function that returns book from the database
+        depending on the id.
+        """
+
         correct_book_id = True
         numbers = "0123456789"
 
@@ -63,7 +68,12 @@ class RatingSystem:
 
         return self.users
 
-    def get_retrieved_user_by_id(self, user_name):
+    def get_retrieved_user_by_username(self, user_name):
+        """
+        Function that returns user data from the database
+        depending on the username.
+        """
+
         retrieved_ID = list(
             user_collection.find({'user_name': user_name}, {'_id': False})
             )
@@ -84,6 +94,8 @@ class RatingSystem:
         return self.user_ratings
 
     def get_retrieved_ratings_by_username(self, user_name):
+        """Function that returns all of user's ratings."""
+
         retrieved_ID = list(
             rating_collection.find(
                 {'Username': str(user_name)}, {'_id': False}
@@ -97,16 +109,22 @@ class RatingSystem:
             400
             )
 
-    def get_retrieved_rating_by_id(self, user_name, book_id):
+    def get_retrieved_rating_by_username_and_id(self, user_name, book_id):
+        """Function that returns user's ratings on a book."""
+
         correct_id = True
+        correct_username = False
         numbers = "0123456789"
 
         for letter in book_id:
             if letter not in numbers:
                 correct_id = False
-        if correct_id:
+        for rating in retrieved_rating_collection:
+            if rating["Username"] == user_name:
+                correct_username = True
+        if correct_id and correct_username:
             retrieved_ID = list(
-                user_collection.find(
+                rating_collection.find(
                     {
                         'Username': user_name,
                         'Book_ID': int(book_id)
@@ -144,7 +162,7 @@ class RatingSystem:
         for rating in self.user_ratings:
             if rating["Username"] == user_name and \
                     rating["Book_ID"] == int(book_id):
-                self.user_ratings[count]["Rating"] == int(new_rating)
+                self.user_ratings[count]["Rating"] = int(new_rating)
                 count += 1
 
     # replace doesn't work
@@ -166,7 +184,7 @@ class RatingSystem:
                 self.get_reimbursable_user_rating(new_rating),
                 new_rating
                 )
-            self.replace_user_rating(new_rating)
+            self.replace_user_rating(user_name, book_id, new_rating)
         else:
             self.user_ratings.append(new_rating)
             rating_collection.insert_one(new_rating)

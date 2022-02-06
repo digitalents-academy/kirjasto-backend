@@ -10,11 +10,11 @@ client = MongoClient(
     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
     )
 db = client['kirjasto-backend']
-collection = db['backendAPI']
+collection = db['books']
 retrieved_book_collection = list(collection.find({}, {'_id': False}))
 
 
-def db_query():
+def get_books():
 
     retrieved_status = list(collection.find({}, {
         '_id': False
@@ -24,7 +24,7 @@ def db_query():
 
 
 # cannot see books that have string book_id
-def status_query(book_id):
+def get_book_by_id(book_id):
 
     correct_book_id = True
     numbers = "0123456789"
@@ -45,6 +45,7 @@ def status_query(book_id):
         'Book ID must be an int and the book must exist!',
         400
         )
+
 
 #Works but needs to be edited
 #If book is updated data needs to be checked from database
@@ -72,6 +73,7 @@ def add_new_book(
             return
         else:
             collection.insert_one({
+#                "Book_ID": len(retrieved_book_collection) + 1,
                 "Book_ID": int(book_id),
                 "Name": name,
                 "Writer": writer,
@@ -126,7 +128,7 @@ def delete_book_by_id(book_id):
 
 #Need to be checked out
 #Doesn't work
-def loan_book_by_id(user_name, book_id):
+def loan_book_by_username_and_id(user_name, book_id):
 
     correct_book_id = True
     numbers = "0123456789"
@@ -153,7 +155,7 @@ def loan_book_by_id(user_name, book_id):
                     }
                     collection.replace_one(book, new_book)
 
-    #     retrieved = list(collection.find({'Book_ID': book_id}, {'_id': False}))
+    # retrieved = list(collection.find({'Book_ID': book_id}, {'_id': False}))
     # for data in retrieved:
     #     if data['Book_ID'] == book_id:
     #         return collection.find_one_and_update(

@@ -43,7 +43,7 @@ def post_comment(user_name, comment, book_id, comment_id):
         'Username': user_name,
         'Comment': comment,
         'Book_ID': int(book_id),
-        'Comment_ID': int(comment_id)
+        'Comment_ID': int(len(get_comments()))
     })
 
 
