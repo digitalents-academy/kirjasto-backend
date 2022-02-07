@@ -83,8 +83,8 @@ class BooksAddNewBook(Resource):
             description):
         """Function that posts book data to the database."""
 
-        if add_new_book(name, writer, year, isbn, about, tags,
-                description) == "Book has already been added.":
+        if add_new_book(name, writer, year, isbn, about, tags, description) \
+                == "Book has already been added.":
             return "Book has already been added."
 
         add_new_book(
@@ -119,7 +119,7 @@ class BooksDeleteByID(Resource):
         return "Book was deleted succesfully!"
 
 
-class BooksLoanByUsernameAndID (Resource):
+class BooksLoanByUsernameAndID(Resource):
     """Class for changing book datas loan state."""
 
     def post(self, user_name, book_id):
@@ -145,10 +145,12 @@ class CommentsAddNewComment(Resource):
 
     def post(self, user_name, comment, book_id):
         """Function that posts comment data to the database."""
-        if post_comment(user_name, comment, book_id) != "Incorrect ID or username":
+        if post_comment(user_name, comment, book_id) != \
+                "Incorrect ID or username":
             post_comment(user_name, comment, book_id)
             return "Comment was posted succesfully!"
-        return 'error: Not a valid username or book_id! book_id and username must exist!'
+        return "error: Not a valid username or book_id! " \
+            "book_id and username must exist!"
 
 
 class CommentsDelete(Resource):
@@ -201,9 +203,8 @@ class Ratings(Resource):
 
         if book_id is not None:
             if rating_system.get_retrieved_rating_by_username_and_id(
-                user_name,
-                book_id
-                ) is not None:
+                    user_name,
+                    book_id) is not None:
                 return rating_system.get_retrieved_rating_by_username_and_id(
                     user_name,
                     book_id
@@ -211,11 +212,9 @@ class Ratings(Resource):
             return "Incorrect username or book id!"
         elif user_name is not None:
             if rating_system.get_retrieved_ratings_by_username(
-                user_name
-                ) is not None:
+                    user_name) is not None:
                 return rating_system.get_retrieved_ratings_by_username(
-                user_name
-                )
+                    user_name)
             return "Incorrect username"
         if rating_system.get_retrieved_rating_collection() is not None:
             return rating_system.get_retrieved_rating_collection()

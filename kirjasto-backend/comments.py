@@ -39,6 +39,7 @@ def get_comments_by_book_id(book_id):
         return retrieved
     return
 
+
 #Works but the comment_id could be same with the help of delete
 #so some new way to make ids is needed
 #Error handling is done correctly here, but nowhere else!
