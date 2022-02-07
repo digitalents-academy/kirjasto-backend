@@ -17,9 +17,7 @@ from comments import (
     post_comment
     )
 from rating_system import RatingSystem
-from user import routes
 import db_secret
-from app import login_required, home, dashboard
 
 parser = reqparse.RequestParser()
 
@@ -244,55 +242,14 @@ class RatingsDeleteByUsernameAndBookID(Resource):
         return "Rating was deleted succesfully!"
 
 
-#Not working
-#-----------------------------------------------------------------------------
-class AuthenticationSignup(Resource):
-    def post(self):
-        routes.signup()
-        return "User was added succesfully!"
-
-
-class AuthenticationSignout(Resource):
-    def get(self):
-        return routes.signout()
-
-
-class AuthenticationLogin(Resource):
-    def post(self):
-        return routes.login()
-
-
-class AuthenticationLoginRequired(Resource):
-    def get(self, f):
-        return login_required(f)
-
-
-class AuthenticationHome(Resource):
-    def get(self):
-        return home()
-
-
-class AuthenticationDashBoard(Resource):
-    def get(self):
-        return dashboard()
-
-
 class HomePage(Resource):
     def get(self):
         return Response(response=render_template("index.html"))
 
 
-#-----------------------------------------------------------------------------
-
 api.add_resource(TesterData, "/api/testerdata/<_id>")
 # works
-#api.add_resource(HomePage, '/')
-# testing
-#api.add_resource(AuthenticationLoginRequired, )
-# testing
-api.add_resource(AuthenticationHome, '/')
-# testing
-api.add_resource(AuthenticationDashBoard, '/dashboard/')
+api.add_resource(HomePage, '/')
 # works
 api.add_resource(
     Books,
@@ -360,11 +317,7 @@ api.add_resource(
     RatingsDeleteByUsernameAndBookID,
     '/api/ratings/d/<book_id>/user_name'
     )
-api.add_resource(AuthenticationSignup,
-                 '/api/authentication/signup', methods=['POST'])
-api.add_resource(AuthenticationSignout, '/api/authentication/signout')
-api.add_resource(AuthenticationLogin,
-                 '/api/authentication/login', methods=['POST'])
+
 
 # Runs on port 8000!!
 if __name__ == "__main__":

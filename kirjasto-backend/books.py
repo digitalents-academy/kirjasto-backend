@@ -2,7 +2,6 @@ import uuid
 from pymongo import MongoClient
 from flask_restful import reqparse
 import db_secret
-import user
 
 # Initiate connection to mongoDB
 client = MongoClient(
