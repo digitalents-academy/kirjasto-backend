@@ -20,7 +20,7 @@ from comments import (
 from rating_system import RatingSystem
 from user import routes
 import db_secret
-#from bson.objectid import ObjectId
+from bson.objectid import ObjectId
 from app import login_required, home, dashboard
 
 parser = reqparse.RequestParser()
@@ -80,12 +80,13 @@ class StatusUpdateBook(Resource):
             book_id, name, writer, year, isbn, rating, about, tags,
             description, loaner, loan_status
             )
+        return " Book was updated succesfully!"
 
 
 class StatusDeleteBookByID(Resource):
     def delete(self, book_id):
         delete_book_by_id(book_id)
-        return "Deleted comment!", 200
+        return "Deleted comment!"
 
 
 class StatusID(Resource):
