@@ -1,7 +1,5 @@
 from flask import Flask, Response, render_template
 from flask_restful import Resource, Api, reqparse
-#from flask_restful import reqparse
-#from pymongo import ALL
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from books import (
@@ -83,12 +81,16 @@ class BooksAddNewBook(Resource):
     """Class for posting book data to the database."""
 
     def post(
-            self, book_id, name, writer, year, isbn, about, tags,
+            self, name, writer, year, isbn, about, tags,
             description):
         """Function that posts book data to the database."""
 
+        if add_new_book(name, writer, year, isbn, about, tags,
+                description) == "Book has already been added.":
+            return "Book has already been added."
+
         add_new_book(
-            book_id, name, writer, year, isbn, about, tags,
+            name, writer, year, isbn, about, tags,
             description
             )
         return " Book was added succesfully!"
@@ -143,10 +145,10 @@ class Comments(Resource):
 class CommentsAddNewComment(Resource):
     """Class for posting comment data to the database."""
 
-    def post(self, user_name, comment, book_id, comment_id):
+    def post(self, user_name, comment, book_id):
         """Function that posts comment data to the database."""
-        if post_comment(user_name, comment, book_id, comment_id) != "Doesn't work":
-            post_comment(user_name, comment, book_id, comment_id)
+        if post_comment(user_name, comment, book_id) != "Incorrect ID or username":
+            post_comment(user_name, comment, book_id)
             return "Comment was posted succesfully!"
         return 'error: Not a valid username or book_id! book_id and username must exist!'
 
@@ -156,7 +158,6 @@ class CommentsDelete(Resource):
 
     def delete(self, user_name, book_id, comment_id):
         """Function that deletes comment data from the database."""
-        print("here")
 
         delete_comments_by_id(user_name, book_id, comment_id)
         return "Comment was deleted succesfully!"
@@ -201,15 +202,26 @@ class Ratings(Resource):
         """Function that returns rating data depending on the url."""
 
         if book_id is not None:
-            return rating_system.get_retrieved_rating_by_username_and_id(
+            if rating_system.get_retrieved_rating_by_username_and_id(
                 user_name,
                 book_id
-                )
+                ) is not None:
+                return rating_system.get_retrieved_rating_by_username_and_id(
+                    user_name,
+                    book_id
+                    )
+            return "Incorrect username or book id!"
         elif user_name is not None:
-            return rating_system.get_retrieved_ratings_by_username(
+            if rating_system.get_retrieved_ratings_by_username(
+                user_name
+                ) is not None:
+                return rating_system.get_retrieved_ratings_by_username(
                 user_name
                 )
-        return rating_system.get_retrieved_rating_collection()
+            return "Incorrect username"
+        if rating_system.get_retrieved_rating_collection() is not None:
+            return rating_system.get_retrieved_rating_collection()
+        return "Something went wrong!"
 
 
 class RatingsAddNewRating(Resource):
@@ -290,7 +302,7 @@ api.add_resource(
 # works needs to be edited
 api.add_resource(
     BooksAddNewBook,
-    '/api/books/add/<book_id>/<name>/<writer>/<year>/<isbn>/' +
+    '/api/books/add/<name>/<writer>/<year>/<isbn>/' +
     '<about>/<tags>/<description>'
     )
 # works but is this needed?
@@ -314,7 +326,7 @@ api.add_resource(
 # works
 api.add_resource(
     CommentsAddNewComment,
-    '/api/comments/add/<user_name>/<comment>/<book_id>/<comment_id>'
+    '/api/comments/add/<user_name>/<comment>/<book_id>'
     )
 # Works
 api.add_resource(

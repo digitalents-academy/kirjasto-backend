@@ -4,6 +4,7 @@ from pymongo.mongo_client import MongoClient
 import db_secret
 
 app = Flask(__name__)
+app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":"

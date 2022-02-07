@@ -1,4 +1,4 @@
-# from pymongo import ALL
+import uuid
 from pymongo import MongoClient
 from flask_restful import reqparse
 import db_secret
@@ -48,52 +48,36 @@ def get_book_by_id(book_id):
         )
 
 
-#Not complete
-#Unique Book_id needed
+#Slight problem 
+#Book is added even though isbn or name is the same
 def add_new_book(
-        book_id, name, writer, year, isbn, about, tags, description):
+        name, writer, year, isbn, about, tags, description):
     """Function that posts new book to the database."""
 
+    numbers = "0123456789"
+    correct_writer = False
+
     for book in retrieved_book_collection:
-        if book["Book_ID"] == int(book_id):
-            collection.update(
-                {'Book_ID': int(book_id)},
-                {
-                    "$set": {
-                        "Name": name,
-                        "Writer": writer,
-                        "Year": year,
-                        "ISBN": isbn,
-                        "Rating": book["Rating"],
-                        "About": about,
-                        "Tags": tags,
-                        "Description": description,
-                        "Loaner": book["Loaner"],
-                        "Loan_Status": book["Loan_Status"]
-                        }
-                    }
-                )
-            return
-        else:
-            collection.insert_one({
-                #"Book_ID": len(retrieved_book_collection) + 1,
-                "Book_ID": book_id,
-                "Name": name,
-                "Writer": writer,
-                "Year": int(year),
-                "ISBN": isbn,
-                "Rating": 0,
-                "About": about,
-                "Tags": tags,
-                "Description": description,
-                "Loaner": None,
-                "Loan_Status": False
-
-            })
-        return
+        if book["Name"] == name or book["ISBN"] == isbn:
+            return "Book has already been added."
+    #Another test
+    collection.insert_one({
+        "Book_ID": uuid.uuid4().hex,
+        "Name": name,
+        "Writer": writer,
+        "Year": int(year),
+        "ISBN": isbn,
+        "Rating": 0,
+        "About": about,
+        "Tags": tags,
+        "Description": description,
+        "Loaner": None,
+        "Loan_Status": False
+    })
 
 
-#Needed?
+#book_id could be the only parameter
+#and rest of the attributes could be added with parser.
 def update_book(
         book_id, name, writer, year, isbn, rating, about, tags, description,
         loaner, loan_status):
