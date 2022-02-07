@@ -1,2 +1,31 @@
-venv
+# created by virtualenv automatically
+# Byte-compiled / optimized / DLL files
+*/__pycache__/
+
+# Distribution / packaging
+*/env/
+*/build/
+*/app/lib/
+*/lib/
+
+# Installer logs
+*/pip-log.txt
+*/pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+*/.cache
+
+# Sphinx documentation
+*/docs/_build/
+
+# pyenv
+*/.python-version
+
+# dotenv
+*/.env
+
+# virtualenv
+*/venv/
+*/ENV/
+
 kirjasto-backend-v2/kirjasto-backend-v2/db_secret.py

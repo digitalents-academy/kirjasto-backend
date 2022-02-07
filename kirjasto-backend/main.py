@@ -3,13 +3,14 @@ from flask_restful import Resource, Api, reqparse
 #from flask_restful import reqparse
 #from pymongo import ALL
 from pymongo import MongoClient
-from query import (
-    db_query,
-    status_query,
+from bson.objectid import ObjectId
+from books import (
+    get_books,
+    get_book_by_id,
     add_new_book,
     delete_book_by_id,
     update_book,
-    loan_book_by_id
+    loan_book_by_username_and_id
     )
 from comments import (
     delete_comments_by_id,
@@ -20,7 +21,6 @@ from comments import (
 from rating_system import RatingSystem
 from user import routes
 import db_secret
-from bson.objectid import ObjectId
 from app import login_required, home, dashboard
 
 parser = reqparse.RequestParser()
@@ -34,196 +34,243 @@ client = MongoClient(
     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
     )
 db = client['kirjasto-backend']
-collection = db['backendAPI']
+collection = db['books']
 testcollection = db["testerdata"]
 
+
 class TesterData(Resource):
+    """Class for testing sending and returning data."""
     # def get(self):
     #     return list(testcollection.find())
 
     def get(self, _id):
+        """Function that returns data with object id."""
+
         return testcollection.find_one({"_id": ObjectId(_id)})
-    
+
     def post(self):
+        """
+        Function that posts data depending on
+        what is writed on the frontend form.
+        """
+
         parser.add_argument("name", type=str)
         parser.add_argument("writer", type=str)
         parser.add_argument("year", type=int)
         args = parser.parse_args()
 
-        item = {"name": args["name"], "writer": args["writer"], "year": args["year"]}
+        item = {
+            "name": args["name"],
+            "writer": args["writer"],
+            "year": args["year"]
+            }
         testcollection.insert_one(item)
         return "Nice!"
 
-class StatusGetBooks(Resource):
-    # Get the status for all of the books in the books collection
-    def get(self):
-        # Query books with book name id and loan status
-        return db_query()
+
+class Books(Resource):
+    """Class for returning book data from the database."""
+
+    def get(self, book_id=None):
+        """Function that returns book data depending on the url."""
+
+        if (book_id is not None):
+            return get_book_by_id(book_id)
+        return get_books()
 
 
-class StatusAddNewBook(Resource):
+class BooksAddNewBook(Resource):
+    """Class for posting book data to the database."""
+
     def post(
-            self, book_id, name, writer, year, isbn, rating, about, tags,
-            description, loaner, loan_status):
+            self, book_id, name, writer, year, isbn, about, tags,
+            description):
+        """Function that posts book data to the database."""
+
         add_new_book(
-            book_id, name, writer, year, isbn, rating, about, tags,
-            description, loaner, loan_status
+            book_id, name, writer, year, isbn, about, tags,
+            description
             )
-        return " Adding new book was succesful!"
+        return " Book was added succesfully!"
 
 
-class StatusUpdateBook(Resource):
+class BooksUpdateBook(Resource):
+    """Class for updating book data to the database."""
+
     def put(
             self, book_id, name, writer, year, isbn, rating, about, tags,
             description, loaner, loan_status):
+        """Function that updates book data to the database."""
+
         update_book(
             book_id, name, writer, year, isbn, rating, about, tags,
             description, loaner, loan_status
             )
-        return " Book was updated succesfully!"
+        return "Book was added succesfully!"
 
 
-class StatusDeleteBookByID(Resource):
+class BooksDeleteByID(Resource):
+    """Class for deleting book data from the database."""
+
     def delete(self, book_id):
+        """Function that deletes book data from the database."""
+
         delete_book_by_id(book_id)
-        return "Deleted comment!"
+        return "Book was deleted succesfully!"
 
 
-class StatusID(Resource):
-    def get(self, book_id):
-        return status_query(book_id), 200
+class BooksLoanByUsernameAndID (Resource):
+    """Class for changing book datas loan state."""
+
+    def post(self, user_name, book_id):
+        """Function that changes book's loan state."""
+
+        loan_book_by_username_and_id(user_name, book_id)
+        return "Book was loaned succesfully!"
 
 
-class StatusLoan (Resource):
-    def post(self, book_id):
-        return loan_book_by_id(book_id), 200
+class Comments(Resource):
+    """Class for returning comment data from the database."""
+
+    def get(self, book_id=None):
+        """Function that returns comment data depending on the url."""
+
+        if (book_id is not None):
+            return get_comments_by_book_id(book_id)
+        return get_comments()
 
 
-class CommentsGet(Resource):
-    def get(self):
-        return get_comments(), 200
+class CommentsAddNewComment(Resource):
+    """Class for posting comment data to the database."""
 
-
-class CommentsPost(Resource):
     def post(self, user_name, comment, book_id, comment_id):
-        return {"task": post_comment(user_name, comment, book_id, comment_id)}, 200
+        """Function that posts comment data to the database."""
+        if post_comment(user_name, comment, book_id, comment_id) != "Doesn't work":
+            post_comment(user_name, comment, book_id, comment_id)
+            return "Comment was posted succesfully!"
+        return 'error: Not a valid username or book_id! book_id and username must exist!'
 
 
-class CommentsGetByID(Resource):
-    def get(self, book_id):
-        return get_comments_by_book_id(book_id), 200
+class CommentsDelete(Resource):
+    """Class for deleting comment data from the database."""
+
+    def delete(self, user_name, book_id, comment_id):
+        """Function that deletes comment data from the database."""
+        print("here")
+
+        delete_comments_by_id(user_name, book_id, comment_id)
+        return "Comment was deleted succesfully!"
 
 
-class CommentsDeleteByID(Resource):
-    def delete(self, comment_id):
-        delete_comments_by_id(comment_id)
-        return "Deleted comment!", 200
-
-
-class RatingsGetBooks(Resource):
-
-    def get(self):
-        return rating_system.get_retrieved_book_collection(), 200
-
-
-class RatingsGetBookByID(Resource):
-
-    def get(self, book_id):
-        return rating_system.get_retrieved_book_by_id(book_id), 200
-
-
-class RatingsPostBooks(Resource):
-
-    def post(self):
-        rating_system.post_updated_book_collection(), 200
-
-
+#Not needed in rating system?
+#-----------------------------------------------------------------------------
+#Needed in user file
 class RatingsGetUsers(Resource):
+    """Class for returning user data from the database."""
 
-    def get(self):
-        return rating_system.get_retrieved_user_collection(), 200
+    def get(self, user_name=None):
+        """Function that returns user data depending on the url."""
+
+        if user_name is not None:
+            if rating_system.get_retrieved_user_by_username(user_name) is None:
+                return 'error: Not a valid username! username must exist!'
+            return rating_system.get_retrieved_user_by_username(user_name)
+        return rating_system.get_retrieved_user_collection()
 
 
-class RatingsGetUserByUsername(Resource):
-
-    def get(self, user_name):
-        return rating_system.get_retrieved_user_by_id(user_name), 200
-
-
+#Needed?
 class RatingsPostUsers(Resource):
+    """Class for updating user data from the database."""
 
     def post(self):
-        rating_system.post_updated_user_collection(), 200
+        """
+        Function that replaces user_collection
+        with dictionary called self.users.
+        """
+
+        rating_system.post_updated_user_collection()
+        return "User data was updated succesfully!"
+#-----------------------------------------------------------------------------
 
 
-class RatingsGetRatings(Resource):
+#Editing this
+class Ratings(Resource):
+    """Class for returning rating data from the database."""
 
-    def get(self):
-        return rating_system.get_retrieved_rating_collection(), 200
+    def get(self, user_name=None, book_id=None):
+        """Function that returns rating data depending on the url."""
 
-
-class RatingsGetRatingsByUsername(Resource):
-
-    def get(self, user_name):
-        return rating_system.get_retrieved_ratings_by_username(
-            user_name
-            ), 200
-
-
-class RatingsGetRatingByID(Resource):
-
-    def get(self, user_name, book_id):
-        return rating_system.get_retrieved_rating_by_id(
-            user_name,
-            book_id
-            ), 200
+        if book_id is not None:
+            return rating_system.get_retrieved_rating_by_username_and_id(
+                user_name,
+                book_id
+                )
+        elif user_name is not None:
+            return rating_system.get_retrieved_ratings_by_username(
+                user_name
+                )
+        return rating_system.get_retrieved_rating_collection()
 
 
-class RatingsPostRating(Resource):
+class RatingsAddNewRating(Resource):
+    """Class for posting rating data to the database."""
 
     def post(self, user_name: int, book_id: int, rating: int):
-        rating_system.give_rating(user_name, book_id, rating), 200
+        """Function that posts comment data to the database."""
+
+        rating_system.give_rating(user_name, book_id, rating)
+        return "Rating was posted succesfully!"
 
 
-class RatingsDeleteRating(Resource):
+class RatingsDeleteByUsernameAndBookID(Resource):
+    """Class for deleting rating data from the database."""
 
     def delete(self, user_name, book_id):
-        rating_system.delete_rating(user_name, book_id), 200
+        """Function that deletes rating data from the database."""
+
+        rating_system.delete_rating(user_name, book_id)
+        return "Rating was deleted succesfully!"
 
 
+#Not working
+#-----------------------------------------------------------------------------
 class AuthenticationSignup(Resource):
     def post(self):
-        return routes.signup(), 200
+        routes.signup()
+        return "User was added succesfully!"
 
 
 class AuthenticationSignout(Resource):
     def get(self):
-        return routes.signout(), 200
+        return routes.signout()
 
 
 class AuthenticationLogin(Resource):
     def post(self):
-        return routes.login(), 200
+        return routes.login()
 
 
 class AuthenticationLoginRequired(Resource):
-    def get(self):
-        return login_required(), 200
+    def get(self, f):
+        return login_required(f)
 
 
 class AuthenticationHome(Resource):
     def get(self):
-        return home(), 200
+        return home()
 
 
 class AuthenticationDashBoard(Resource):
     def get(self):
-        return dashboard(), 200
+        return dashboard()
 
 
 class HomePage(Resource):
     def get(self):
         return Response(response=render_template("index.html"))
+
+
+#-----------------------------------------------------------------------------
 
 api.add_resource(TesterData, "/api/testerdata/<_id>")
 # works
@@ -235,70 +282,72 @@ api.add_resource(AuthenticationHome, '/')
 # testing
 api.add_resource(AuthenticationDashBoard, '/dashboard/')
 # works
-api.add_resource(StatusGetBooks, '/api/status')
-# works
 api.add_resource(
-    StatusAddNewBook,
-    '/api/status/add/<book_id>/<name>/<writer>/<year>/<isbn>/<rating>/' +
-    '<about>/<tags>/<description>/<loaner>/<loan_status>'
+    Books,
+    '/api/books',
+    '/api/books/<book_id>'
+    )
+# works needs to be edited
+api.add_resource(
+    BooksAddNewBook,
+    '/api/books/add/<book_id>/<name>/<writer>/<year>/<isbn>/' +
+    '<about>/<tags>/<description>'
+    )
+# works but is this needed?
+api.add_resource(
+    BooksUpdateBook, '/api/books/update/<book_id>/<name>/<writer>/' +
+    '<year>/<isbn>/<about>/<tags>/<description>/'
     )
 # works
-api.add_resource(
-    StatusUpdateBook, '/api/status/update/<book_id>/<name>/<writer>/' +
-    '<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/' +
-    '<loan_status>'
-    )
-# works
-api.add_resource(StatusDeleteBookByID, '/api/status/d/<book_id>/')
-# works
-api.add_resource(StatusID, '/api/status/<book_id>')
+api.add_resource(BooksDeleteByID, '/api/books/d/<book_id>/')
 # not complete
-api.add_resource(StatusLoan, '/api/loan/<book_id>')
-# works
-api.add_resource(CommentsGet, '/api/comments/get')
-# works
-api.add_resource(CommentsGetByID, '/api/comments/get/<book_id>')
+api.add_resource(
+    BooksLoanByUsernameAndID,
+    '/api/books/loan/<user_name>/<book_id>'
+    )
 # works
 api.add_resource(
-    CommentsPost,
-    '/api/comments/<user_name>/<comment>/<book_id>/<comment_id>'
+    Comments,
+    '/api/comments',
+    '/api/comments/<book_id>'
     )
-# not complete
-api.add_resource(CommentsDeleteByID, '/api/comments/d/<comment_id>')
-#Works but is this needed?
-api.add_resource(RatingsGetBooks, '/api/ratings/get/books/')
-#Works but is this needed?
-api.add_resource(RatingsGetBookByID, '/api/ratings/get/books/<book_id>/')
+# works
+api.add_resource(
+    CommentsAddNewComment,
+    '/api/comments/add/<user_name>/<comment>/<book_id>/<comment_id>'
+    )
+# Works
+api.add_resource(
+    CommentsDelete,
+    '/api/comments/d/<user_name>/<book_id>/<comment_id>'
+    )
+# Works
+api.add_resource(
+    RatingsGetUsers,
+    '/api/ratings/users',
+    '/api/ratings/users/<user_name>'
+    )
+
 # Not sure
-api.add_resource(RatingsPostBooks, '/api/ratings/post/books/')
-# Works
-api.add_resource(RatingsGetUsers, '/api/ratings/get/users/')
-# Works
+#api.add_resource(RatingsPostUsers, '/api/ratings/post/users/')
+
+# Works but when book is added doesn't work after reboot?
 api.add_resource(
-    RatingsGetUserByUsername,
-    '/api/ratings/get/users/<user_name>/'
+    Ratings,
+    '/api/ratings',
+    '/api/ratings/<user_name>',
+    '/api/ratings/<user_name>/<book_id>'
     )
-# Not sure
-api.add_resource(RatingsPostUsers, '/api/ratings/post/users/')
-# Works
-api.add_resource(RatingsGetRatings, '/api/ratings/get/ratings/')
 # Works
 api.add_resource(
-    RatingsGetRatingsByUsername,
-    '/api/ratings/get/ratings/<user_name>'
+    RatingsAddNewRating,
+    '/api/ratings/add/<user_name>/<book_id>/<rating>'
     )
 # not complete
 api.add_resource(
-    RatingsGetRatingByID,
-    '/api/ratings/get/ratings/user_name/book_id/'
+    RatingsDeleteByUsernameAndBookID,
+    '/api/ratings/d/<book_id>/user_name'
     )
-# Works
-api.add_resource(
-    RatingsPostRating,
-    '/api/ratings/post/<user_name>/<book_id>/<rating>/'
-    )
-# not complete
-api.add_resource(RatingsDeleteRating, '/api/ratings/d/<book_id>/user_name/')
 api.add_resource(AuthenticationSignup,
                  '/api/authentication/signup', methods=['POST'])
 api.add_resource(AuthenticationSignout, '/api/authentication/signout')
