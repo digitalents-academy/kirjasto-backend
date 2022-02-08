@@ -1,8 +1,12 @@
-# from pymongo import ALL
+import uuid
 from pymongo import MongoClient
 from flask_restful import reqparse
 import db_secret
-import user
+from tests import (
+    is_book_already_added,
+    is_book_id_inside_book_collection,
+    is_user_name_inside_user_collection
+    )
 
 # Initiate connection to mongoDB
 client = MongoClient(
@@ -48,52 +52,36 @@ def get_book_by_id(book_id):
         )
 
 
-#Not complete
-#Unique Book_id needed
+#Slight problem
+#Book is added even though isbn or name is the same
 def add_new_book(
-        book_id, name, writer, year, isbn, about, tags, description):
+        name, writer, year, isbn, about, tags, description):
     """Function that posts new book to the database."""
 
+    numbers = "0123456789"
+    correct_writer = False
+
     for book in retrieved_book_collection:
-        if book["Book_ID"] == int(book_id):
-            collection.update(
-                {'Book_ID': int(book_id)},
-                {
-                    "$set": {
-                        "Name": name,
-                        "Writer": writer,
-                        "Year": year,
-                        "ISBN": isbn,
-                        "Rating": book["Rating"],
-                        "About": about,
-                        "Tags": tags,
-                        "Description": description,
-                        "Loaner": book["Loaner"],
-                        "Loan_Status": book["Loan_Status"]
-                        }
-                    }
-                )
-            return
-        else:
-            collection.insert_one({
-                #"Book_ID": len(retrieved_book_collection) + 1,
-                "Book_ID": book_id,
-                "Name": name,
-                "Writer": writer,
-                "Year": int(year),
-                "ISBN": isbn,
-                "Rating": 0,
-                "About": about,
-                "Tags": tags,
-                "Description": description,
-                "Loaner": None,
-                "Loan_Status": False
-
-            })
-        return
+        if book["Name"] == name or book["ISBN"] == isbn:
+            return "Book has already been added."
+    #Another test
+    collection.insert_one({
+        "Book_ID": uuid.uuid4().hex,
+        "Name": name,
+        "Writer": writer,
+        "Year": int(year),
+        "ISBN": isbn,
+        "Rating": 0,
+        "About": about,
+        "Tags": tags,
+        "Description": description,
+        "Loaner": None,
+        "Loan_Status": False
+    })
 
 
-#Needed?
+#book_id could be the only parameter
+#and rest of the attributes could be added with parser.
 def update_book(
         book_id, name, writer, year, isbn, rating, about, tags, description,
         loaner, loan_status):
@@ -131,35 +119,29 @@ def delete_book_by_id(book_id):
         collection.delete_one({"Book_ID": int(book_id)})
 
 
-#Need to be checked out
-#Doesn't work
 def loan_book_by_username_and_id(user_name, book_id):
     """Function that changes book's loan state."""
 
-    correct_book_id = True
-    numbers = "0123456789"
-
-    for letter in book_id:
-        if letter not in numbers:
-            correct_book_id = False
-    if correct_book_id:
-        for book in retrieved_book_collection:
-            if book["Book_ID"] == int(book_id):
-                if book['Loan_Status'] is False:
-                    new_book = {
-                        'Book_ID': book['Book_ID'],
-                        'Name': book['Name'],
-                        'Writer': book['Writer'],
-                        'Year': book['Year'],
-                        'ISBN': book['ISBN'],
-                        'Rating': book['Rating'],
-                        'About': book['About'],
-                        'Tags': book['Tags'],
-                        'Description': book['Description'],
-                        'Loaner': None,
-                        'Loan_Status': True
-                    }
-                    collection.replace_one(book, new_book)
+    if is_user_name_inside_user_collection(user_name) and \
+            is_book_id_inside_book_collection(int(book_id)):
+        book = get_book_by_id(book_id)
+        if book[0]['Loan_Status'] == "False":
+            new_book = {
+                'Book_ID': book[0]['Book_ID'],
+                'Name': book[0]['Name'],
+                'Writer': book[0]['Writer'],
+                'Year': book[0]['Year'],
+                'ISBN': book[0]['ISBN'],
+                'Rating': book[0]['Rating'],
+                'About': book[0]['About'],
+                'Tags': book[0]['Tags'],
+                'Description': book[0]['Description'],
+                'Loaner': user_name,
+                'Loan_Status': True
+            }
+            collection.replace_one(book[0], new_book)
+    else:
+        return "Something went wrong."
 
     # retrieved = list(collection.find({'Book_ID': book_id}, {'_id': False}))
     # for data in retrieved:

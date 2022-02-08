@@ -29,6 +29,7 @@ class RatingSystem:
         self.users = retrieved_user_collection
         self.user_ratings = retrieved_rating_collection
 
+#Needed?
     def get_retrieved_book_collection(self):
         """
         Function that returns a dictionary called self.books
@@ -78,7 +79,7 @@ class RatingSystem:
 
         if correct_user_name:
             retrieved = list(
-                user_collection.find({'user_name': user_name}, {'_id': False})
+                user_collection.find({'Username': user_name}, {'_id': False})
                 )
 
             if len(retrieved) > 0:
@@ -138,12 +139,6 @@ class RatingSystem:
                     )
                 )
             return retrieved
-        return (
-            'error: Not a valid User or Book ID! ' +
-            'Username must exist and Book ID must be an int. ' +
-            'Also the rating must exist!',
-            400
-            )
 
     def has_the_user_already_rated_this_book(self, user_name, book_id):
         """Function that checks whether a user has already rated the book."""
@@ -300,7 +295,7 @@ class RatingSystem:
         """
 
         for retrieved_user in retrieved_user_collection:
-            if retrieved_user["user_name"] == user["user_name"]:
+            if retrieved_user["Username"] == user["Username"]:
                 return retrieved_user
 
     def get_reimbursable_user_rating(self, rating):

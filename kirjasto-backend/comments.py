@@ -1,3 +1,4 @@
+import uuid
 from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
 import db_secret
@@ -38,10 +39,11 @@ def get_comments_by_book_id(book_id):
         return retrieved
     return
 
+
 #Works but the comment_id could be same with the help of delete
 #so some new way to make ids is needed
 #Error handling is done correctly here, but nowhere else!
-def post_comment(user_name, comment, book_id, comment_id):
+def post_comment(user_name, comment, book_id):
     """Function that posts new comment to the database."""
 
     correct_user_name = False
@@ -59,10 +61,10 @@ def post_comment(user_name, comment, book_id, comment_id):
             'Username': user_name,
             'Comment': comment,
             'Book_ID': int(book_id),
-            'Comment_ID': int(comment_id)
+            'Comment_ID': uuid.uuid4().hex
         })
     else:
-        return "Doesn't work"
+        return "Incorrect ID or username"
 
 
 def delete_comments_by_id(user_name, book_id, comment_id):

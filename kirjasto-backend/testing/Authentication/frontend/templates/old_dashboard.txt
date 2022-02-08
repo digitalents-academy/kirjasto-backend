@@ -24,9 +24,9 @@
 
         <p>
             <strong>ID:</strong> {{ session['user']['_id'] }}<br>
-            <strong>Name:</strong> {{ session['user']['name'] }}<br>
-            <strong>Email:</strong> {{ session['user']['email'] }}<br>
-            <strong>Mean Score:</strong> {{ session['user']['mean_score'] }}
+            <strong>Name:</strong> {{ session['user']['Username'] }}<br>
+            <strong>Email:</strong> {{ session['user']['Email'] }}<br>
+            <strong>Mean Score:</strong> {{ session['user']['Mean_score'] }}
         </p>
 
     </div>
