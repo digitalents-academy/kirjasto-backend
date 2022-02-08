@@ -156,10 +156,12 @@ class CommentsDelete(Resource):
 
     def delete(self, user_name, book_id, comment_id):
         """Function that deletes comment data from the database."""
-        print("here")
 
-        delete_comments_by_id(user_name, book_id, comment_id)
-        return "Comment was deleted succesfully!"
+        if delete_comments_by_id(user_name, book_id, comment_id) != "something went wrong":
+            delete_comments_by_id(user_name, book_id, comment_id)
+            return "Comment was deleted succesfully!"
+        
+        return "error: Not a valid username, book_id or comment_id!"
 
 
 #Not needed in rating system?

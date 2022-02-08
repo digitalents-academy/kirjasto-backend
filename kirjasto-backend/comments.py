@@ -52,7 +52,7 @@ def post_comment(user_name, comment, book_id, comment_id):
         if letter not in numbers:
             correct_book_id = False
     for user in retrieved_user_collection:
-        if user["user_name"] == user_name:
+        if user["Username"] == user_name:
             correct_user_name = True
     if correct_book_id and correct_user_name:
         collection.insert_one({
@@ -84,6 +84,8 @@ def delete_comments_by_id(user_name, book_id, comment_id):
             correct_user_name = True
     if correct_user_name and correct_book_id and correct_comment_id:
         collection.delete_one({"Comment_ID": int(comment_id)})
+    else:
+         return "something went wrong"
 
 #Maybe needed when the front is ready?
     #     parser = reqparse.RequestParser()
