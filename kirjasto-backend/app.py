@@ -118,9 +118,11 @@ class BooksDeleteByID(Resource):
 
     def delete(self, book_id):
         """Function that deletes book data from the database."""
+        if is_book_id_inside_book_collection(book_id):
 
-        delete_book_by_id(book_id)
-        return "Book was deleted succesfully!"
+            delete_book_by_id(book_id)
+            return "Book was deleted succesfully!"
+        return "error: Not a valid book_id! Book_id must be inside the database!"
 
 
 class BooksLoanByUsernameAndID(Resource):
@@ -138,9 +140,13 @@ class Comments(Resource):
 
     def get(self, book_id=None):
         """Function that returns comment data depending on the url."""
-
-        if (book_id is not None):
-            return get_comments_by_book_id(book_id)
+        if book_id is not None:
+            
+            if is_book_id_inside_book_collection(book_id):
+                get_comments_by_book_id(book_id)
+                return "Comments retrieved successfully!"
+            return "error: Not a valid book_id!"
+        
         return get_comments()
 
 
@@ -162,9 +168,10 @@ class CommentsDelete(Resource):
 
     def delete(self, user_name, book_id, comment_id):
         """Function that deletes comment data from the database."""
-
-        delete_comments_by_id(user_name, book_id, comment_id)
-        return "Comment was deleted succesfully!"
+        if is_user_name_inside_user_collection(user_name) and is_book_id_inside_book_collection(book_id) and is_comment_data_inside_comment_collection(user_name, book_id):
+            delete_comments_by_id(user_name, book_id, comment_id)
+            return "Comment was deleted succesfully!"
+        return "error: Not a valid username, book_id or comment_id!"
 
 
 #Not needed in rating system?
@@ -177,9 +184,12 @@ class RatingsGetUsers(Resource):
         """Function that returns user data depending on the url."""
 
         if user_name is not None:
-            if rating_system.get_retrieved_user_by_username(user_name) is None:
-                return 'error: Not a valid username! username must exist!'
-            return rating_system.get_retrieved_user_by_username(user_name)
+            if is_user_name_inside_user_collection(user_name):
+
+                rating_system.get_retrieved_user_by_username(user_name)
+                return "return was successful"
+            return 'error: Not a valid username! username must exist!'
+
         return rating_system.get_retrieved_user_collection()
 
 
@@ -206,23 +216,20 @@ class Ratings(Resource):
         """Function that returns rating data depending on the url."""
 
         if book_id is not None:
-            if rating_system.get_retrieved_rating_by_username_and_id(
-                    user_name,
-                    book_id) is not None:
+            if is_book_id_inside_book_collection(book_id) and is_user_name_inside_user_collection(user_name):
                 return rating_system.get_retrieved_rating_by_username_and_id(
                     user_name,
                     book_id
                     )
             return "Incorrect username or book id!"
         elif user_name is not None:
-            if rating_system.get_retrieved_ratings_by_username(
-                    user_name) is not None:
+            if is_user_name_inside_user_collection(user_name):
                 return rating_system.get_retrieved_ratings_by_username(
                     user_name)
             return "Incorrect username"
-        if rating_system.get_retrieved_rating_collection() is not None:
-            return rating_system.get_retrieved_rating_collection()
-        return "Something went wrong!"
+        
+        return rating_system.get_retrieved_rating_collection()
+        
 
 
 class RatingsAddNewRating(Resource):

@@ -50,7 +50,7 @@ def is_comment_data_inside_comment_collection(user_name, book_id):
     """
 
     for comment in retrieved_comment_collection:
-        if comment["Username"] == user_name and comment["Book_ID"] == int(book_id):
+        if comment["Username"] == user_name and comment["Book_ID"] == book_id:
             return True
     return False
 
