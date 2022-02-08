@@ -32,24 +32,13 @@ def get_books():
 def get_book_by_id(book_id):
     """Function that returns book data depending on the book_id."""
 
-    correct_book_id = True
-    numbers = "0123456789"
-
-    for letter in book_id:
-        if letter not in numbers:
-            correct_book_id = False
-    if correct_book_id:
-        retrieved = list(
-            collection.find(
-                {'Book_ID': int(book_id)},
-                {'_id': False}
-                )
+    retrieved = list(
+        collection.find(
+            {'Book_ID': book_id},
+            {'_id': False}
             )
-        return retrieved
-    return (
-        'error: Not a valid Book ID! ' +
-        'Book ID must be an int and the book must exist!'
         )
+    return retrieved
 
 
 #Slight problem
@@ -58,13 +47,6 @@ def add_new_book(
         name, writer, year, isbn, about, tags, description):
     """Function that posts new book to the database."""
 
-    numbers = "0123456789"
-    correct_writer = False
-
-    for book in retrieved_book_collection:
-        if book["Name"] == name or book["ISBN"] == isbn:
-            return "Book has already been added."
-    #Another test
     collection.insert_one({
         "Book_ID": uuid.uuid4().hex,
         "Name": name,

@@ -2,6 +2,7 @@ from flask import Flask, Response, render_template
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from tests import is_book_already_added, is_book_id_inside_book_collection, is_comment_data_inside_comment_collection, is_rating_acceptable, is_user_name_inside_user_collection, is_object_int
 from books import (
     get_books,
     get_book_by_id,
@@ -70,8 +71,10 @@ class Books(Resource):
     def get(self, book_id=None):
         """Function that returns book data depending on the url."""
 
-        if (book_id is not None):
-            return get_book_by_id(book_id)
+        if book_id is not None:
+            if is_book_id_inside_book_collection(book_id):
+                return get_book_by_id(book_id)
+            return "Book is not inside the database!"
         return get_books()
 
 
@@ -83,15 +86,14 @@ class BooksAddNewBook(Resource):
             description):
         """Function that posts book data to the database."""
 
-        if add_new_book(name, writer, year, isbn, about, tags, description) \
-                == "Book has already been added.":
-            return "Book has already been added."
+        if is_book_already_added(name, isbn):
+            return "Book has already been added!"
 
         add_new_book(
             name, writer, year, isbn, about, tags,
             description
             )
-        return " Book was added succesfully!"
+        return "Book was added succesfully!"
 
 
 class BooksUpdateBook(Resource):
@@ -102,11 +104,13 @@ class BooksUpdateBook(Resource):
             description, loaner, loan_status):
         """Function that updates book data to the database."""
 
-        update_book(
-            book_id, name, writer, year, isbn, rating, about, tags,
-            description, loaner, loan_status
-            )
-        return "Book was added succesfully!"
+        if is_book_id_inside_book_collection(book_id) and is_book_already_added(name, isbn) and is_object_int(year):
+            update_book(
+                book_id, name, writer, year, isbn, rating, about, tags, description,
+                loaner, loan_status)
+            return "Book was updated succesfully!"
+        return "error: Not a valid book_id, name or isbn! " \
+            "book_id, name and isbn must be inside the database!"
 
 
 class BooksDeleteByID(Resource):
@@ -145,8 +149,8 @@ class CommentsAddNewComment(Resource):
 
     def post(self, user_name, comment, book_id):
         """Function that posts comment data to the database."""
-        if post_comment(user_name, comment, book_id) != \
-                "Incorrect ID or username":
+
+        if is_book_id_inside_book_collection(book_id) and is_user_name_inside_user_collection(user_name):
             post_comment(user_name, comment, book_id)
             return "Comment was posted succesfully!"
         return "error: Not a valid username or book_id! " \
@@ -264,7 +268,7 @@ api.add_resource(
 # works but is this needed?
 api.add_resource(
     BooksUpdateBook, '/api/books/update/<book_id>/<name>/<writer>/' +
-    '<year>/<isbn>/<about>/<tags>/<description>/'
+    '<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/<loan_status>'
     )
 # works
 api.add_resource(BooksDeleteByID, '/api/books/d/<book_id>/')

@@ -2,6 +2,7 @@
 
 from pymongo.mongo_client import MongoClient
 import db_secret
+from tests import is_rating_acceptable, is_book_id_inside_book_collection, is_user_name_inside_user_collection, is_object_int
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":"
@@ -175,6 +176,10 @@ class RatingSystem:
         user id, rated book's id and rating
         to a list called self.user_ratings.
         """
+
+        if is_rating_acceptable(rating) is False or is_user_name_inside_user_collection(user_name) is False or is_book_id_inside_book_collection(book_id) is False or is_object_int(rating):
+            return "Something went wrong."
+
 
         new_rating = {
             "Username": user_name,

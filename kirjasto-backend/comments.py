@@ -1,3 +1,4 @@
+from tests import is_user_name_inside_user_collection, is_book_id_inside_book_collection
 import uuid
 from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
@@ -46,25 +47,12 @@ def get_comments_by_book_id(book_id):
 def post_comment(user_name, comment, book_id):
     """Function that posts new comment to the database."""
 
-    correct_user_name = False
-    correct_book_id = True
-    numbers = "0123456789"
-
-    for letter in book_id:
-        if letter not in numbers:
-            correct_book_id = False
-    for user in retrieved_user_collection:
-        if user["Username"] == user_name:
-            correct_user_name = True
-    if correct_book_id and correct_user_name:
-        collection.insert_one({
-            'Username': user_name,
-            'Comment': comment,
-            'Book_ID': int(book_id),
-            'Comment_ID': uuid.uuid4().hex
-        })
-    else:
-        return "Incorrect ID or username"
+    collection.insert_one({
+        'Username': user_name,
+        'Comment': comment,
+        'Book_ID': book_id,
+        'Comment_ID': uuid.uuid4().hex
+    })
 
 
 def delete_comments_by_id(user_name, book_id, comment_id):
