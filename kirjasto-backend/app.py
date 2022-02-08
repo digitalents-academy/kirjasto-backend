@@ -1,8 +1,21 @@
-from flask import Flask, Response, render_template
+#Testing authentication
+from distutils.log import debug
+from flask import Flask, Response, render_template, session, redirect
+from functools import wraps
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
+
+#Testing authentication
+from pymongo.mongo_client import MongoClient
+
 from bson.objectid import ObjectId
-from tests import is_book_already_added, is_book_id_inside_book_collection, is_comment_data_inside_comment_collection, is_rating_acceptable, is_user_name_inside_user_collection, is_object_int
+from tests import (
+    is_book_already_added, is_book_id_inside_book_collection,
+    is_comment_data_inside_comment_collection,
+    is_rating_acceptable,
+    is_user_name_inside_user_collection,
+    is_object_int
+    )
 from books import (
     get_books,
     get_book_by_id,
@@ -23,6 +36,8 @@ import db_secret
 parser = reqparse.RequestParser()
 
 app = Flask(__name__)
+#Testing authentication
+app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 api = Api(app)
 rating_system = RatingSystem()
 
@@ -33,6 +48,29 @@ client = MongoClient(
 db = client['kirjasto-backend']
 collection = db['books']
 testcollection = db["testerdata"]
+
+#Testing authentication
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            return redirect('/')
+
+    return wrap
+
+# Routes
+from user import routes
+
+@app.route('/')
+def home():
+    return render_template('home.html')
+
+@app.route('/dashboard/')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
 
 
 class TesterData(Resource):
@@ -324,4 +362,9 @@ api.add_resource(
 
 # Runs on port 8000!!
 if __name__ == "__main__":
-    app.run(debug=True, host='127.0.0.1', port=8000)
+    #api urls work with this
+    app.run(debug=True)
+    #api urls work with this without authentication
+    #app.run(debug=True, host='127.0.0.1', port=8000)
+    #for testing
+    #app.run(debug=True, use_debugger=False, use_reloader=False, host='127.0.0.1', port=8000)

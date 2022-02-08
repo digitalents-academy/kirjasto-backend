@@ -47,6 +47,11 @@ class User:
             "Email": request.form.get('email')
         })
 
+        print(user)
+        print(pbkdf2_sha256.verify(
+                request.form.get('password'),
+                user['Password']))
+
         if user and pbkdf2_sha256.verify(
                 request.form.get('password'),
                 user['Password']):

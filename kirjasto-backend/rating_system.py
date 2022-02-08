@@ -159,15 +159,10 @@ class RatingSystem:
     def replace_user_rating(self, user_name, book_id, new_rating):
         """Function that replaces old rating with a new one."""
 
-        #Pretty sure count isn't needed here
-        #count = 0
-
         for rating in self.user_ratings:
             if rating["Username"] == user_name and \
                     rating["Book_ID"] == int(book_id):
-                #self.user_ratings[count]["Rating"] = int(new_rating)
                 rating["Rating"] = int(new_rating)
-                #count += 1
 
     # replace doesn't work
     def give_rating(self, user_name, book_id, rating):
@@ -179,7 +174,6 @@ class RatingSystem:
 
         if is_rating_acceptable(rating) is False or is_user_name_inside_user_collection(user_name) is False or is_book_id_inside_book_collection(book_id) is False or is_object_int(rating):
             return "Something went wrong."
-
 
         new_rating = {
             "Username": user_name,
@@ -197,8 +191,6 @@ class RatingSystem:
             self.user_ratings.append(new_rating)
             rating_collection.insert_one(new_rating)
 
-        #Where should the data be updated?
-        #---------------------------------------------------------------------
         self.update_books_dictionary_ratings()
 
         for book in self.books:
@@ -208,7 +200,6 @@ class RatingSystem:
 
         for user in self.users:
             book_collection.replace_one(self.get_reimbursable_user(user), user)
-        #---------------------------------------------------------------------
 
     def delete_rating(self, user_name: int, book_id):
         """Function that deletes a rating and updates data after."""
@@ -221,8 +212,8 @@ class RatingSystem:
 
         # Needs to be updated some other way
         # since now Object_id will be added aswell
-        # self.update_books_dictionary_ratings()
-        # self.update_users_dictionary_rating()
+        self.update_books_dictionary_ratings()
+        self.update_users_dictionary_rating()
 
     def get_books_rating_data(self, book_id):
         """
@@ -313,25 +304,3 @@ class RatingSystem:
         for retrieved_rating in retrieved_rating_collection:
             if retrieved_rating["Username"] == rating["Username"]:
                 return retrieved_rating
-
-    def post_updated_book_collection(self):
-        """
-        Function that replaces book_collection
-        with dictionary called self.books.
-        """
-
-        self.update_books_dictionary_ratings()
-
-        for book in self.books:
-            book_collection.replace_one(self.get_reimbursable_book(book), book)
-
-    def post_updated_user_collection(self):
-        """
-        Function that replaces user_collection
-        with dictionary called self.users.
-        """
-
-        self.update_users_dictionary_rating()
-
-        for user in self.users:
-            book_collection.replace_one(self.get_reimbursable_user(user), user)

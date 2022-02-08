@@ -34,6 +34,7 @@ def is_book_already_added(name, isbn):
             return True
     return False
 
+
 def is_book_id_inside_book_collection(book_id):
     """Function that checks whether book_id can be found from the database."""
 
@@ -50,7 +51,8 @@ def is_comment_data_inside_comment_collection(user_name, book_id):
     """
 
     for comment in retrieved_comment_collection:
-        if comment["Username"] == user_name and comment["Book_ID"] == int(book_id):
+        if comment["Username"] == user_name and \
+                comment["Book_ID"] == int(book_id):
             return True
     return False
 
