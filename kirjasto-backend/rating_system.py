@@ -45,18 +45,12 @@ class RatingSystem:
         depending on the id.
         """
 
-        correct_book_id = True
-        numbers = "0123456789"
-
-        for letter in book_id:
-            if letter not in numbers:
-                correct_book_id = False
-        if correct_book_id:
-            retrieved = list(
-                book_collection.find({'Book_ID': int(book_id)}, {'_id': False})
-                )
-            return retrieved
-        return
+        
+        retrieved = list(
+            book_collection.find({'Book_ID': int(book_id)}, {'_id': False})
+            )
+        return retrieved
+       
 
     def get_retrieved_user_collection(self):
         """
@@ -71,25 +65,13 @@ class RatingSystem:
         Function that returns user data from the database
         depending on the username.
         """
+        retrieved = list(
+            user_collection.find({'Username': user_name}, {'_id': False})
+            )
 
-        correct_user_name = False
-
-        for user in retrieved_user_collection:
-            if user["Username"] == user_name:
-                correct_user_name = True
-
-        if correct_user_name:
-            retrieved = list(
-                user_collection.find({'Username': user_name}, {'_id': False})
-                )
-
-            if len(retrieved) > 0:
-                return retrieved
-            return (
-                'error: Not a valid User ID! ' +
-                'User ID must be an int and the user must exist!'
-                )
-        return
+        if len(retrieved) > 0:
+            return retrieved
+          
 
     def get_retrieved_rating_collection(self):
         """
@@ -115,7 +97,7 @@ class RatingSystem:
                 )
             if len(retrieved) > 0:
                 return retrieved
-        return
+        
 
     def get_retrieved_rating_by_username_and_id(self, user_name, book_id):
         """Function that returns user's ratings on a book."""

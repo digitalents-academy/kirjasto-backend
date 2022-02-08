@@ -91,14 +91,7 @@ def update_book(
 def delete_book_by_id(book_id):
     """Function that deletes a book from the database."""
 
-    correct_book_id = True
-    numbers = "0123456789"
-
-    for letter in book_id:
-        if letter not in numbers:
-            correct_book_id = False
-    if correct_book_id:
-        collection.delete_one({"Book_ID": int(book_id)})
+    collection.delete_one({"Book_ID": int(book_id)})
 
 
 def loan_book_by_username_and_id(user_name, book_id):

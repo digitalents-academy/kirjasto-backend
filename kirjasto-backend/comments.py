@@ -27,18 +27,11 @@ def get_comments():
 def get_comments_by_book_id(book_id):
     """Function that returns comment by book_id."""
 
-    correct_book_id = True
-    numbers = "0123456789"
-
-    for letter in book_id:
-        if letter not in numbers:
-            correct_book_id = False
-    if correct_book_id:
-        retrieved = list(
-            collection.find({'Book_ID': int(book_id)}, {'_id': False})
-            )
-        return retrieved
-    return
+    retrieved = list(
+        collection.find({'Book_ID': int(book_id)}, {'_id': False})
+        )
+    return retrieved
+    
 
 
 #Works but the comment_id could be same with the help of delete
@@ -58,22 +51,10 @@ def post_comment(user_name, comment, book_id):
 def delete_comments_by_id(user_name, book_id, comment_id):
     """Function that deletes comment by comment id."""
 
-    correct_user_name = False
-    correct_book_id = True
-    correct_comment_id = True
-    numbers = "0123456789"
-
-    for letter in book_id:
-        if letter not in numbers:
-            correct_book_id = False
-    for letter in comment_id:
-        if letter not in numbers:
-            correct_comment_id = False
-    for comment in retrieved_comment_collection:
-        if comment["Username"] == user_name:
-            correct_user_name = True
-    if correct_user_name and correct_book_id and correct_comment_id:
-        collection.delete_one({"Comment_ID": int(comment_id)})
+    collection.delete_one({"Comment_ID": comment_id,
+                            "Username": user_name,
+                            "Book_ID": book_id})
+    
 
 #Maybe needed when the front is ready?
     #     parser = reqparse.RequestParser()
