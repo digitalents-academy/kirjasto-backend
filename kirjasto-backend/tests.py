@@ -43,18 +43,6 @@ def is_book_id_inside_book_collection(book_id):
     return False
 
 
-def is_user_name_inside_user_collection(user_name):
-    """
-    Function that checks
-    whether user_name can be found inside the database.
-    """
-
-    for user in retrieved_user_collection:
-        if user["Username"] == user_name:
-            return True
-    return False
-
-
 def is_comment_data_inside_comment_collection(user_name, book_id):
     """
     Function that checks
@@ -63,6 +51,29 @@ def is_comment_data_inside_comment_collection(user_name, book_id):
 
     for comment in retrieved_comment_collection:
         if comment["Username"] == user_name and comment["Book_ID"] == int(book_id):
+            return True
+    return False
+
+
+def is_rating_acceptable(rating):
+    """
+    Function that checks
+    whether rating is acceptable.
+    """
+
+    if rating <= 5 and rating >= 0:
+        return True
+    return False
+
+
+def is_user_name_inside_user_collection(user_name):
+    """
+    Function that checks
+    whether user_name can be found inside the database.
+    """
+
+    for user in retrieved_user_collection:
+        if user["Username"] == user_name:
             return True
     return False
 
