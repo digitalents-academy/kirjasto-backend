@@ -2,7 +2,6 @@
 
 from pymongo.mongo_client import MongoClient
 import db_secret
-from tests import is_rating_acceptable, is_book_id_inside_book_collection, is_user_name_inside_user_collection, is_object_int
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":"
@@ -30,55 +29,11 @@ class RatingSystem:
         self.users = retrieved_user_collection
         self.user_ratings = retrieved_rating_collection
 
-#Needed?
-    def get_retrieved_book_collection(self):
-        """
-        Function that returns a dictionary called self.books
-        that contains retrieved book collection.
-        """
-
-        return self.books
-
-    def get_retrieved_book_by_id(self, book_id):
-        """
-        Function that returns book from the database
-        depending on the id.
-        """
-
-        
-        retrieved = list(
-            book_collection.find({'Book_ID': book_id}, {'_id': False})
-            )
-        return retrieved
-       
-
-    def get_retrieved_user_collection(self):
-        """
-        Function that returns a dictionary called self.users
-        that contains retrieved user collection.
-        """
-
-        return self.users
-
-    def get_retrieved_user_by_username(self, user_name):
-        """
-        Function that returns user data from the database
-        depending on the username.
-        """
-        retrieved = list(
-            user_collection.find({'Username': user_name}, {'_id': False})
-            )
-
-        if len(retrieved) > 0:
-            return retrieved
-          
-
     def get_retrieved_rating_collection(self):
         """
         Function that returns a dictionary called self.user_ratings
         that contains retrieved rating collection.
         """
-        print(self.user_ratings)
 
         return self.user_ratings
 
@@ -98,7 +53,6 @@ class RatingSystem:
                 )
             if len(retrieved) > 0:
                 return retrieved
-        
 
     def get_retrieved_rating_by_username_and_id(self, user_name, book_id):
         """Function that returns user's ratings on a book."""
@@ -166,7 +120,11 @@ class RatingSystem:
                 self.get_reimbursable_user_rating(new_rating),
                 new_rating
                 )
-            self.replace_user_rating(new_rating["Username"], new_rating["Book_ID"], new_rating["Rating"])
+            self.replace_user_rating(
+                new_rating["Username"],
+                new_rating["Book_ID"],
+                new_rating["Rating"]
+                )
         else:
             self.user_ratings.append(new_rating)
             rating_collection.insert_one(new_rating)

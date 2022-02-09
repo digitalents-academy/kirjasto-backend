@@ -79,6 +79,13 @@ def is_user_name_inside_user_collection(user_name):
             return True
     return False
 
+#Could make one for every collection
+#or function that takes a collection as a parameter
+def is_id_inside_collection(object_id):
+    for user in retrieved_user_collection:
+        if user["_id"] == object_id:
+            return True
+    return False
 
 # Needed if the object_id is changed
 def is_object_int(object_id):
