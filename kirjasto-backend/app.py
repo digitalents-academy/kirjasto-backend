@@ -46,7 +46,7 @@ client = MongoClient(
     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
     )
 db = client['kirjasto-backend']
-collection = db['books']
+collection = db['users']
 testcollection = db["testerdata"]
 
 #Testing authentication
@@ -273,8 +273,14 @@ class Ratings(Resource):
 class RatingsAddNewRating(Resource):
     """Class for posting rating data to the database."""
 
-    def post(self, user_name: int, book_id: int, rating: int):
+    def post(self, user_name, book_id, rating):
         """Function that posts comment data to the database."""
+
+        if is_rating_acceptable(rating) is False \
+                or is_user_name_inside_user_collection(user_name) \
+                is False or is_book_id_inside_book_collection(book_id) \
+                is False or is_object_int(rating) is False:
+            return "Something went wrong."
 
         rating_system.give_rating(user_name, book_id, rating)
         return "Rating was posted succesfully!"
@@ -286,8 +292,10 @@ class RatingsDeleteByUsernameAndBookID(Resource):
     def delete(self, user_name, book_id):
         """Function that deletes rating data from the database."""
 
-        rating_system.delete_rating(user_name, book_id)
-        return "Rating was deleted succesfully!"
+        if is_user_name_inside_user_collection(user_name) and is_book_id_inside_book_collection(book_id):
+            rating_system.delete_rating(user_name, book_id)
+            return "Rating was deleted succesfully!"
+        return "Something went wrong!"
 
 
 class HomePage(Resource):
@@ -348,6 +356,7 @@ api.add_resource(
 # Not sure
 #api.add_resource(RatingsPostUsers, '/api/ratings/post/users/')
 
+# Not complete
 # Works but when book is added doesn't work after reboot?
 api.add_resource(
     Ratings,
@@ -355,7 +364,7 @@ api.add_resource(
     '/api/ratings/<user_name>',
     '/api/ratings/<user_name>/<book_id>'
     )
-# Works
+# Not complete
 api.add_resource(
     RatingsAddNewRating,
     '/api/ratings/add/<user_name>/<book_id>/<rating>'
@@ -363,7 +372,7 @@ api.add_resource(
 # not complete
 api.add_resource(
     RatingsDeleteByUsernameAndBookID,
-    '/api/ratings/d/<book_id>/user_name'
+    '/api/ratings/d/<book_id>/<user_name>'
     )
 
 

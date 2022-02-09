@@ -47,7 +47,7 @@ class RatingSystem:
 
         
         retrieved = list(
-            book_collection.find({'Book_ID': int(book_id)}, {'_id': False})
+            book_collection.find({'Book_ID': book_id}, {'_id': False})
             )
         return retrieved
        
@@ -78,6 +78,7 @@ class RatingSystem:
         Function that returns a dictionary called self.user_ratings
         that contains retrieved rating collection.
         """
+        print(self.user_ratings)
 
         return self.user_ratings
 
@@ -117,7 +118,7 @@ class RatingSystem:
                 rating_collection.find(
                     {
                         'Username': user_name,
-                        'Book_ID': int(book_id)
+                        'Book_ID': book_id
                         }, {'_id': False}
                     )
                 )
@@ -143,7 +144,7 @@ class RatingSystem:
 
         for rating in self.user_ratings:
             if rating["Username"] == user_name and \
-                    rating["Book_ID"] == int(book_id):
+                    rating["Book_ID"] == book_id:
                 rating["Rating"] = int(new_rating)
 
     # replace doesn't work
@@ -154,12 +155,9 @@ class RatingSystem:
         to a list called self.user_ratings.
         """
 
-        if is_rating_acceptable(rating) is False or is_user_name_inside_user_collection(user_name) is False or is_book_id_inside_book_collection(book_id) is False or is_object_int(rating):
-            return "Something went wrong."
-
         new_rating = {
             "Username": user_name,
-            "Book_ID": int(book_id),
+            "Book_ID": book_id,
             "Rating": int(rating)
             }
 
@@ -168,7 +166,7 @@ class RatingSystem:
                 self.get_reimbursable_user_rating(new_rating),
                 new_rating
                 )
-            self.replace_user_rating(user_name, book_id, new_rating)
+            self.replace_user_rating(new_rating["Username"], new_rating["Book_ID"], new_rating["Rating"])
         else:
             self.user_ratings.append(new_rating)
             rating_collection.insert_one(new_rating)
@@ -183,7 +181,7 @@ class RatingSystem:
         for user in self.users:
             book_collection.replace_one(self.get_reimbursable_user(user), user)
 
-    def delete_rating(self, user_name: int, book_id):
+    def delete_rating(self, user_name, book_id):
         """Function that deletes a rating and updates data after."""
 
         for rating in self.user_ratings:
@@ -206,7 +204,7 @@ class RatingSystem:
         count = 0
         rating_sum = 0
         for rating in self.user_ratings:
-            if rating["Book_ID"] == int(book_id):
+            if rating["Book_ID"] == book_id:
                 count += 1
                 rating_sum += rating["Rating"]
         if rating_sum == 0:

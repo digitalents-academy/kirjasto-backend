@@ -63,7 +63,7 @@ def is_rating_acceptable(rating):
     whether rating is acceptable.
     """
 
-    if rating <= 5 and rating >= 0:
+    if int(rating) <= 5 and int(rating) >= 0:
         return True
     return False
 
