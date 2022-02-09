@@ -90,8 +90,9 @@ def update_book(
 
 def delete_book_by_id(book_id):
     """Function that deletes a book from the database."""
-
+    
     collection.delete_one({"Book_ID": int(book_id)})
+    
 
 
 def loan_book_by_username_and_id(user_name, book_id):

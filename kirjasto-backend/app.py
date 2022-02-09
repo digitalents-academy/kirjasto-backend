@@ -275,9 +275,10 @@ class RatingsAddNewRating(Resource):
 
     def post(self, user_name: int, book_id: int, rating: int):
         """Function that posts comment data to the database."""
-
-        rating_system.give_rating(user_name, book_id, rating)
-        return "Rating was posted succesfully!"
+        if rating_system.give_rating(user_name, book_id, rating) != "Something went wrong":
+            rating_system.give_rating(user_name, book_id, rating)
+            return "Rating was posted succesfully!"
+        return "error: Not a valid username, book_id or rating. Username and book_id must exist inside the database!"
 
 
 class RatingsDeleteByUsernameAndBookID(Resource):
@@ -285,9 +286,10 @@ class RatingsDeleteByUsernameAndBookID(Resource):
 
     def delete(self, user_name, book_id):
         """Function that deletes rating data from the database."""
-
-        rating_system.delete_rating(user_name, book_id)
-        return "Rating was deleted succesfully!"
+        if is_user_name_inside_user_collection(user_name) and is_book_id_inside_book_collection(book_id):
+            rating_system.delete_rating(user_name, book_id)
+            return "Rating was deleted succesfully!"
+        return "Error!"
 
 
 class HomePage(Resource):
