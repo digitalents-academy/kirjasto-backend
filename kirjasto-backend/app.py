@@ -1,13 +1,9 @@
-#Testing authentication
 from distutils.log import debug
 from flask import Flask, Response, render_template, session, redirect
 from functools import wraps
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
-
-#Testing authentication
 from pymongo.mongo_client import MongoClient
-
 from bson.objectid import ObjectId
 from tests import (
     is_book_already_added, is_book_id_inside_book_collection,
@@ -32,11 +28,17 @@ from comments import (
     )
 from rating_system import RatingSystem
 import db_secret
+from users import (
+    get_user_by_username,
+    get_users,
+    get_user_by_id,
+    update_user,
+    delete_user_by_id
+    )
 
 parser = reqparse.RequestParser()
 
 app = Flask(__name__)
-#Testing authentication
 app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 api = Api(app)
 rating_system = RatingSystem()
@@ -46,10 +48,10 @@ client = MongoClient(
     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
     )
 db = client['kirjasto-backend']
-collection = db['books']
+collection = db['users']
 testcollection = db["testerdata"]
 
-#Testing authentication
+
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -60,12 +62,14 @@ def login_required(f):
 
     return wrap
 
-# Routes
+
 from user import routes
+
 
 @app.route('/')
 def home():
     return render_template('home.html')
+
 
 @app.route('/dashboard/')
 @login_required
@@ -142,9 +146,12 @@ class BooksUpdateBook(Resource):
             description, loaner, loan_status):
         """Function that updates book data to the database."""
 
-        if is_book_id_inside_book_collection(book_id) and is_book_already_added(name, isbn) and is_object_int(year):
+        if is_book_id_inside_book_collection(book_id) and \
+                is_book_already_added(name, isbn) and \
+                is_object_int(year):
             update_book(
-                book_id, name, writer, year, isbn, rating, about, tags, description,
+                book_id, name, writer, year, isbn,
+                rating, about, tags, description,
                 loaner, loan_status)
             return "Book was updated succesfully!"
         return "error: Not a valid book_id, name or isbn! " \
@@ -160,7 +167,8 @@ class BooksDeleteByID(Resource):
 
             delete_book_by_id(book_id)
             return "Book was deleted succesfully!"
-        return "error: Not a valid book_id! Book_id must be inside the database!"
+        return "error: Not a valid book_id! " \
+            "Book_id must be inside the database!"
 
 
 class BooksLoanByUsernameAndID(Resource):
@@ -179,12 +187,10 @@ class Comments(Resource):
     def get(self, book_id=None):
         """Function that returns comment data depending on the url."""
         if book_id is not None:
-            
             if is_book_id_inside_book_collection(book_id):
                 get_comments_by_book_id(book_id)
                 return "Comments retrieved successfully!"
             return "error: Not a valid book_id!"
-        
         return get_comments()
 
 
@@ -194,7 +200,8 @@ class CommentsAddNewComment(Resource):
     def post(self, user_name, comment, book_id):
         """Function that posts comment data to the database."""
 
-        if is_book_id_inside_book_collection(book_id) and is_user_name_inside_user_collection(user_name):
+        if is_book_id_inside_book_collection(book_id) and \
+                is_user_name_inside_user_collection(user_name):
             post_comment(user_name, comment, book_id)
             return "Comment was posted succesfully!"
         return "error: Not a valid username or book_id! " \
@@ -206,44 +213,13 @@ class CommentsDelete(Resource):
 
     def delete(self, user_name, book_id, comment_id):
         """Function that deletes comment data from the database."""
-        if is_user_name_inside_user_collection(user_name) and is_book_id_inside_book_collection(book_id) and is_comment_data_inside_comment_collection(user_name, book_id):
+        if is_user_name_inside_user_collection(user_name) and \
+                is_book_id_inside_book_collection(book_id) and \
+                is_comment_data_inside_comment_collection(
+                    user_name, book_id):
             delete_comments_by_id(user_name, book_id, comment_id)
             return "Comment was deleted succesfully!"
         return "error: Not a valid username, book_id or comment_id!"
-
-
-#Not needed in rating system?
-#-----------------------------------------------------------------------------
-#Needed in user file
-class RatingsGetUsers(Resource):
-    """Class for returning user data from the database."""
-
-    def get(self, user_name=None):
-        """Function that returns user data depending on the url."""
-
-        if user_name is not None:
-            if is_user_name_inside_user_collection(user_name):
-
-                rating_system.get_retrieved_user_by_username(user_name)
-                return "return was successful"
-            return 'error: Not a valid username! username must exist!'
-
-        return rating_system.get_retrieved_user_collection()
-
-
-#Needed?
-class RatingsPostUsers(Resource):
-    """Class for updating user data from the database."""
-
-    def post(self):
-        """
-        Function that replaces user_collection
-        with dictionary called self.users.
-        """
-
-        rating_system.post_updated_user_collection()
-        return "User data was updated succesfully!"
-#-----------------------------------------------------------------------------
 
 
 #Editing this
@@ -254,7 +230,8 @@ class Ratings(Resource):
         """Function that returns rating data depending on the url."""
 
         if book_id is not None:
-            if is_book_id_inside_book_collection(book_id) and is_user_name_inside_user_collection(user_name):
+            if is_book_id_inside_book_collection(book_id) and \
+                    is_user_name_inside_user_collection(user_name):
                 return rating_system.get_retrieved_rating_by_username_and_id(
                     user_name,
                     book_id
@@ -265,20 +242,23 @@ class Ratings(Resource):
                 return rating_system.get_retrieved_ratings_by_username(
                     user_name)
             return "Incorrect username"
-        
         return rating_system.get_retrieved_rating_collection()
-        
 
 
 class RatingsAddNewRating(Resource):
     """Class for posting rating data to the database."""
 
-    def post(self, user_name: int, book_id: int, rating: int):
+    def post(self, user_name, book_id, rating):
         """Function that posts comment data to the database."""
-        if rating_system.give_rating(user_name, book_id, rating) != "Something went wrong":
-            rating_system.give_rating(user_name, book_id, rating)
-            return "Rating was posted succesfully!"
-        return "error: Not a valid username, book_id or rating. Username and book_id must exist inside the database!"
+
+        if is_rating_acceptable(rating) is False \
+                or is_user_name_inside_user_collection(user_name) \
+                is False or is_book_id_inside_book_collection(book_id) \
+                is False or is_object_int(rating) is False:
+            return "error: Not a valid username, book_id or rating. Username and book_id must exist inside the database!"
+
+        rating_system.give_rating(user_name, book_id, rating)
+        return "Rating was posted succesfully!"
 
 
 class RatingsDeleteByUsernameAndBookID(Resource):
@@ -286,10 +266,25 @@ class RatingsDeleteByUsernameAndBookID(Resource):
 
     def delete(self, user_name, book_id):
         """Function that deletes rating data from the database."""
-        if is_user_name_inside_user_collection(user_name) and is_book_id_inside_book_collection(book_id):
+
+        if is_user_name_inside_user_collection(user_name) and \
+                is_book_id_inside_book_collection(book_id):
             rating_system.delete_rating(user_name, book_id)
             return "Rating was deleted succesfully!"
-        return "Error!"
+        return "Something went wrong!"
+
+
+class Users(Resource):
+    """Class for returning user data from the database."""
+
+    def get(self, user_name=None):
+        """Function that returns user data depending on the url."""
+
+        if user_name is not None:
+            if is_user_name_inside_user_collection(user_name):
+                return get_user_by_username()
+            return 'error: Not a valid username! username must exist!'
+        return get_users()
 
 
 class HomePage(Resource):
@@ -315,7 +310,8 @@ api.add_resource(
 # works but is this needed?
 api.add_resource(
     BooksUpdateBook, '/api/books/update/<book_id>/<name>/<writer>/' +
-    '<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/<loan_status>'
+    '<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/' +
+    '<loan_status>'
     )
 # works
 api.add_resource(BooksDeleteByID, '/api/books/d/<book_id>/')
@@ -340,16 +336,11 @@ api.add_resource(
     CommentsDelete,
     '/api/comments/d/<user_name>/<book_id>/<comment_id>'
     )
-# Works
-api.add_resource(
-    RatingsGetUsers,
-    '/api/ratings/users',
-    '/api/ratings/users/<user_name>'
-    )
 
 # Not sure
 #api.add_resource(RatingsPostUsers, '/api/ratings/post/users/')
 
+# Not complete
 # Works but when book is added doesn't work after reboot?
 api.add_resource(
     Ratings,
@@ -357,7 +348,7 @@ api.add_resource(
     '/api/ratings/<user_name>',
     '/api/ratings/<user_name>/<book_id>'
     )
-# Works
+# Not complete
 api.add_resource(
     RatingsAddNewRating,
     '/api/ratings/add/<user_name>/<book_id>/<rating>'
@@ -365,9 +356,14 @@ api.add_resource(
 # not complete
 api.add_resource(
     RatingsDeleteByUsernameAndBookID,
-    '/api/ratings/d/<book_id>/user_name'
+    '/api/ratings/d/<book_id>/<user_name>'
     )
-
+#ID version is needed
+api.add_resource(
+    Users,
+    '/api/users',
+    '/api/users/<user_name>'
+    )
 
 # Runs on port 8000!!
 if __name__ == "__main__":
@@ -376,4 +372,10 @@ if __name__ == "__main__":
     #api urls work with this without authentication
     #app.run(debug=True, host='127.0.0.1', port=8000)
     #for testing
-    #app.run(debug=True, use_debugger=False, use_reloader=False, host='127.0.0.1', port=8000)
+    #app.run(
+    #    debug=True,
+    #    use_debugger=False,
+    #    use_reloader=False,
+    #    host='127.0.0.1',
+    #    port=8000
+    #    )

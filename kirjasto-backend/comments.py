@@ -1,4 +1,3 @@
-from tests import is_user_name_inside_user_collection, is_book_id_inside_book_collection
 import uuid
 from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
@@ -28,10 +27,9 @@ def get_comments_by_book_id(book_id):
     """Function that returns comment by book_id."""
 
     retrieved = list(
-        collection.find({'Book_ID': int(book_id)}, {'_id': False})
+        collection.find({'Book_ID': book_id}, {'_id': False})
         )
     return retrieved
-    
 
 
 #Works but the comment_id could be same with the help of delete
@@ -51,10 +49,14 @@ def post_comment(user_name, comment, book_id):
 def delete_comments_by_id(user_name, book_id, comment_id):
     """Function that deletes comment by comment id."""
 
-    collection.delete_one({"Comment_ID": comment_id,
-                            "Username": user_name,
-                            "Book_ID": book_id})
-    
+    collection.delete_one(
+        {
+            "Comment_ID": comment_id,
+            "Username": user_name,
+            "Book_ID": book_id
+            }
+        )
+
 
 #Maybe needed when the front is ready?
     #     parser = reqparse.RequestParser()

@@ -63,7 +63,7 @@ def is_rating_acceptable(rating):
     whether rating is acceptable.
     """
 
-    if rating <= 5 and rating >= 0:
+    if int(rating) <= 5 and int(rating) >= 0:
         return True
     return False
 
@@ -79,6 +79,13 @@ def is_user_name_inside_user_collection(user_name):
             return True
     return False
 
+#Could make one for every collection
+#or function that takes a collection as a parameter
+def is_id_inside_collection(object_id):
+    for user in retrieved_user_collection:
+        if user["_id"] == object_id:
+            return True
+    return False
 
 # Needed if the object_id is changed
 def is_object_int(object_id):
