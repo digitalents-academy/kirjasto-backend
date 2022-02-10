@@ -221,7 +221,8 @@ class CommentsUpdateComment(Resource):
     def put(self, comment_id, user_name, comment, book_id):
         """Function that updates comment data to the database."""
 
-        if is_comment_data_inside_comment_collection(comment_id, user_name, book_id) and \
+        if is_comment_data_inside_comment_collection(
+                comment_id, user_name, book_id) and \
                 is_user_name_inside_user_collection(user_name) and \
                 is_book_id_inside_book_collection(book_id):
             update_comment(comment_id, user_name, comment, book_id)
@@ -295,7 +296,8 @@ class RatingsUpdateRating(Resource):
             rating_system.update_rating(user_name, book_id, rating)
             return "Rating was updated succesfully!"
         return "error: Not a valid username, book_id or rating! " \
-            "username and book_id must be inside the database And Rating must be int!"
+            "username and book_id must be inside the database " \
+            "And Rating must be int!"
 
 
 class RatingsDeleteByUsernameAndBookID(Resource):
@@ -334,7 +336,10 @@ class UsersUpdateUser(Resource):
     def put(self, object_id, user_name, email, password):
         """Function that updates user data to the database."""
 
-        if is_id_inside_collection(object_id) and is_user_name_inside_user_collection(user_name) and is_email_inside_user_collection(email) and is_password_inside_user_collection(password)
+        if is_id_inside_collection(object_id) and \
+                is_user_name_inside_user_collection(user_name) and \
+                is_email_inside_user_collection(email) and \
+                is_password_inside_user_collection(password):
             update_user(object_id, user_name, email, password)
             return "User was updated succesfully!"
         return "error: Not a valid object_id! " \

@@ -47,8 +47,8 @@ def add_new_book(
         name, writer, year, isbn, about, tags, description):
     """Function that posts new book to the database."""
 
-    print(rating_system.get_books_rating_data[0])
-    print(rating_system.get_books_rating_data[1])
+    #print(rating_system.get_books_rating_data[0])
+    #print(rating_system.get_books_rating_data[1])
 
     book_collection.insert_one({
         "Book_ID": uuid.uuid4().hex,
@@ -56,8 +56,8 @@ def add_new_book(
         "Writer": writer,
         "Year": int(year),
         "ISBN": isbn,
-        "Rating": rating_system.get_books_rating_data[0],
-        "Rating_count": rating_system.get_books_rating_data[1],
+        "Rating": 0,
+        "Rating_count": 0,
         "About": about,
         "Tags": tags,
         "Description": description,
@@ -129,8 +129,10 @@ def loan_book_by_username_and_id(user_name, book_id):
         }
         book_collection.replace_one(book[0], new_book)
 
-
-    # retrieved = list(book_collection.find({'Book_ID': book_id}, {'_id': False}))
+    #retrieved = list(book_collection.find(
+    #    {'Book_ID': book_id},
+    #    {'_id': False}
+    #    ))
     # for data in retrieved:
     #     if data['Book_ID'] == book_id:
     #         return book_collection.find_one_and_update(

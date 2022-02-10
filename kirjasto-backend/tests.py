@@ -47,6 +47,7 @@ class TestBooks(unittest.TestCase):
         assert result == "Book is not inside the database!"
         self.assertEqual(result, "Book is not inside the database!")
 
+
 if __name__ == "__main__":
     unittest.main()
     #TestBooks.test_books_get_wrong_object_id()

@@ -69,7 +69,7 @@ class RatingSystem:
                     rating["Book_ID"] == book_id:
                 return True
         return False
-    
+
     def update_rating(self, user_name, book_id, new_rating):
         """Function that posts updated rating data to the database."""
 
@@ -162,7 +162,6 @@ class RatingSystem:
                 count += 1
                 rating_sum += rating["Rating"]
         if rating_sum == 0:
-            prnt("here")
             return (0, 0)
         else:
             return (rating_sum / count, count)
