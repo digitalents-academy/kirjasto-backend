@@ -2,7 +2,7 @@ import uuid
 from pymongo import MongoClient
 from flask_restful import reqparse
 import db_secret
-from tests import (
+from helpers import (
     is_book_already_added,
     is_book_id_inside_book_collection,
     is_user_name_inside_user_collection
@@ -59,13 +59,18 @@ def add_new_book(
     })
 
 
-#book_id could be the only parameter
-#and rest of the attributes could be added with parser.
 #Rating count isn't complete
 def update_book(
         book_id, name, writer, year, isbn, rating, about, tags, description,
         loaner, loan_status):
-    """Function that posts updated book_data to the database."""
+    """Function that posts updated book data to the database."""
+
+    if loaner == "null":
+        loaner = None
+    if loan_status == "false":
+        loan_status = False
+    elif loan_status == "true":
+        loan_status = True
 
     collection.update(
         {'Book_ID': book_id},
@@ -91,6 +96,10 @@ def delete_book_by_id(book_id):
     """Function that deletes a book from the database."""
 
     collection.delete_one({"Book_ID": book_id})
+
+    #When a book is deleted
+    #also the comments and ratings
+    #for that book should be deleted.
 
 
 def loan_book_by_username_and_id(user_name, book_id):

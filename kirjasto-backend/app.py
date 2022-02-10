@@ -5,12 +5,12 @@ from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
 from pymongo.mongo_client import MongoClient
 from bson.objectid import ObjectId
-from tests import (
+from helpers import (
     is_book_already_added, is_book_id_inside_book_collection,
     is_comment_data_inside_comment_collection,
     is_rating_acceptable,
     is_user_name_inside_user_collection,
-    is_object_int
+    is_object_int, is_id_inside_collection
     )
 from books import (
     get_books,
@@ -24,7 +24,8 @@ from comments import (
     delete_comments_by_id,
     get_comments,
     get_comments_by_book_id,
-    post_comment
+    post_comment,
+    update_comment
     )
 from rating_system import RatingSystem
 import db_secret
@@ -163,8 +164,8 @@ class BooksDeleteByID(Resource):
 
     def delete(self, book_id):
         """Function that deletes book data from the database."""
-        if is_book_id_inside_book_collection(book_id):
 
+        if is_book_id_inside_book_collection(book_id):
             delete_book_by_id(book_id)
             return "Book was deleted succesfully!"
         return "error: Not a valid book_id! " \
@@ -188,8 +189,7 @@ class Comments(Resource):
         """Function that returns comment data depending on the url."""
         if book_id is not None:
             if is_book_id_inside_book_collection(book_id):
-                get_comments_by_book_id(book_id)
-                return "Comments retrieved successfully!"
+                return get_comments_by_book_id(book_id)
             return "error: Not a valid book_id!"
         return get_comments()
 
@@ -208,6 +208,21 @@ class CommentsAddNewComment(Resource):
             "book_id and username must exist!"
 
 
+class CommentsUpdateComment(Resource):
+    """Class for updating comment data to the database."""
+
+    def put(self, comment_id, user_name, comment, book_id):
+        """Function that updates comment data to the database."""
+
+        if is_comment_data_inside_comment_collection(comment_id, user_name, book_id) and \
+                is_user_name_inside_user_collection(user_name) and \
+                is_book_id_inside_book_collection(book_id):
+            update_comment(comment_id, user_name, comment, book_id)
+            return "Comment was updated succesfully!"
+        return "error: Not a valid comment_id, username or book_id! " \
+            "comment_id, username and book_id must be inside the database!"
+
+
 class CommentsDelete(Resource):
     """Class for deleting comment data from the database."""
 
@@ -216,13 +231,12 @@ class CommentsDelete(Resource):
         if is_user_name_inside_user_collection(user_name) and \
                 is_book_id_inside_book_collection(book_id) and \
                 is_comment_data_inside_comment_collection(
-                    user_name, book_id):
+                    comment_id, user_name, book_id):
             delete_comments_by_id(user_name, book_id, comment_id)
             return "Comment was deleted succesfully!"
         return "error: Not a valid username, book_id or comment_id!"
 
 
-#Editing this
 class Ratings(Resource):
     """Class for returning rating data from the database."""
 
@@ -255,10 +269,26 @@ class RatingsAddNewRating(Resource):
                 or is_user_name_inside_user_collection(user_name) \
                 is False or is_book_id_inside_book_collection(book_id) \
                 is False or is_object_int(rating) is False:
-            return "error: Not a valid username, book_id or rating. Username and book_id must exist inside the database!"
+            return "error: Not a valid username, book_id or rating. " \
+                "Username and book_id must exist inside the database!"
 
         rating_system.give_rating(user_name, book_id, rating)
         return "Rating was posted succesfully!"
+
+
+class RatingsUpdateRating(Resource):
+    """Class for updating rating data to the database."""
+
+    def put(self, user_name, book_id, rating):
+        """Function that updates rating data to the database."""
+
+        if is_user_name_inside_user_collection(user_name) and \
+                is_book_id_inside_book_collection(book_id) and \
+                is_object_int(rating):
+            rating_system.update_rating(user_name, book_id, rating)
+            return "Rating was updated succesfully!"
+        return "error: Not a valid username, book_id or rating! " \
+            "username and book_id must be inside the database And Rating must be int!"
 
 
 class RatingsDeleteByUsernameAndBookID(Resource):
@@ -271,20 +301,50 @@ class RatingsDeleteByUsernameAndBookID(Resource):
                 is_book_id_inside_book_collection(book_id):
             rating_system.delete_rating(user_name, book_id)
             return "Rating was deleted succesfully!"
-        return "Something went wrong!"
+        return "error: Not a valid username or book_id! " \
+            "username and book_id must be inside the database!"
 
 
 class Users(Resource):
     """Class for returning user data from the database."""
 
-    def get(self, user_name=None):
+    def get(self, user_name=None, object_id=None):
         """Function that returns user data depending on the url."""
 
-        if user_name is not None:
+        if object_id is not None:
+            if is_id_inside_collection(object_id):
+                return get_user_by_id(object_id)
+        elif user_name is not None:
             if is_user_name_inside_user_collection(user_name):
-                return get_user_by_username()
+                return get_user_by_username(user_name)
             return 'error: Not a valid username! username must exist!'
         return get_users()
+
+
+class UsersUpdateUser(Resource):
+    """Class for updating user data to the database."""
+
+    def put(self, object_id):
+        """Function that updates user data to the database."""
+
+        if is_id_inside_collection(object_id):
+            update_user(object_id)
+            return "User was updated succesfully!"
+        return "error: Not a valid object_id! " \
+            "object_id must be inside the database!"
+
+
+class UsersDeleteByID(Resource):
+    """Class for deleting user data from the database."""
+
+    def delete(self, object_id):
+        """Function that deletes user data from the database."""
+
+        if is_id_inside_collection(object_id):
+            delete_user_by_id(object_id)
+            return "User was deleted succesfully!"
+        return "error: Not a valid object_id! " \
+            "object_id must be inside the database!"
 
 
 class HomePage(Resource):
@@ -295,26 +355,26 @@ class HomePage(Resource):
 api.add_resource(TesterData, "/api/testerdata/<_id>")
 # works
 api.add_resource(HomePage, '/')
-# works
+# works but needs to be edited
 api.add_resource(
     Books,
     '/api/books',
     '/api/books/<book_id>'
     )
-# works needs to be edited
+# works but needs to be edited
 api.add_resource(
     BooksAddNewBook,
     '/api/books/add/<name>/<writer>/<year>/<isbn>/' +
     '<about>/<tags>/<description>'
     )
-# works but is this needed?
+# Works
 api.add_resource(
     BooksUpdateBook, '/api/books/update/<book_id>/<name>/<writer>/' +
     '<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/' +
     '<loan_status>'
     )
 # works
-api.add_resource(BooksDeleteByID, '/api/books/d/<book_id>/')
+api.add_resource(BooksDeleteByID, '/api/books/d/<book_id>')
 # not complete
 api.add_resource(
     BooksLoanByUsernameAndID,
@@ -333,13 +393,14 @@ api.add_resource(
     )
 # Works
 api.add_resource(
+    CommentsUpdateComment,
+    '/api/comments/update/<comment_id>/<user_name>/<comment>/<book_id>'
+    )
+# Works
+api.add_resource(
     CommentsDelete,
     '/api/comments/d/<user_name>/<book_id>/<comment_id>'
     )
-
-# Not sure
-#api.add_resource(RatingsPostUsers, '/api/ratings/post/users/')
-
 # Not complete
 # Works but when book is added doesn't work after reboot?
 api.add_resource(
@@ -348,10 +409,15 @@ api.add_resource(
     '/api/ratings/<user_name>',
     '/api/ratings/<user_name>/<book_id>'
     )
-# Not complete
+# Works
 api.add_resource(
     RatingsAddNewRating,
     '/api/ratings/add/<user_name>/<book_id>/<rating>'
+    )
+# Not complete
+api.add_resource(
+    RatingsUpdateRating,
+    '/api/ratings/update/<user_name>/<book_id>/<rating>'
     )
 # not complete
 api.add_resource(
@@ -362,8 +428,18 @@ api.add_resource(
 api.add_resource(
     Users,
     '/api/users',
-    '/api/users/<user_name>'
+    '/api/users/<user_name>',
+    '/api/users/<user_name>/<object_id>'
     )
+api.add_resource(
+    UsersUpdateUser,
+    '/api/users/update/<object_id>'
+    )
+api.add_resource(
+    UsersDeleteByID,
+    '/api/users/d/<object_id>'
+    )
+
 
 # Runs on port 8000!!
 if __name__ == "__main__":

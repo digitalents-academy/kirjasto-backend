@@ -46,6 +46,22 @@ def post_comment(user_name, comment, book_id):
     })
 
 
+def update_comment(comment_id, user_name, comment, book_id):
+    """Function that posts updated comment data to the database."""
+
+    collection.update(
+        {'Comment_ID': comment_id},
+        {
+            "$set": {
+                "Username": user_name,
+                "Comment": comment,
+                "Book_ID": book_id,
+                "Comment_ID": comment_id
+                }
+            }
+        )
+
+
 def delete_comments_by_id(user_name, book_id, comment_id):
     """Function that deletes comment by comment id."""
 

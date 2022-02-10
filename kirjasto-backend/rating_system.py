@@ -57,26 +57,15 @@ class RatingSystem:
     def get_retrieved_rating_by_username_and_id(self, user_name, book_id):
         """Function that returns user's ratings on a book."""
 
-        correct_id = True
-        correct_username = False
-        numbers = "0123456789"
-
-        for letter in book_id:
-            if letter not in numbers:
-                correct_id = False
-        for rating in retrieved_rating_collection:
-            if rating["Username"] == user_name:
-                correct_username = True
-        if correct_id and correct_username:
-            retrieved = list(
-                rating_collection.find(
-                    {
-                        'Username': user_name,
-                        'Book_ID': book_id
-                        }, {'_id': False}
-                    )
+        retrieved = list(
+            rating_collection.find(
+                {
+                    'Username': user_name,
+                    'Book_ID': book_id
+                    }, {'_id': False}
                 )
-            return retrieved
+            )
+        return retrieved
 
     def has_the_user_already_rated_this_book(self, user_name, book_id):
         """Function that checks whether a user has already rated the book."""
@@ -86,6 +75,20 @@ class RatingSystem:
                     rating["Book_ID"] == book_id:
                 return True
         return False
+    
+    def update_rating(self, user_name, book_id, new_rating):
+        """Function that posts updated rating data to the database."""
+
+        rating_collection.update(
+            {'Book_ID': book_id},
+            {
+                "$set": {
+                    "Username": user_name,
+                    "Book_ID": book_id,
+                    "Rating": int(new_rating)
+                    }
+                }
+            )
 
     # Everytime a rating is replaced also the ObjectID is replaced
     # Maybe not a problem but good to know
@@ -101,7 +104,6 @@ class RatingSystem:
                     rating["Book_ID"] == book_id:
                 rating["Rating"] = int(new_rating)
 
-    # replace doesn't work
     def give_rating(self, user_name, book_id, rating):
         """
         Function that saves user's rating,

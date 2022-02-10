@@ -62,4 +62,4 @@ def update_user(object_id, user_name, email, password):
 def delete_user_by_id(object_id):
     """Function that deletes a user from the database."""
 
-    collection.delete_one({"Book_ID": object_id})
+    collection.delete_one({"_id": object_id})
