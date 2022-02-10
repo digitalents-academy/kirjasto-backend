@@ -175,10 +175,14 @@ class BooksLoanByUsernameAndID(Resource):
     """Class for changing book datas loan state."""
 
     def post(self, user_name, book_id):
-        """Function that changes book's loan state."""
+        """Function that changes book's loan state."""  
 
-        loan_book_by_username_and_id(user_name, book_id)
-        return "Book was loaned succesfully!"
+        if loan_book_by_username_and_id(user_name, book_id) != "Something went wrong.":
+            loan_book_by_username_and_id(user_name, book_id)
+            return "Book was loaned succesfully!"
+        
+        return "error: Not a valid username or book_id." \
+            "Book_id and username must exist"
 
 
 class Comments(Resource):
