@@ -162,6 +162,7 @@ class RatingSystem:
                 count += 1
                 rating_sum += rating["Rating"]
         if rating_sum == 0:
+            prnt("here")
             return (0, 0)
         else:
             return (rating_sum / count, count)

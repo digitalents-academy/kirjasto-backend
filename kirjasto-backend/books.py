@@ -7,15 +7,17 @@ from helpers import (
     is_book_id_inside_book_collection,
     is_user_name_inside_user_collection
     )
+from rating_system import RatingSystem
 
+rating_system = RatingSystem()
 # Initiate connection to mongoDB
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
     )
 db = client['kirjasto-backend']
-collection = db['books']
-retrieved_book_collection = list(collection.find({}, {'_id': False}))
+book_collection = db['books']
+retrieved_book_collection = list(book_collection.find({}, {'_id': False}))
 
 
 def get_books():
@@ -31,7 +33,7 @@ def get_book_by_id(book_id):
     """Function that returns book data depending on the book_id."""
 
     retrieved = list(
-        collection.find(
+        book_collection.find(
             {'Book_ID': book_id},
             {'_id': False}
             )
@@ -45,14 +47,17 @@ def add_new_book(
         name, writer, year, isbn, about, tags, description):
     """Function that posts new book to the database."""
 
-    collection.insert_one({
+    print(rating_system.get_books_rating_data[0])
+    print(rating_system.get_books_rating_data[1])
+
+    book_collection.insert_one({
         "Book_ID": uuid.uuid4().hex,
         "Name": name,
         "Writer": writer,
         "Year": int(year),
         "ISBN": isbn,
-        "Rating": 0,
-        "Rating_count": 0,
+        "Rating": rating_system.get_books_rating_data[0],
+        "Rating_count": rating_system.get_books_rating_data[1],
         "About": about,
         "Tags": tags,
         "Description": description,
@@ -74,7 +79,7 @@ def update_book(
     elif loan_status == "true":
         loan_status = True
 
-    collection.update(
+    book_collection.update(
         {'Book_ID': book_id},
         {
             "$set": {
@@ -97,7 +102,7 @@ def update_book(
 def delete_book_by_id(book_id):
     """Function that deletes a book from the database."""
 
-    collection.delete_one({"Book_ID": book_id})
+    book_collection.delete_one({"Book_ID": book_id})
 
     #When a book is deleted
     #also the comments and ratings
@@ -122,13 +127,13 @@ def loan_book_by_username_and_id(user_name, book_id):
             'Loaner': user_name,
             'Loan_Status': True
         }
-        collection.replace_one(book[0], new_book)
+        book_collection.replace_one(book[0], new_book)
 
 
-    # retrieved = list(collection.find({'Book_ID': book_id}, {'_id': False}))
+    # retrieved = list(book_collection.find({'Book_ID': book_id}, {'_id': False}))
     # for data in retrieved:
     #     if data['Book_ID'] == book_id:
-    #         return collection.find_one_and_update(
+    #         return book_collection.find_one_and_update(
     #             data, {"$set": parse()})
     #     elif data['Book_ID'] != book_id:
     #         return {'message': f"{book_id} doesn't exist."
