@@ -21,7 +21,9 @@ retrieved_book_collection = list(collection.find({}, {'_id': False}))
 def get_books():
     """Function that returns all books."""
 
-    return retrieved_book_collection
+    if len(retrieved_book_collection) > 0:
+        return retrieved_book_collection
+    return "Something went wrong!"
 
 
 # cannot see books that have string book_id
@@ -105,26 +107,23 @@ def delete_book_by_id(book_id):
 def loan_book_by_username_and_id(user_name, book_id):
     """Function that changes book's loan state."""
 
-    if is_user_name_inside_user_collection(user_name) and \
-            is_book_id_inside_book_collection(book_id):
-        book = get_book_by_id(book_id)
-        if book[0]['Loan_Status'] == "False":
-            new_book = {
-                'Book_ID': book[0]['Book_ID'],
-                'Name': book[0]['Name'],
-                'Writer': book[0]['Writer'],
-                'Year': book[0]['Year'],
-                'ISBN': book[0]['ISBN'],
-                'Rating': book[0]['Rating'],
-                'About': book[0]['About'],
-                'Tags': book[0]['Tags'],
-                'Description': book[0]['Description'],
-                'Loaner': user_name,
-                'Loan_Status': True
-            }
-            collection.replace_one(book[0], new_book)
-    else:
-        return "Something went wrong."
+    book = get_book_by_id(book_id)
+    if book[0]['Loan_Status'] is False:
+        new_book = {
+            'Book_ID': book[0]['Book_ID'],
+            'Name': book[0]['Name'],
+            'Writer': book[0]['Writer'],
+            'Year': book[0]['Year'],
+            'ISBN': book[0]['ISBN'],
+            'Rating': book[0]['Rating'],
+            'About': book[0]['About'],
+            'Tags': book[0]['Tags'],
+            'Description': book[0]['Description'],
+            'Loaner': user_name,
+            'Loan_Status': True
+        }
+        collection.replace_one(book[0], new_book)
+
 
     # retrieved = list(collection.find({'Book_ID': book_id}, {'_id': False}))
     # for data in retrieved:

@@ -40,19 +40,13 @@ class RatingSystem:
     def get_retrieved_ratings_by_username(self, user_name):
         """Function that returns all of user's ratings."""
 
-        correct_user_name = False
-
-        for rating in retrieved_rating_collection:
-            if rating["Username"] == user_name:
-                correct_user_name = True
-        if correct_user_name:
-            retrieved = list(
-                rating_collection.find(
-                    {'Username': str(user_name)}, {'_id': False}
-                    )
+        retrieved = list(
+            rating_collection.find(
+                {'Username': str(user_name)}, {'_id': False}
                 )
-            if len(retrieved) > 0:
-                return retrieved
+            )
+        if len(retrieved) > 0:
+            return retrieved
 
     def get_retrieved_rating_by_username_and_id(self, user_name, book_id):
         """Function that returns user's ratings on a book."""
