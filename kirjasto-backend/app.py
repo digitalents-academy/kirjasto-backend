@@ -10,7 +10,9 @@ from helpers import (
     is_comment_data_inside_comment_collection,
     is_rating_acceptable,
     is_user_name_inside_user_collection,
-    is_object_int, is_id_inside_collection
+    is_object_int, is_id_inside_collection,
+    is_email_inside_user_collection,
+    is_password_inside_user_collection
     )
 from books import (
     get_books,
@@ -329,11 +331,11 @@ class Users(Resource):
 class UsersUpdateUser(Resource):
     """Class for updating user data to the database."""
 
-    def put(self, object_id):
+    def put(self, object_id, user_name, email, password):
         """Function that updates user data to the database."""
 
-        if is_id_inside_collection(object_id):
-            update_user(object_id)
+        if is_id_inside_collection(object_id) and is_user_name_inside_user_collection(user_name) and is_email_inside_user_collection(email) and is_password_inside_user_collection(password)
+            update_user(object_id, user_name, email, password)
             return "User was updated succesfully!"
         return "error: Not a valid object_id! " \
             "object_id must be inside the database!"
@@ -438,7 +440,7 @@ api.add_resource(
     )
 api.add_resource(
     UsersUpdateUser,
-    '/api/users/update/<object_id>'
+    '/api/users/update/<object_id>/<user_name>/<email>/<password>'
     )
 api.add_resource(
     UsersDeleteByID,
