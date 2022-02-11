@@ -1,5 +1,4 @@
 """rating_system.py: Contains Rating class."""
-
 import uuid
 from pymongo.mongo_client import MongoClient
 import db_secret
@@ -19,6 +18,8 @@ retrieved_user_collection = list(user_collection.find({}, {'_id': False}))
 retrieved_rating_collection = list(rating_collection.find({}, {'_id': False}))
 
 
+#Self.books, self.users and self.user_ratings are not needed
+#Also class isn't needed
 class RatingSystem:
     """
     Class that contain functions
@@ -30,6 +31,7 @@ class RatingSystem:
         self.users = retrieved_user_collection
         self.user_ratings = retrieved_rating_collection
 
+#Collection can be returned
     def get_retrieved_rating_collection(self):
         """
         Function that returns a dictionary called self.user_ratings
@@ -62,6 +64,7 @@ class RatingSystem:
             )
         return retrieved
 
+#Can be checked with pymongo find
     def has_the_user_already_rated_this_book(self, user_name, book_id):
         """Function that checks whether a user has already rated the book."""
 
@@ -92,6 +95,7 @@ class RatingSystem:
     # it doesn't have ObjectID so the question is:
     # should the rating be stored in the dictionary from database?
 
+#Not needed?
 #Rating id could be better here
     def replace_user_rating(self, user_name, book_id, new_rating):
         """Function that replaces old rating with a new one."""
@@ -100,6 +104,8 @@ class RatingSystem:
             if rating["Username"] == user_name and \
                     rating["Book_ID"] == book_id:
                 rating["Rating"] = int(new_rating)
+
+#Only database collection is needed
 
 #Needs to be edited
 #User's mean score should change after gicing a rating
@@ -112,37 +118,57 @@ class RatingSystem:
         to a list called self.user_ratings.
         """
 
-#rating id changes everytime rating is updated
+        rating_id = uuid.uuid4().hex
+
         new_rating = {
-            "Rating_ID": uuid.uuid4().hex,
+            "Rating_ID": rating_id,
             "Rating": int(rating),
             "Username": user_name,
             "Book_ID": book_id,
             }
 
+#A better way to replace a rating is needed
+#Update_one?
         if self.has_the_user_already_rated_this_book(user_name, book_id):
-            rating_collection.replace_one(
-                self.get_reimbursable_user_rating(new_rating),
-                new_rating
-                )
-            self.replace_user_rating(
-                new_rating["Username"],
-                new_rating["Book_ID"],
-                new_rating["Rating"]
-                )
+            #rating_collection.replace_one(
+            #    self.get_reimbursable_user_rating(new_rating),
+            #    new_rating
+            #    )
+            #self.replace_user_rating(
+            #    new_rating["Username"],
+            #    new_rating["Book_ID"],
+            #    new_rating["Rating"]
+            #    )
+            for retrieved in retrieved_rating_collection:
+                if retrieved["Username"] == user_name and \
+                        retrieved["Book_ID"] == book_id:
+                    rating_id = retrieved["Rating_ID"]
+                rating_collection.update(
+                    {'Rating_ID': rating_id},
+                    {
+                        "$set": {
+                            "Rating": rating,
+                            }
+                        }
+                    )
         else:
             self.user_ratings.append(new_rating)
             rating_collection.insert_one(new_rating)
+        #Not needed?
+        #self.update_books_dictionary_rating_data(book_id)
 
-        self.update_books_dictionary_rating_data(book_id)
+        #for book in self.books:
+        #    book_collection.replace_one(
+        #        self.get_reimbursable_book(book),
+        #        book
+        #        )
 
-        for book in self.books:
-            book_collection.replace_one(self.get_reimbursable_book(book), book)
+        #self.update_users_dictionary_mean_score_data(user_name)
 
-        self.update_users_dictionary_mean_score_data(user_name)
+        #for user in self.users:
+        #    book_collection.replace_one(self.get_reimbursable_user(user), user)
 
-        for user in self.users:
-            book_collection.replace_one(self.get_reimbursable_user(user), user)
+#Can be done with collection
 
 #rating id could work better here
     def delete_rating(self, user_name, book_id):
@@ -164,8 +190,7 @@ class RatingSystem:
                 rating["Book_ID"] == book_id:
                 return "Something went wrong!"
 
-
-
+#Only collection is needed
     def get_books_rating_data(self, book_id):
         """
         Function that returns single books rating
@@ -183,6 +208,7 @@ class RatingSystem:
         else:
             return (rating_sum / count, count)
 
+#Only collection is needed
     def get_users_mean_score(self, user_name):
         """
         Function that returns single user's mean score
@@ -201,6 +227,7 @@ class RatingSystem:
         else:
             return (rating_sum / count, count)
 
+#Can be done with pymongo update
     def update_books_dictionary_rating_data(self, book_id):
         """Function that updates ratings in the dictionary called books."""
 
@@ -209,6 +236,7 @@ class RatingSystem:
                 rating["Rating"] = self.get_books_rating_data(book_id)[0]
                 rating["Rating_count"] = self.get_books_rating_data(book_id)[1]
 
+#Can be done with pymongo update
     def update_users_dictionary_mean_score_data(self, user_name):
         """Function that updates mean score in the dictionary called users."""
 
