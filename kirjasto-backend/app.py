@@ -1,6 +1,6 @@
 from distutils.log import debug
-from flask import Flask, Response, render_template, session, redirect
 from functools import wraps
+from flask import Flask, Response, render_template, session, redirect
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
 from pymongo.mongo_client import MongoClient
@@ -145,19 +145,20 @@ class BooksUpdateBook(Resource):
     """Class for updating book data to the database."""
 
     def put(
-            self, book_id, name, writer, year, isbn, rating, about, tags,
-            description, loaner, loan_status):
+            self, book_id, name, writer, year, isbn, rating, rating_count,
+            about, tags, description, loaner, loan_status):
         """Function that updates book data to the database."""
 
         if is_book_id_inside_book_collection(book_id) and \
                 is_book_already_added(name, isbn) and \
-                is_object_int(year):
+                is_object_int(year) and is_object_int(rating) and \
+                is_object_int(rating_count):
             update_book(
                 book_id, name, writer, year, isbn,
-                rating, about, tags, description,
+                rating, rating_count, about, tags, description,
                 loaner, loan_status)
             return "Book was updated succesfully!"
-        return "error: Not a valid book_id, name or isbn! " \
+        return "error: Not a valid book_id, name, isbn or rating! " \
             "book_id, name and isbn must be inside the database!"
 
 
@@ -284,16 +285,17 @@ class RatingsAddNewRating(Resource):
         return "Rating was posted succesfully!"
 
 
+#Test is needed for the rating_id
 class RatingsUpdateRating(Resource):
     """Class for updating rating data to the database."""
 
-    def put(self, user_name, book_id, rating):
+    def put(self, rating_id, user_name, book_id, rating):
         """Function that updates rating data to the database."""
 
         if is_user_name_inside_user_collection(user_name) and \
                 is_book_id_inside_book_collection(book_id) and \
                 is_object_int(rating):
-            rating_system.update_rating(user_name, book_id, rating)
+            rating_system.update_rating(rating_id, user_name, book_id, rating)
             return "Rating was updated succesfully!"
         return "error: Not a valid username, book_id or rating! " \
             "username and book_id must be inside the database " \
@@ -382,8 +384,8 @@ api.add_resource(
 # Works
 api.add_resource(
     BooksUpdateBook, '/api/books/update/<book_id>/<name>/<writer>/' +
-    '<year>/<isbn>/<rating>/<about>/<tags>/<description>/<loaner>/' +
-    '<loan_status>'
+    '<year>/<isbn>/<rating>/<rating_count>/<about>/<tags>/<description>/' +
+    '<loaner>/<loan_status>'
     )
 # works
 api.add_resource(BooksDeleteByID, '/api/books/d/<book_id>')
@@ -429,14 +431,13 @@ api.add_resource(
 # Not complete
 api.add_resource(
     RatingsUpdateRating,
-    '/api/ratings/update/<user_name>/<book_id>/<rating>'
+    '/api/ratings/update/<rating_id>/<user_name>/<book_id>/<rating>'
     )
 # not complete
 api.add_resource(
     RatingsDeleteByUsernameAndBookID,
     '/api/ratings/d/<book_id>/<user_name>'
     )
-#ID version is needed
 api.add_resource(
     Users,
     '/api/users',

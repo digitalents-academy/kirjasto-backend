@@ -5,8 +5,8 @@ that are needed for the Kirjasto functions.
 """
 
 from pymongo.mongo_client import MongoClient
-import db_secret
 from passlib.hash import pbkdf2_sha256
+import db_secret
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":"
@@ -111,6 +111,11 @@ def is_password_inside_user_collection(password):
 #Could make one for every collection
 #or function that takes a collection as a parameter
 def is_id_inside_collection(object_id):
+    """
+    Function that checks
+    whether object_id can be found inside the user collection.
+    """
+
     retrieved = list(user_collection.find({'_id': object_id}))
     for user in retrieved:
         if user["_id"] == object_id:
