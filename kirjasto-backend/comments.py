@@ -45,9 +45,25 @@ def post_comment(user_name, comment, book_id):
         'Comment_ID': uuid.uuid4().hex
     })
 
+    current_comment_id = retrieved_comment_collection['Comment_ID']
+
+    for comment in retrieved_comment_collection:
+        if comment["Comment_ID"] == current_comment_id:
+            return "Something went wrong!"
+
 
 def update_comment(comment_id, user_name, comment, book_id):
     """Function that posts updated comment data to the database."""
+    
+    old_user_name = ""
+    old_comment = ""
+    old_book_id = ""
+
+    for comment in retrieved_comment_collection:
+        if comment["_id"] == comment_id:
+            old_user_name = comment["Username"]
+            old_comment = comment["Comment"]
+            old_book_id = comment["Book_ID"]
 
     collection.update(
         {'Comment_ID': comment_id},
@@ -60,6 +76,10 @@ def update_comment(comment_id, user_name, comment, book_id):
                 }
             }
         )
+
+    if old_user_name != user_name or old_user_name != "" or old_comment != comment or old_comment != "" or old_book_id != book_id or old_book_id != "":
+        return "Comment updated!"
+
 
 
 def delete_comments_by_id(user_name, book_id, comment_id):
