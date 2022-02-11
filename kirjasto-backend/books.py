@@ -1,12 +1,12 @@
+"""
+books.py:
+Contains necessary functions for making book function work as intended.
+"""
+
 import uuid
 from pymongo import MongoClient
 from flask_restful import reqparse
 import db_secret
-from helpers import (
-    is_book_already_added,
-    is_book_id_inside_book_collection,
-    is_user_name_inside_user_collection
-    )
 from rating_system import RatingSystem
 
 rating_system = RatingSystem()
@@ -41,14 +41,9 @@ def get_book_by_id(book_id):
     return retrieved
 
 
-#Slight problem
-#Book is added even though isbn or name is the same
 def add_new_book(
         name, writer, year, isbn, about, tags, description):
     """Function that posts new book to the database."""
-
-    #print(rating_system.get_books_rating_data[0])
-    #print(rating_system.get_books_rating_data[1])
 
     book_collection.insert_one({
         "Book_ID": uuid.uuid4().hex,
@@ -66,10 +61,9 @@ def add_new_book(
     })
 
 
-#Rating count isn't complete
 def update_book(
-        book_id, name, writer, year, isbn, rating, about, tags, description,
-        loaner, loan_status):
+        book_id, name, writer, year, isbn, rating, rating_count, about, tags,
+        description, loaner, loan_status):
     """Function that posts updated book data to the database."""
 
     if loaner == "null":
@@ -88,7 +82,7 @@ def update_book(
                 "Year": int(year),
                 "ISBN": isbn,
                 "Rating": int(rating),
-                "Rating_count": int(rating),
+                "Rating_count": int(rating_count),
                 "About": about,
                 "Tags": tags,
                 "Description": description,

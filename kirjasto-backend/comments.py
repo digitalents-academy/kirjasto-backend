@@ -1,3 +1,9 @@
+"""
+comments.py:
+File that contains necessary functions
+for making comment system work as intended.
+"""
+
 import uuid
 from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
@@ -39,10 +45,10 @@ def post_comment(user_name, comment, book_id):
     """Function that posts new comment to the database."""
 
     collection.insert_one({
-        'Username': user_name,
+        'Comment_ID': uuid.uuid4().hex,
         'Comment': comment,
-        'Book_ID': book_id,
-        'Comment_ID': uuid.uuid4().hex
+        'Username': user_name,
+        'Book_ID': book_id
     })
 
     current_comment_id = retrieved_comment_collection['Comment_ID']

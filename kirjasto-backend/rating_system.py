@@ -1,5 +1,6 @@
 """rating_system.py: Contains Rating class."""
 
+import uuid
 from pymongo.mongo_client import MongoClient
 import db_secret
 
@@ -70,13 +71,14 @@ class RatingSystem:
                 return True
         return False
 
-    def update_rating(self, user_name, book_id, new_rating):
+    def update_rating(self, rating_id, user_name, book_id, new_rating):
         """Function that posts updated rating data to the database."""
 
         rating_collection.update(
-            {'Book_ID': book_id},
+            {'Rating_ID': rating_id},
             {
                 "$set": {
+                    "Rating_ID": rating_id,
                     "Username": user_name,
                     "Book_ID": book_id,
                     "Rating": int(new_rating)
@@ -90,6 +92,7 @@ class RatingSystem:
     # it doesn't have ObjectID so the question is:
     # should the rating be stored in the dictionary from database?
 
+#Rating id could be better here
     def replace_user_rating(self, user_name, book_id, new_rating):
         """Function that replaces old rating with a new one."""
 
@@ -98,6 +101,10 @@ class RatingSystem:
                     rating["Book_ID"] == book_id:
                 rating["Rating"] = int(new_rating)
 
+#Needs to be edited
+#User's mean score should change after gicing a rating
+#Also Books rating score and rating count should change
+#Replace method could be done better
     def give_rating(self, user_name, book_id, rating):
         """
         Function that saves user's rating,
@@ -105,10 +112,12 @@ class RatingSystem:
         to a list called self.user_ratings.
         """
 
+#rating id changes everytime rating is updated
         new_rating = {
+            "Rating_ID": uuid.uuid4().hex,
+            "Rating": int(rating),
             "Username": user_name,
             "Book_ID": book_id,
-            "Rating": int(rating)
             }
 
         if self.has_the_user_already_rated_this_book(user_name, book_id):
@@ -125,16 +134,17 @@ class RatingSystem:
             self.user_ratings.append(new_rating)
             rating_collection.insert_one(new_rating)
 
-        self.update_books_dictionary_ratings()
+        self.update_books_dictionary_rating_data(book_id)
 
         for book in self.books:
             book_collection.replace_one(self.get_reimbursable_book(book), book)
 
-        self.update_users_dictionary_rating()
+        self.update_users_dictionary_mean_score_data(user_name)
 
         for user in self.users:
             book_collection.replace_one(self.get_reimbursable_user(user), user)
 
+#rating id could work better here
     def delete_rating(self, user_name, book_id):
         """Function that deletes a rating and updates data after."""
 
@@ -146,8 +156,8 @@ class RatingSystem:
 
         # Needs to be updated some other way
         # since now Object_id will be added aswell
-        self.update_books_dictionary_ratings()
-        self.update_users_dictionary_rating()
+        self.update_books_dictionary_rating_data(book_id)
+        self.update_users_dictionary_mean_score_data(user_name)
 
         for rating in self.user_ratings:
             if rating["Username"] == user_name and \
@@ -191,27 +201,21 @@ class RatingSystem:
         else:
             return (rating_sum / count, count)
 
-    def update_books_dictionary_ratings(self):
+    def update_books_dictionary_rating_data(self, book_id):
         """Function that updates ratings in the dictionary called books."""
 
         for rating in self.books:
-            book_id = rating["Book_ID"]
-            rating["Rating"] = (
-                f"{self.get_books_rating_data(book_id)[0]} "
-                f"out of 5 ({self.get_books_rating_data(book_id)[1]} "
-                f"ratings)"
-                )
+            if book_id == rating["Book_ID"]:
+                rating["Rating"] = self.get_books_rating_data(book_id)[0]
+                rating["Rating_count"] = self.get_books_rating_data(book_id)[1]
 
-    def update_users_dictionary_rating(self):
+    def update_users_dictionary_mean_score_data(self, user_name):
         """Function that updates mean score in the dictionary called users."""
 
-        for score in self.books:
-            user_name = score["Book_ID"]
-            score["Mean_score"] = (
-                f"{self.get_users_mean_score(user_name)[0]} "
-                f"out of 5 ({self.get_users_mean_score(user_name)[1]} "
-                f"ratings)"
-                )
+        for score in self.users:
+            if user_name == score["Username"]:
+                score["Mean_score"] = self.get_users_mean_score(user_name)[0]
+                score["Mean_count"] = self.get_users_mean_score(user_name)[1]
 
     def get_reimbursable_book(self, book):
         """
