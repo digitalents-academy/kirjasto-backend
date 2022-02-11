@@ -104,6 +104,10 @@ def delete_book_by_id(book_id):
 
     book_collection.delete_one({"Book_ID": book_id})
 
+    for book in retrieved_book_collection:
+        if book["Book_ID"] == book_id:
+            return "Something went wrong!"
+
     #When a book is deleted
     #also the comments and ratings
     #for that book should be deleted.

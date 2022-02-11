@@ -149,6 +149,13 @@ class RatingSystem:
         self.update_books_dictionary_ratings()
         self.update_users_dictionary_rating()
 
+        for rating in self.user_ratings:
+            if rating["Username"] == user_name and \
+                rating["Book_ID"] == book_id:
+                return "Something went wrong!"
+
+
+
     def get_books_rating_data(self, book_id):
         """
         Function that returns single books rating

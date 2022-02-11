@@ -5,6 +5,7 @@ for updating, editing and deleting user data from the database.
 
 from pymongo import MongoClient
 from flask_restful import reqparse
+from passlib.hash import pbkdf2_sha256
 import db_secret
 
 # Initiate connection to mongoDB
@@ -46,16 +47,31 @@ def get_user_by_username(user_name):
 def update_user(object_id, user_name, email, password):
     """Function that posts updated user_data to the database."""
 
+    old_user_name = ""
+    old_email = ""
+    old_password = ""
+
+    for user in retrieved_user_collection:
+        if user["_id"] == object_id:
+            old_user_name = user["Username"]
+            old_email = user["Email"]
+            old_password = user["Password"]
+
     collection.update(
         {'_id': object_id},
         {
             "$set": {
                 "Username": user_name,
                 "Email": email,
-                "Password": password
+                "Password": pbkdf2_sha256.encrypt(password)
                 }
             }
         )
+    
+    if old_user_name != user_name or old_user_name != "" or old_email != email or old_email != "" or old_password != password or old_password != "":
+        return "User updated!"
+
+
 
 
 #Is user, email and password needed?
@@ -63,3 +79,7 @@ def delete_user_by_id(object_id):
     """Function that deletes a user from the database."""
 
     collection.delete_one({"_id": object_id})
+
+    for user in retrieved_user_collection:
+        if user["_id"] == object_id:
+            return "Something went wrong!"

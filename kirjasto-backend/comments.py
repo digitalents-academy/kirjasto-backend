@@ -73,6 +73,10 @@ def delete_comments_by_id(user_name, book_id, comment_id):
             }
         )
 
+    for comment in retrieved_comment_collection:
+        if comment["Comment_ID"] == comment_id:
+            return "Something went wrong!"
+
 
 #Maybe needed when the front is ready?
     #     parser = reqparse.RequestParser()
