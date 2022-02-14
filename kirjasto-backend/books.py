@@ -7,10 +7,7 @@ import uuid
 from pymongo import MongoClient
 from flask_restful import reqparse
 import db_secret
-from rating_system import RatingSystem
 
-rating_system = RatingSystem()
-# Initiate connection to mongoDB
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"

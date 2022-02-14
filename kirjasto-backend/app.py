@@ -29,7 +29,14 @@ from comments import (
     post_comment,
     update_comment
     )
-from rating_system import RatingSystem
+from rating_system import (
+    get_retrieved_rating_collection,
+    get_retrieved_ratings_by_username,
+    get_retrieved_rating_by_username_and_id,
+    update_rating,
+    give_rating,
+    delete_rating
+    )
 import db_secret
 from users import (
     get_user_by_username,
@@ -44,7 +51,6 @@ parser = reqparse.RequestParser()
 app = Flask(__name__)
 app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 api = Api(app)
-rating_system = RatingSystem()
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
@@ -255,17 +261,17 @@ class Ratings(Resource):
         if book_id is not None:
             if is_book_id_inside_book_collection(book_id) and \
                     is_user_name_inside_user_collection(user_name):
-                return rating_system.get_retrieved_rating_by_username_and_id(
+                return get_retrieved_rating_by_username_and_id(
                     user_name,
                     book_id
                     )
             return "Incorrect username or book id!"
         elif user_name is not None:
             if is_user_name_inside_user_collection(user_name):
-                return rating_system.get_retrieved_ratings_by_username(
+                return get_retrieved_ratings_by_username(
                     user_name)
             return "Incorrect username"
-        return rating_system.get_retrieved_rating_collection()
+        return get_retrieved_rating_collection()
 
 
 class RatingsAddNewRating(Resource):
@@ -281,7 +287,7 @@ class RatingsAddNewRating(Resource):
             return "error: Not a valid username, book_id or rating. " \
                 "Username and book_id must exist inside the database!"
 
-        rating_system.give_rating(user_name, book_id, rating)
+        give_rating(user_name, book_id, rating)
         return "Rating was posted succesfully!"
 
 
@@ -295,7 +301,7 @@ class RatingsUpdateRating(Resource):
         if is_user_name_inside_user_collection(user_name) and \
                 is_book_id_inside_book_collection(book_id) and \
                 is_object_int(rating):
-            rating_system.update_rating(rating_id, user_name, book_id, rating)
+            update_rating(rating_id, user_name, book_id, rating)
             return "Rating was updated succesfully!"
         return "error: Not a valid username, book_id or rating! " \
             "username and book_id must be inside the database " \
@@ -310,7 +316,7 @@ class RatingsDeleteByUsernameAndBookID(Resource):
 
         if is_user_name_inside_user_collection(user_name) and \
                 is_book_id_inside_book_collection(book_id):
-            rating_system.delete_rating(user_name, book_id)
+            delete_rating(user_name, book_id)
             return "Rating was deleted succesfully!"
         return "error: Not a valid username or book_id! " \
             "username and book_id must be inside the database!"
