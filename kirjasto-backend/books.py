@@ -45,8 +45,10 @@ def add_new_book(
         name, writer, year, isbn, about, tags, description):
     """Function that posts new book to the database."""
 
+    book_id = uuid.uuid4().hex
+
     book_collection.insert_one({
-        "Book_ID": uuid.uuid4().hex,
+        "Book_ID": book_id,
         "Name": name,
         "Writer": writer,
         "Year": int(year),
@@ -60,6 +62,12 @@ def add_new_book(
         "Loan_Status": False
     })
 
+    for book in retrieved_book_collection:
+        if book["Book_ID"] == book_id:
+            return 
+        else:
+            "Something went wrong!"
+
 
 def update_book(
         book_id, name, writer, year, isbn, rating, rating_count, about, tags,
@@ -72,6 +80,19 @@ def update_book(
         loan_status = False
     elif loan_status == "true":
         loan_status = True
+
+    old_isbn = ""
+    old_about = ""
+    old_description = ""
+
+    for book in retrieved_book_collection:
+        if book['Book_ID'] == book_id:
+            old_isbn == book['ISBN']
+            old_about == book['About']
+            old_description == book["Description"]
+    
+    
+    
 
     book_collection.update(
         {'Book_ID': book_id},
@@ -91,6 +112,10 @@ def update_book(
                 }
             }
         )
+
+    if old_description != description or old_description != "" or old_isbn != isbn or old_isbn != "" or old_about != about or old_about != "":
+        return "Book updated!"
+    
 
 
 def delete_book_by_id(book_id):
@@ -126,6 +151,12 @@ def loan_book_by_username_and_id(user_name, book_id):
             'Loan_Status': True
         }
         book_collection.replace_one(book[0], new_book)
+    
+    for book in retrieved_book_collection:
+        if book["Book_ID"] == book_id:
+            if book["Loan_Status"] == True:
+                return
+    return "Something went wrong!"
 
     #retrieved = list(book_collection.find(
     #    {'Book_ID': book_id},

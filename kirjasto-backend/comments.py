@@ -44,17 +44,21 @@ def get_comments_by_book_id(book_id):
 def post_comment(user_name, comment, book_id):
     """Function that posts new comment to the database."""
 
+    comment_id = uuid.uuid4().hex
+
     collection.insert_one({
-        'Comment_ID': uuid.uuid4().hex,
+        'Comment_ID': comment_id,
         'Comment': comment,
         'Username': user_name,
         'Book_ID': book_id
     })
 
-    current_comment_id = retrieved_comment_collection['Comment_ID']
+    
 
     for comment in retrieved_comment_collection:
-        if comment["Comment_ID"] == current_comment_id:
+        if comment["Comment_ID"] == comment_id:
+            return
+        else:
             return "Something went wrong!"
 
 
