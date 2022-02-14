@@ -59,6 +59,7 @@ client = MongoClient(
 db = client['kirjasto-backend']
 collection = db['users']
 testcollection = db["testerdata"]
+retrieved_testcollection = list(testcollection.find({}, {'_id': False}))
 
 
 def login_required(f):
@@ -132,40 +133,21 @@ class Books(Resource):
 class BooksAddNewBook(Resource):
     """Class for posting book data to the database."""
 
-    def post(
-            self, name, writer, year, isbn, about, tags,
-            description):
+    def post(self):
         """Function that posts book data to the database."""
 
-        if is_book_already_added(name, isbn):
-            return "Book has already been added!"
-
-        add_new_book(
-            name, writer, year, isbn, about, tags,
-            description
-            )
+        add_new_book()
         return "Book was added succesfully!"
 
 
 class BooksUpdateBook(Resource):
     """Class for updating book data to the database."""
 
-    def put(
-            self, book_id, name, writer, year, isbn, rating, rating_count,
-            about, tags, description, loaner, loan_status):
+    def put(self):
         """Function that updates book data to the database."""
 
-        if is_book_id_inside_book_collection(book_id) and \
-                is_book_already_added(name, isbn) and \
-                is_object_int(year) and is_object_int(rating) and \
-                is_object_int(rating_count):
-            update_book(
-                book_id, name, writer, year, isbn,
-                rating, rating_count, about, tags, description,
-                loaner, loan_status)
-            return "Book was updated succesfully!"
-        return "error: Not a valid book_id, name, isbn or rating! " \
-            "book_id, name and isbn must be inside the database!"
+        update_book()
+        return "Book was updated succesfully!"
 
 
 class BooksDeleteByID(Resource):
@@ -381,17 +363,13 @@ api.add_resource(
     '/api/books',
     '/api/books/<book_id>'
     )
-# works but needs to be edited
+# works
 api.add_resource(
     BooksAddNewBook,
-    '/api/books/add/<name>/<writer>/<year>/<isbn>/' +
-    '<about>/<tags>/<description>'
-    )
+    '/api/books/add')
 # Works
 api.add_resource(
-    BooksUpdateBook, '/api/books/update/<book_id>/<name>/<writer>/' +
-    '<year>/<isbn>/<rating>/<rating_count>/<about>/<tags>/<description>/' +
-    '<loaner>/<loan_status>'
+    BooksUpdateBook, '/api/books/update'
     )
 # works
 api.add_resource(BooksDeleteByID, '/api/books/d/<book_id>')

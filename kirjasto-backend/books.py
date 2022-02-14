@@ -7,6 +7,7 @@ import uuid
 from pymongo import MongoClient
 from flask_restful import reqparse
 import db_secret
+from helpers import is_book_already_added
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
@@ -15,6 +16,7 @@ client = MongoClient(
 db = client['kirjasto-backend']
 book_collection = db['books']
 retrieved_book_collection = list(book_collection.find({}, {'_id': False}))
+parser = reqparse.RequestParser()
 
 
 def get_books():
@@ -38,81 +40,127 @@ def get_book_by_id(book_id):
     return retrieved
 
 
-def add_new_book(
-        name, writer, year, isbn, about, tags, description):
+def add_new_book():
     """Function that posts new book to the database."""
 
     book_id = uuid.uuid4().hex
 
-    book_collection.insert_one({
-        "Book_ID": book_id,
-        "Name": name,
-        "Writer": writer,
-        "Year": int(year),
-        "ISBN": isbn,
-        "Rating": 0,
+    parser.add_argument('name', required=True, type=str)
+    parser.add_argument('writer', required=True, type=str)
+    parser.add_argument('year', required=True, type=int)
+    parser.add_argument('isbn', required=True, type=str)
+    parser.add_argument('about', required=True, type=str)
+    parser.add_argument('tags', required=True, type=str)
+    parser.add_argument('description', required=True, type=str)
+
+    args = parser.parse_args()
+
+    values = {
+        'Book_ID': book_id,
+        'Name': args['name'],
+        'Writer': args['writer'],
+        'Year': int(args['year']),
+        'ISBN': args['isbn'],
+        'Rating': 0,
         "Rating_count": 0,
-        "About": about,
-        "Tags": tags,
-        "Description": description,
-        "Loaner": None,
-        "Loan_Status": False
-    })
+        'About': args['about'],
+        'Tags': args['tags'],
+        'Description': args['description'],
+        'Loaner': None,
+        'Loan_Status': False
+        }
+
+    if is_book_already_added(values["Name"], values["ISBN"]):
+        return "Book has already been added!"
+
+    book_collection.insert_one(values)
 
     for book in retrieved_book_collection:
         if book["Book_ID"] == book_id:
-            return 
-        else:
-            "Something went wrong!"
+            return
+        return "Something went wrong!"
 
 
-def update_book(
-        book_id, name, writer, year, isbn, rating, rating_count, about, tags,
-        description, loaner, loan_status):
+def update_book():
     """Function that posts updated book data to the database."""
 
-    if loaner == "null":
-        loaner = None
-    if loan_status == "false":
-        loan_status = False
-    elif loan_status == "true":
-        loan_status = True
+    #Necessary tests
+    #if is_book_id_inside_book_collection(book_id) and \
+    #            is_book_already_added(name, isbn) and \
+    #            is_object_int(year) and is_object_int(rating) and \
+    #            is_object_int(rating_count):
+    #return "error: Not a valid book_id, name, isbn or rating! " \
+    #        "book_id, name and isbn must be inside the database!"
+
+    parser.add_argument('book_id', required=True, type=str)
+    parser.add_argument('name', required=True, type=str)
+    parser.add_argument('writer', required=True, type=str)
+    parser.add_argument('year', required=True, type=int)
+    parser.add_argument('isbn', required=True, type=str)
+    parser.add_argument('rating', required=True, type=int)
+    parser.add_argument('rating_count', required=True, type=int)
+    parser.add_argument('about', required=True, type=str)
+    parser.add_argument('tags', required=True, type=str)
+    parser.add_argument('description', required=True, type=str)
+    parser.add_argument('loaner', required=True, type=str)
+    parser.add_argument('loan_status', required=True, type=bool)
+
+    args = parser.parse_args()
+
+    values = {
+        'Book_ID': args['book_id'],
+        'Name': args['name'],
+        'Writer': args['writer'],
+        'Year': int(args['year']),
+        'ISBN': args['isbn'],
+        'Rating': args['rating'],
+        "Rating_count": args['rating_count'],
+        'About': args['about'],
+        'Tags': args['tags'],
+        'Description': args['description'],
+        'Loaner': args['loaner'],
+        'Loan_Status': args['loan_status']
+        }
+
+    if values["Loaner"] == "null":
+        values["Loaner"] = None
+    if values["Loan_Status"] == "false":
+        values["Loan_Status"] = False
+    elif values["Loan_Status"] == "true":
+        values["Loan_Status"] = True
 
     old_isbn = ""
     old_about = ""
     old_description = ""
 
     for book in retrieved_book_collection:
-        if book['Book_ID'] == book_id:
-            old_isbn == book['ISBN']
-            old_about == book['About']
+        if book["Book_ID"] == values["Book_ID"]:
+            old_isbn == book["ISBN"]
+            old_about == book["About"]
             old_description == book["Description"]
     
-    
-    
-
     book_collection.update(
-        {'Book_ID': book_id},
+        {'Book_ID': values["Book_ID"]},
         {
             "$set": {
-                "Name": name,
-                "Writer": writer,
-                "Year": int(year),
-                "ISBN": isbn,
-                "Rating": int(rating),
-                "Rating_count": int(rating_count),
-                "About": about,
-                "Tags": tags,
-                "Description": description,
-                "Loaner": loaner,
-                "Loan_Status": loan_status
+                "Name": values["Name"],
+                "Writer": values["Writer"],
+                "Year": int(values["Year"]),
+                "ISBN": values["ISBN"],
+                "Rating": int(values["Rating"]),
+                "Rating_count": int(values["Rating_count"]),
+                "About": values["About"],
+                "Tags": values["Tags"],
+                "Description": values["Description"],
+                "Loaner": values["Loaner"],
+                "Loan_Status": values["Loan_Status"]
                 }
             }
         )
 
-    if old_description != description or old_description != "" or old_isbn != isbn or old_isbn != "" or old_about != about or old_about != "":
+    if old_description != values["Description"] or old_description != "" or old_isbn != values["ISBN"] or old_isbn != "" or old_about != values["About"] or old_about != "":
         return "Book updated!"
-    
+    return "Something went Wrong!"
 
 
 def delete_book_by_id(book_id):
@@ -129,9 +177,31 @@ def delete_book_by_id(book_id):
     #for that book should be deleted.
 
 
+#Not Done Yet!
 def loan_book_by_username_and_id(user_name, book_id):
     """Function that changes book's loan state."""
 
+    #parser.add_argument('user_name', required=True, type=str)
+    #parser.add_argument('book_id', required=True, type=str)
+
+    #args = parser.parse_args()
+
+    # values = {
+    #     'Book_ID': args['book_id'],
+    #     'Name': args['name'],
+    #     'Writer': args['writer'],
+    #     'Year': int(args['year']),
+    #     'ISBN': args['isbn'],
+    #     'Rating': args['rating'],
+    #     "Rating_count": args['rating_count'],
+    #     'About': args['about'],
+    #     'Tags': args['tags'],
+    #     'Description': args['description'],
+    #     'Loaner': args['loaner'],
+    #     'Loan_Status': args['loan_status']
+    #     }
+
+    #book = get_book_by_id(values["book_ID"])
     book = get_book_by_id(book_id)
     if book[0]['Loan_Status'] is False:
         new_book = {
@@ -148,58 +218,9 @@ def loan_book_by_username_and_id(user_name, book_id):
             'Loan_Status': True
         }
         book_collection.replace_one(book[0], new_book)
-    
+
     for book in retrieved_book_collection:
         if book["Book_ID"] == book_id:
             if book["Loan_Status"] == True:
                 return
     return "Something went wrong!"
-
-    #retrieved = list(book_collection.find(
-    #    {'Book_ID': book_id},
-    #    {'_id': False}
-    #    ))
-    # for data in retrieved:
-    #     if data['Book_ID'] == book_id:
-    #         return book_collection.find_one_and_update(
-    #             data, {"$set": parse()})
-    #     elif data['Book_ID'] != book_id:
-    #         return {'message': f"{book_id} doesn't exist."
-    #                 }, 401
-    #     else:
-    #         return {
-    #             'message': " Unknown error."
-    #         }, 401
-
-
-def parse():
-    # Required values for the api requests. False would be optional
-    parser = reqparse.RequestParser()
-    parser.add_argument('book_id', required=True)
-    parser.add_argument('name', required=True)
-    parser.add_argument('writer', required=True)
-    parser.add_argument('year', required=True)
-    parser.add_argument('isbn', required=True)
-    parser.add_argument('rating', required=True)
-    parser.add_argument('about', required=True)
-    parser.add_argument('tags', required=True)
-    parser.add_argument('description', required=True)
-    parser.add_argument('loaner', required=True)
-    parser.add_argument('loan_status', required=True)
-
-    args = parser.parse_args()
-
-    values = {
-        'Book_ID': args['book_id'],
-        'Name': args['name'],
-        'Writer': args['writer'],
-        'Year': args['year'],
-        'ISBN': args['isbn'],
-        'Rating': args['rating'],
-        'About': args['about'],
-        'Tags': args['tags'],
-        'Description': args['description'],
-        'Loaner': args['loaner'],
-        'Loan_Status': args['loan_status']
-        }
-    return values
