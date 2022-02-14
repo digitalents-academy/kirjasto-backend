@@ -1,4 +1,5 @@
 """rating_system.py: Contains Rating class."""
+from doctest import script_from_examples
 import uuid
 from pymongo.mongo_client import MongoClient
 import db_secret
@@ -80,6 +81,14 @@ def has_the_user_already_rated_this_book(user_name, book_id):
 def update_rating(rating_id, user_name, book_id, new_rating):
     """Function that posts updated rating data to the database."""
 
+    old_rating = ""
+    
+
+    for rating in retrieved_rating_collection:
+        if rating["Rating_ID"] == rating_id:
+            old_rating = rating["Rating"]
+            
+
     rating_collection.update(
         {'Rating_ID': rating_id},
         {
@@ -94,6 +103,9 @@ def update_rating(rating_id, user_name, book_id, new_rating):
 
     update_books_rating_data(book_id)
     update_users_mean_score_data(user_name)
+
+    if old_rating != new_rating or old_rating != "":
+        return "Rating updated!"
 
 
 #Needs to be edited
@@ -115,6 +127,8 @@ def give_rating(user_name, book_id, rating):
         "Book_ID": book_id,
         }
 
+    
+
 #Update_one?
     if has_the_user_already_rated_this_book(user_name, book_id):
         for retrieved in retrieved_rating_collection:
@@ -134,6 +148,12 @@ def give_rating(user_name, book_id, rating):
 
     update_books_rating_data(book_id)
     update_users_mean_score_data(user_name)
+
+    for rating in retrieved_rating_collection:
+        if rating['Rating_ID'] == rating_id:
+            return
+        else:
+            return "Something went wrong!"
 
 
 #rating id could work better here
@@ -195,6 +215,13 @@ def get_users_mean_score(user_name):
 def update_books_rating_data(book_id):
     """Function that updates ratings in the dictionary called books."""
 
+    old_rating = ""
+    new_rating = ""
+
+    for rating in retrieved_book_collection:
+        if rating['Book_ID'] == book_id:
+            old_rating = rating["Rating"]
+
     book_collection.update(
         {'Book_ID': book_id},
         {
@@ -204,12 +231,32 @@ def update_books_rating_data(book_id):
                 }
             }
         )
+    
+    for rating in retrieved_book_collection:
+        if rating['Book_ID'] == book_id:
+            new_rating = rating["Rating"]
+
+    if old_rating != new_rating or old_rating != "" or new_rating != "":
+        return "Rating updated!"
+    return "Something went wrong!"
+            
+    
 
 
 #Test this when users are in the right form!
 #Thus having Mean count
 def update_users_mean_score_data(user_name):
     """Function that updates mean score in the dictionary called users."""
+
+    old_mean_score = ""
+    old_mean_count = ""
+    new_mean_score = ""
+    new_mean_count = ""
+
+    for score in retrieved_user_collection:
+        if score["Username"] == user_name:
+            old_mean_score = score["Mean_score"]
+            old_mean_count = score["Mean_count"]
 
     user_collection.update(
         {'Username': user_name},
@@ -220,3 +267,12 @@ def update_users_mean_score_data(user_name):
                 }
             }
         )
+
+    for score in retrieved_user_collection:
+        if score['Username'] == user_name:
+            new_mean_score = score['Mean_score']
+            new_mean_count = score['Mean_count']
+
+    if old_mean_score != new_mean_score or old_mean_score != "" or old_mean_count != new_mean_count or new_mean_score != "" or new_mean_count != "":
+        return "User mean score and mean count updated!"
+    return "Something went wrong!"
