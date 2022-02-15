@@ -1,3 +1,4 @@
+from pymongo.mongo_client import MongoClient
 from app import (
     TesterData, Books, BooksAddNewBook, BooksDeleteByID,
     BooksLoanByUsernameAndID, BooksUpdateBook, Comments,
@@ -6,7 +7,6 @@ from app import (
     Users, UsersDeleteByID, UsersUpdateUser
     )
 
-from pymongo.mongo_client import MongoClient
 import db_secret
 #Library needs to be downloaded
 #Maybe not needed?

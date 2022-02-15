@@ -8,6 +8,11 @@ import uuid
 from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
 import db_secret
+from helpers import (
+    is_book_id_inside_book_collection,
+    is_comment_id_inside_comment_collection,
+    is_user_name_inside_user_collection
+    )
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":"
@@ -16,16 +21,19 @@ client = MongoClient(
     "retryWrites=true&w=majority"
     )
 db = client['kirjasto-backend']
-collection = db['comments']
+comment_collection = db['comments']
 user_collection = db['users']
-retrieved_comment_collection = list(collection.find({}, {'_id': False}))
+retrieved_comment_collection = list(
+    comment_collection.find({}, {'_id': False})
+    )
 retrieved_user_collection = list(user_collection.find({}, {'_id': False}))
+parser = reqparse.RequestParser()
 
 
 def get_comments():
     """Function that returns all comments."""
 
-    retrieved = list(collection.find({}, {'_id': False}))
+    retrieved = list(comment_collection.find({}, {'_id': False}))
     return retrieved
 
 
@@ -33,104 +41,97 @@ def get_comments_by_book_id(book_id):
     """Function that returns comment by book_id."""
 
     retrieved = list(
-        collection.find({'Book_ID': book_id}, {'_id': False})
+        comment_collection.find({'Book_ID': book_id}, {'_id': False})
         )
     return retrieved
 
 
-#Works but the comment_id could be same with the help of delete
-#so some new way to make ids is needed
-#Error handling is done correctly here, but nowhere else!
-def post_comment(user_name, comment, book_id):
+def post_comment():
     """Function that posts new comment to the database."""
 
     comment_id = uuid.uuid4().hex
 
-    collection.insert_one({
+    parser.add_argument('book_id', required=True, type=str)
+    parser.add_argument('user_name', required=True, type=str)
+    parser.add_argument('comment', required=True, type=str)
+
+    args = parser.parse_args()
+
+    values = {
+        'Book_ID': args['book_id'],
+        'Username': args["user_name"],
         'Comment_ID': comment_id,
-        'Comment': comment,
-        'Username': user_name,
-        'Book_ID': book_id
-    })
+        'Comment': args['comment']
+        }
 
-    
+    if is_book_id_inside_book_collection(values["Book_ID"]) and \
+            is_user_name_inside_user_collection(values["Username"]):
+        comment_collection.insert_one(values)
+    else:
+        return "error: Not a valid book_id, username! " \
+                    "book_id and username must be inside the database!"
 
-    for comment in retrieved_comment_collection:
-        if comment["Comment_ID"] == comment_id:
-            return
-        else:
-            return "Something went wrong!"
+    if is_comment_id_inside_comment_collection(comment_id) is False:
+        return "Something went wrong!"
 
 
-def update_comment(comment_id, user_name, comment, book_id):
+def update_comment():
     """Function that posts updated comment data to the database."""
-    
+
+    old_book_id = ""
     old_user_name = ""
     old_comment = ""
-    old_book_id = ""
+
+    parser.add_argument('book_id', required=True, type=str)
+    parser.add_argument('user_name', required=True, type=str)
+    parser.add_argument('comment_id', required=True, type=str)
+    parser.add_argument('comment', required=True, type=str)
+
+    args = parser.parse_args()
+
+    if is_comment_id_inside_comment_collection(args["comment_id"]) is False \
+            or is_book_id_inside_book_collection(args["book_id"]) is False \
+            or is_user_name_inside_user_collection(args["user_name"]) is False:
+        return "error: Not a valid book id, username or comment id! " \
+                    "book id, username and comment id " \
+                    "must be inside the database!"
 
     for comment in retrieved_comment_collection:
-        if comment["_id"] == comment_id:
+        if comment["Comment_ID"] == args["comment_id"]:
+            old_book_id = comment["Book_ID"]
             old_user_name = comment["Username"]
             old_comment = comment["Comment"]
-            old_book_id = comment["Book_ID"]
 
-    collection.update(
-        {'Comment_ID': comment_id},
+    comment_collection.update(
+        {'Comment_ID': args["comment_id"]},
         {
             "$set": {
-                "Username": user_name,
-                "Comment": comment,
-                "Book_ID": book_id,
-                "Comment_ID": comment_id
+                "Book_ID": args["book_id"],
+                "Username": args["user_name"],
+                "Comment": args["comment"]
                 }
             }
         )
 
-    if old_user_name != user_name or old_user_name != "" or old_comment != comment or old_comment != "" or old_book_id != book_id or old_book_id != "":
-        return "Comment updated!"
+    if old_book_id != "" or old_book_id != args["book_id"] or \
+            old_user_name != "" or old_user_name != args["user_name"] or \
+            old_comment != "" or old_comment != args["comment"]:
+        return
+    return "Something went wrong!"
 
 
-
-def delete_comments_by_id(user_name, book_id, comment_id):
+def delete_comments_by_id():
     """Function that deletes comment by comment id."""
 
-    collection.delete_one(
-        {
-            "Comment_ID": comment_id,
-            "Username": user_name,
-            "Book_ID": book_id
-            }
-        )
+    parser.add_argument('comment_id', required=True, type=str)
 
-    for comment in retrieved_comment_collection:
-        if comment["Comment_ID"] == comment_id:
-            return "Something went wrong!"
+    args = parser.parse_args()
 
+    if is_comment_id_inside_comment_collection(args["comment_id"]) is False:
+        return "error: Not a valid comment id! " \
+                "Comment id must be inside the database!"
 
-#Maybe needed when the front is ready?
-    #     parser = reqparse.RequestParser()
-    #     parser.add_argument('comment_id', required=False)
-    #     parser.add_argument('comment', required=False)
-    #     parser.add_argument('book_id', required=False)
-    #     parser.add_argument('user_name', required=False)
+    user_collection.delete_one({"_id": args["comment_id"]})
 
-    #     args = parser.parse_args()
-    #     retrieved_ID = list(
-    #         collection.find(
-    #             {'Comment_ID': comment_id},
-    #             {'_id': False}
-    #             )
-    #         )
-
-    #     for data in retrieved_ID:
-    #         if data["Comment_ID"] == comment_id:
-    #             collection.find_one_and_delete(
-    #                 {"Comment_ID": comment_id},
-    #                 {
-    #                     'Username': args['user_name'],
-    #                     'Comment': args['comment'],
-    #                     'Book_ID': args['book_id'],
-    #                     'Comment_ID': args['comment_id']
-    #                     }
-    #                     )
+    if is_comment_id_inside_comment_collection(args["comment_id"]):
+        return "Something went wrong!"
