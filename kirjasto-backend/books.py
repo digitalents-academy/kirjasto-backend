@@ -83,8 +83,9 @@ def add_new_book():
 
     book_collection.insert_one(values)
 
-    if is_book_id_inside_book_collection(book_id) is False:
+    if is_book_id_inside_book_collection(values["Book_ID"]) is False:
         return "Something went wrong!"
+    return "Book was added succesfully!"
 
 
 #The error handling for checking whether update was succesful
@@ -180,7 +181,7 @@ def update_book():
             old_description != args["description"] or old_loaner != "" or \
             old_loaner != args["loaner"] or old_loan_status != "" or \
             old_loan_status != args["loan_status"]:
-        return
+        return "Book was updated succesfully!"
     return "Something went wrong!"
 
 
@@ -208,6 +209,7 @@ def delete_book_by_id():
     if is_book_id_inside_comment_collection(args["book_id"]) or \
             is_book_id_inside_rating_collection(args["book_id"]):
         return "Something went wrong!"
+    return "Book was deleted succesfully!"
 
 
 def loan_book_by_username_and_id():
@@ -229,7 +231,7 @@ def loan_book_by_username_and_id():
     for book in retrieved_book_collection:
         if book["Book_ID"] == args["book_id"]:
             old_loaner = book["Loaner"]
-            old_loan_status = book["Loan_status"]
+            old_loan_status = book["Loan_Status"]
 
     book_collection.update(
         {'Book_ID': args["book_id"]},
@@ -244,5 +246,5 @@ def loan_book_by_username_and_id():
     if old_loaner != args["user_name"] or \
             old_loaner != "" or old_loan_status is not False \
             or old_loan_status != "":
-        return
+        return "Book was loaned succesfully!"
     return "Something went wrong!"

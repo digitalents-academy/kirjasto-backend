@@ -99,9 +99,9 @@ def give_rating():
 
     if is_user_name_inside_user_collection(new_rating["Username"]) \
             is False or is_book_id_inside_book_collection(
-                new_rating["Book_ID"]):
-        return "error: Not a valid username or book_id." \
-            "Book_id and username must exist"
+                new_rating["Book_ID"]) is False:
+        return "error: Not a valid username or book id. " \
+            "Book id and username must exist"
 
 #Update_one?
     if has_the_user_already_rated_this_book(
@@ -126,7 +126,7 @@ def give_rating():
     update_users_mean_score_data(args["user_name"])
 
     if is_rating_id_inside_rating_collection(rating_id):
-        return
+        return "Rating was posted succesfully!"
     return "Something went wrong!"
 
 
@@ -161,16 +161,17 @@ def update_rating():
     update_books_rating_data(args["book_id"])
     update_users_mean_score_data(args["user_name"])
 
-    if old_rating == args["new_rating"] or old_rating == "":
-        return "Something went wrong!"
+    if old_rating != args["new_rating"] or old_rating != "":
+        return "Rating was updated succesfully!"
+    return "Something went wrong!"
 
 
 def delete_rating():
     """Function that deletes a rating and updates data after."""
 
     parser.add_argument('rating_id', required=True, type=str)
-    parser.add_argument('book_id', required=True, type=str)
     parser.add_argument('user_name', required=True, type=str)
+    parser.add_argument('book_id', required=True, type=str)
 
     args = parser.parse_args()
 
@@ -187,6 +188,7 @@ def delete_rating():
 
     if is_rating_id_inside_rating_collection(args["rating_id"]):
         return "Something went wrong!"
+    return "Rating was deleted succesfully!"
 
 
 def get_books_rating_data(book_id):

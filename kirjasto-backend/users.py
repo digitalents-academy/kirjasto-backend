@@ -11,7 +11,9 @@ from helpers import (
     is_email_inside_user_collection,
     is_object_id_inside_user_collection,
     is_password_inside_user_collection,
-    is_user_name_inside_user_collection
+    is_user_name_inside_user_collection,
+    is_user_name_inside_comment_collection,
+    is_user_name_inside_rating_collection
     )
 
 # Initiate connection to mongoDB
@@ -21,7 +23,11 @@ client = MongoClient(
     )
 db = client['kirjasto-backend']
 user_collection = db['users']
-retrieved_user_collection = list(user_collection.find({}, {'_id': False}))
+rating_collection = db['ratings']
+comment_collection = db['comments']
+retrieved_user_collection = list(user_collection.find({}))
+retrieved_rating_collection = list(rating_collection.find({}))
+retrieved_comment_collection = list(comment_collection.find({}))
 parser = reqparse.RequestParser()
 
 
@@ -66,13 +72,9 @@ def update_user():
 
     args = parser.parse_args()
 
-    if is_object_id_inside_user_collection(args["object_id"]) is False or \
-            is_user_name_inside_user_collection(args["user_name"]) \
-            is False or is_email_inside_user_collection(args["email"]) \
-            is False or is_password_inside_user_collection(args["password"]) \
-            is False:
-        return "error: Not a valid book_id, name, isbn or rating! " \
-                "book_id, name and isbn must be inside the database!"
+    if is_object_id_inside_user_collection(args["object_id"]) is False:
+        return "error: Not a valid object id! " \
+                "object id must be inside the database!"
 
     for user in retrieved_user_collection:
         if user["_id"] == args["object_id"]:
@@ -94,7 +96,7 @@ def update_user():
     if old_user_name != "" or old_user_name != args["user_name"] or \
             old_email != "" or old_email != args["email"] or \
             old_password != "" or old_password != args["password"]:
-        return
+        return "User was updated succesfully!"
     return "Something went wrong!"
 
 
@@ -112,4 +114,10 @@ def delete_user_by_id():
     user_collection.delete_one({"_id": args["object_id"]})
 
     if is_object_id_inside_user_collection(args["object_id"]) is False:
+        if is_user_name_inside_comment_collection(args["user_name"]):
+            comment_collection.delete_one({"Username": args["user_name"]})
+        if is_user_name_inside_rating_collection(args["user_name"]):
+            rating_collection.delete_one({"Username": args["user_name"]})
+    else:
         return "Something went wrong!"
+    return "User was deleted succesfully!"

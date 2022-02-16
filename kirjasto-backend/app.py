@@ -131,8 +131,7 @@ class BooksAddNewBook(Resource):
     def post(self):
         """Function that posts book data to the database."""
 
-        add_new_book()
-        return "Book was added succesfully!"
+        return add_new_book()
 
 
 class BooksUpdateBook(Resource):
@@ -141,8 +140,7 @@ class BooksUpdateBook(Resource):
     def put(self):
         """Function that updates book data to the database."""
 
-        update_book()
-        return "Book was updated succesfully!"
+        return update_book()
 
 
 class BooksDeleteByID(Resource):
@@ -151,18 +149,16 @@ class BooksDeleteByID(Resource):
     def delete(self):
         """Function that deletes book data from the database."""
 
-        delete_book_by_id()
-        return "Book was deleted succesfully!"
+        return delete_book_by_id()
 
 
 class BooksLoanByUsernameAndID(Resource):
     """Class for changing book datas loan state."""
 
-    def post(self):
+    def put(self):
         """Function that changes book's loan state."""
 
-        loan_book_by_username_and_id()
-        return "Book was loaned succesfully!"
+        return loan_book_by_username_and_id()
 
 
 class Comments(Resource):
@@ -183,8 +179,7 @@ class CommentsAddNewComment(Resource):
     def post(self):
         """Function that posts comment data to the database."""
 
-        post_comment()
-        return "Comment was posted succesfully!"
+        return post_comment()
 
 
 class CommentsUpdateComment(Resource):
@@ -193,8 +188,7 @@ class CommentsUpdateComment(Resource):
     def put(self):
         """Function that updates comment data to the database."""
 
-        update_comment()
-        return "Comment was updated succesfully!"
+        return update_comment()
 
 
 class CommentsDelete(Resource):
@@ -203,8 +197,7 @@ class CommentsDelete(Resource):
     def delete(self):
         """Function that deletes comment data from the database."""
 
-        delete_comments_by_id()
-        return "Comment was deleted succesfully!"
+        return delete_comments_by_id()
 
 
 class Ratings(Resource):
@@ -235,8 +228,7 @@ class RatingsAddNewRating(Resource):
     def post(self):
         """Function that posts comment data to the database."""
 
-        give_rating()
-        return "Rating was posted succesfully!"
+        return give_rating()
 
 
 class RatingsUpdateRating(Resource):
@@ -245,8 +237,7 @@ class RatingsUpdateRating(Resource):
     def put(self):
         """Function that updates rating data to the database."""
 
-        update_rating()
-        return "Rating was updated succesfully!"
+        return update_rating()
 
 
 class RatingsDeleteByUsernameAndBookID(Resource):
@@ -255,8 +246,7 @@ class RatingsDeleteByUsernameAndBookID(Resource):
     def delete(self):
         """Function that deletes rating data from the database."""
 
-        delete_rating()
-        return "Rating was deleted succesfully!"
+        return delete_rating()
 
 
 class Users(Resource):
@@ -281,8 +271,7 @@ class UsersUpdateUser(Resource):
     def put(self):
         """Function that updates user data to the database."""
 
-        update_user()
-        return "User was updated succesfully!"
+        return update_user()
 
 
 class UsersDeleteByID(Resource):
@@ -291,8 +280,7 @@ class UsersDeleteByID(Resource):
     def delete(self):
         """Function that deletes user data from the database."""
 
-        delete_user_by_id()
-        return "User was deleted succesfully!"
+        return delete_user_by_id()
 
 
 class HomePage(Resource):
@@ -301,52 +289,51 @@ class HomePage(Resource):
 
 
 api.add_resource(TesterData, "/api/testerdata/<_id>")
-# works
+# Works
 api.add_resource(HomePage, '/')
-# works but needs to be edited
+# Works
 api.add_resource(
     Books,
     '/api/books',
     '/api/books/<book_id>'
     )
-# works
+# Works but the error handling needs to be updated.
 api.add_resource(
     BooksAddNewBook,
     '/api/books/add')
-# Works
+# Works but the error handling needs to be updated.
 api.add_resource(
     BooksUpdateBook, '/api/books/update'
     )
-# works
-api.add_resource(BooksDeleteByID, '/api/books/d/<book_id>')
-# not complete
+# Works but the error handling needs to be updated.
+api.add_resource(BooksDeleteByID, '/api/books/d')
+# Works but the error handling needs to be updated.
 api.add_resource(
     BooksLoanByUsernameAndID,
     '/api/books/loan'
     )
-# works
+# Works
 api.add_resource(
     Comments,
     '/api/comments',
     '/api/comments/<book_id>'
     )
-# works
+# Works but the error handling needs to be updated.
 api.add_resource(
     CommentsAddNewComment,
     '/api/comments/add'
     )
-# Works
+# Works but the error handling needs to be updated.
 api.add_resource(
     CommentsUpdateComment,
     '/api/comments/update'
     )
-# Works
+# Works but the error handling needs to be updated.
 api.add_resource(
     CommentsDelete,
     '/api/comments/d'
     )
-# Not complete
-# Works but when book is added doesn't work after reboot?
+# Works but when book is added doesn't work before reboot?
 api.add_resource(
     Ratings,
     '/api/ratings',
@@ -358,26 +345,29 @@ api.add_resource(
     RatingsAddNewRating,
     '/api/ratings/add'
     )
-# Not complete
+# Works
 api.add_resource(
     RatingsUpdateRating,
     '/api/ratings/update'
     )
-# not complete
+# Works
 api.add_resource(
     RatingsDeleteByUsernameAndBookID,
     '/api/ratings/d'
     )
+# Works
 api.add_resource(
     Users,
     '/api/users',
     '/api/users/<user_name>',
     '/api/users/<user_name>/<object_id>'
     )
+# Works
 api.add_resource(
     UsersUpdateUser,
     '/api/users/update'
     )
+# Works but ratings and comments made by the user should be deleted too
 api.add_resource(
     UsersDeleteByID,
     '/api/users/d'

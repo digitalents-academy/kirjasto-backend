@@ -22,11 +22,9 @@ client = MongoClient(
     )
 db = client['kirjasto-backend']
 comment_collection = db['comments']
-user_collection = db['users']
 retrieved_comment_collection = list(
     comment_collection.find({}, {'_id': False})
     )
-retrieved_user_collection = list(user_collection.find({}, {'_id': False}))
 parser = reqparse.RequestParser()
 
 
@@ -73,6 +71,7 @@ def post_comment():
 
     if is_comment_id_inside_comment_collection(comment_id) is False:
         return "Something went wrong!"
+    return "Comment was posted succesfully!"
 
 
 def update_comment():
@@ -116,7 +115,7 @@ def update_comment():
     if old_book_id != "" or old_book_id != args["book_id"] or \
             old_user_name != "" or old_user_name != args["user_name"] or \
             old_comment != "" or old_comment != args["comment"]:
-        return
+        return "Comment was updated succesfully!"
     return "Something went wrong!"
 
 
@@ -131,7 +130,8 @@ def delete_comments_by_id():
         return "error: Not a valid comment id! " \
                 "Comment id must be inside the database!"
 
-    user_collection.delete_one({"_id": args["comment_id"]})
+    comment_collection.delete_one({"Comment_ID": args["comment_id"]})
 
     if is_comment_id_inside_comment_collection(args["comment_id"]):
         return "Something went wrong!"
+    return "Comment was deleted succesfully!"
