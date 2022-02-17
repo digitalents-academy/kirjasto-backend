@@ -8,12 +8,10 @@ from flask_restful import reqparse
 from passlib.hash import pbkdf2_sha256
 import db_secret
 from helpers import (
-    is_email_inside_user_collection,
     is_object_id_inside_user_collection,
-    is_password_inside_user_collection,
-    is_user_name_inside_user_collection,
     is_user_name_inside_comment_collection,
-    is_user_name_inside_rating_collection
+    is_user_name_inside_rating_collection,
+    is_user_name_inside_user_collection
     )
 
 # Initiate connection to mongoDB
@@ -34,14 +32,9 @@ parser = reqparse.RequestParser()
 def get_users():
     """Function that returns all users."""
 
-    return retrieved_user_collection
-
-
-def get_user_by_id(object_id):
-    """Function that returns user data depending on the id."""
-
-    retrieved = list(user_collection.find({'_id': object_id}))
-    return retrieved
+    if len(retrieved_user_collection) > 0:
+        return retrieved_user_collection
+    return "Something went wrong!"
 
 
 def get_user_by_username(user_name):
@@ -49,11 +42,29 @@ def get_user_by_username(user_name):
     Function that returns user data from the database
     depending on the username.
     """
+    if is_user_name_inside_user_collection(user_name) is False:
+        return 'error: Not a valid username! username must exist!'
 
     retrieved = list(
         user_collection.find({'Username': user_name}, {'_id': False})
         )
-    return retrieved
+
+    if len(retrieved) > 0:
+        return retrieved
+    return "Something went wrong!"
+
+
+def get_user_by_id(object_id):
+    """Function that returns user data depending on the id."""
+
+    if is_object_id_inside_user_collection(object_id) is False:
+        return 'error: Not a valid object id! Object id must exist!'
+
+    retrieved = list(user_collection.find({'_id': object_id}))
+
+    if len(retrieved) > 0:
+        return retrieved
+    return "Something went wrong!"
 
 
 #The error handling for checking whether update was succesful

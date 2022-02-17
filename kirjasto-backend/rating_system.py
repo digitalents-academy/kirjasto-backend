@@ -31,22 +31,33 @@ def get_retrieved_rating_collection():
     that contains retrieved rating collection.
     """
 
-    return retrieved_rating_collection
+    if len(retrieved_rating_collection) > 0:
+        return retrieved_rating_collection
+    return "Something went wrong!"
 
 
 def get_retrieved_ratings_by_username(user_name):
     """Function that returns all of user's ratings."""
+
+    if is_user_name_inside_user_collection(user_name) is False:
+        return "Incorrect username!"
 
     retrieved = list(
         rating_collection.find(
             {'Username': user_name}, {'_id': False}
             )
         )
-    return retrieved
+    if len(retrieved) > 0:
+        return retrieved
+    return "Something went wrong!"
 
 
 def get_retrieved_rating_by_username_and_id(user_name, book_id):
     """Function that returns user's ratings on a book."""
+
+    if is_book_id_inside_book_collection(book_id) is False or \
+            is_user_name_inside_user_collection(user_name) is False:
+        return "Incorrect username or book id!"
 
     retrieved = list(
         rating_collection.find(
@@ -56,7 +67,9 @@ def get_retrieved_rating_by_username_and_id(user_name, book_id):
                 }, {'_id': False}
             )
         )
-    return retrieved
+    if len(retrieved) > 0:
+        return retrieved
+    return "Something went wrong!"
 
 
 def has_the_user_already_rated_this_book(user_name, book_id):

@@ -39,13 +39,18 @@ def get_books():
 def get_book_by_id(book_id):
     """Function that returns book data depending on the book_id."""
 
+    if is_book_id_inside_book_collection(book_id) is False:
+        return "Book is not inside the database!"
+
     retrieved = list(
         book_collection.find(
             {'Book_ID': book_id},
             {'_id': False}
             )
         )
-    return retrieved
+    if len(retrieved) > 0:
+        return retrieved
+    return "Something went wrong!"
 
 
 def add_new_book():
@@ -185,33 +190,6 @@ def update_book():
     return "Something went wrong!"
 
 
-def delete_book_by_id():
-    """Function that deletes a book from the database."""
-
-    parser.add_argument('book_id', required=True, type=str)
-
-    args = parser.parse_args()
-
-    if is_book_id_inside_book_collection(args["book_id"]) is False:
-        return "error: Not a valid book_id! " \
-                "Book_id must be inside the database!"
-
-    book_collection.delete_one({"Book_ID": args["book_id"]})
-
-    if is_book_id_inside_book_collection(args["book_id"]) is False:
-        if is_book_id_inside_comment_collection(args["book_id"]):
-            comment_collection.delete_one({"Book_ID": args["book_id"]})
-        if is_book_id_inside_rating_collection(args["book_id"]):
-            rating_collection.delete_one({"Book_ID": args["book_id"]})
-    else:
-        return "Something went wrong!"
-
-    if is_book_id_inside_comment_collection(args["book_id"]) or \
-            is_book_id_inside_rating_collection(args["book_id"]):
-        return "Something went wrong!"
-    return "Book was deleted succesfully!"
-
-
 def loan_book_by_username_and_id():
     """Function that changes book's loan state."""
 
@@ -248,3 +226,30 @@ def loan_book_by_username_and_id():
             or old_loan_status != "":
         return "Book was loaned succesfully!"
     return "Something went wrong!"
+
+
+def delete_book_by_id():
+    """Function that deletes a book from the database."""
+
+    parser.add_argument('book_id', required=True, type=str)
+
+    args = parser.parse_args()
+
+    if is_book_id_inside_book_collection(args["book_id"]) is False:
+        return "error: Not a valid book_id! " \
+                "Book_id must be inside the database!"
+
+    book_collection.delete_one({"Book_ID": args["book_id"]})
+
+    if is_book_id_inside_book_collection(args["book_id"]) is False:
+        if is_book_id_inside_comment_collection(args["book_id"]):
+            comment_collection.delete_one({"Book_ID": args["book_id"]})
+        if is_book_id_inside_rating_collection(args["book_id"]):
+            rating_collection.delete_one({"Book_ID": args["book_id"]})
+    else:
+        return "Something went wrong!"
+
+    if is_book_id_inside_comment_collection(args["book_id"]) or \
+            is_book_id_inside_rating_collection(args["book_id"]):
+        return "Something went wrong!"
+    return "Book was deleted succesfully!"

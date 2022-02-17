@@ -38,10 +38,15 @@ def get_comments():
 def get_comments_by_book_id(book_id):
     """Function that returns comment by book_id."""
 
+    if is_book_id_inside_book_collection is False:
+        return "error: Not a valid book_id!"
+
     retrieved = list(
         comment_collection.find({'Book_ID': book_id}, {'_id': False})
         )
-    return retrieved
+    if len(retrieved) > 0:
+        return retrieved
+    return "Something went wrong!"
 
 
 def post_comment():

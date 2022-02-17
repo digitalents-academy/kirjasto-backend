@@ -4,11 +4,6 @@ from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
 from pymongo.mongo_client import MongoClient
 from bson.objectid import ObjectId
-from helpers import (
-    is_book_id_inside_book_collection,
-    is_user_name_inside_user_collection,
-    is_object_id_inside_user_collection
-    )
 from books import (
     get_books,
     get_book_by_id,
@@ -119,9 +114,7 @@ class Books(Resource):
         """Function that returns book data depending on the url."""
 
         if book_id is not None:
-            if is_book_id_inside_book_collection(book_id):
-                return get_book_by_id(book_id)
-            return "Book is not inside the database!"
+            return get_book_by_id(book_id)
         return get_books()
 
 
@@ -166,10 +159,9 @@ class Comments(Resource):
 
     def get(self, book_id=None):
         """Function that returns comment data depending on the url."""
+
         if book_id is not None:
-            if is_book_id_inside_book_collection(book_id):
-                return get_comments_by_book_id(book_id)
-            return "error: Not a valid book_id!"
+            return get_comments_by_book_id(book_id)
         return get_comments()
 
 
@@ -207,18 +199,13 @@ class Ratings(Resource):
         """Function that returns rating data depending on the url."""
 
         if book_id is not None:
-            if is_book_id_inside_book_collection(book_id) and \
-                    is_user_name_inside_user_collection(user_name):
-                return get_retrieved_rating_by_username_and_id(
-                    user_name,
-                    book_id
-                    )
-            return "Incorrect username or book id!"
+            return get_retrieved_rating_by_username_and_id(
+                user_name,
+                book_id
+                )
         elif user_name is not None:
-            if is_user_name_inside_user_collection(user_name):
-                return get_retrieved_ratings_by_username(
-                    user_name)
-            return "Incorrect username"
+            return get_retrieved_ratings_by_username(
+                user_name)
         return get_retrieved_rating_collection()
 
 
@@ -256,12 +243,9 @@ class Users(Resource):
         """Function that returns user data depending on the url."""
 
         if object_id is not None:
-            if is_object_id_inside_user_collection(object_id):
-                return get_user_by_id(object_id)
+            return get_user_by_id(object_id)
         elif user_name is not None:
-            if is_user_name_inside_user_collection(user_name):
-                return get_user_by_username(user_name)
-            return 'error: Not a valid username! username must exist!'
+            return get_user_by_username(user_name)
         return get_users()
 
 
