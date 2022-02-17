@@ -18,62 +18,113 @@ Sakhi Hashmat ([Sakhi97](https://github.com/Sakhi97))
 - Python 3.9
 
 ## Setup
-- pip install -r Requirements.txt
+- pip install -r requirements.txt
 
 ## Api endpoints:
 
 ```html 
-localhost:8000/api/
+localhost:5000/api/
 ```
 
 <b>GET</b>
-  - **/status**
-    ```python 
-    Returns every book's status
-    ```
-  - **/status/id**
-    ```python 
-    Returns book information by book id
-    ```
   - **/books**
     ```python 
-    Returns every book's information
+    Returns every book's data
+    ```
+  - **/books/book_id**
+    ```python 
+    Returns book data by book id
     ```
   - **/comments**
     ```python 
     Returns all comments
     ```
-  - **/comments/id**
+  - **/comments/book_id**
     ```python 
-    Returns Comments by book id
+    Returns comments by book id
+    ```
+  - **/ratings**
+    ```python 
+    Returns every rating's data
+    ```
+  - **/ratings/user_name**
+    ```python 
+    Returns rating data by username
+    ```
+  - **/ratings/user_name/book_id**
+    ```python 
+    Returns rating data by username and book id
+    ```
+  - **/users**
+    ```python 
+    Returns every users's data
+    ```
+  - **/users/user_name**
+    ```python 
+    Returns user data by username
+    ```
+  - **/users/user_name/object_id**
+    ```python 
+    Returns user data by object id
     ```
     
 <b>POST</b>
-  - **/loan**
+  - **/books/add**
     ```python 
-    Updates book's loan status (True or False)
+    Posts new book to the books collection inside the database
     ```
-  - **/comment**
+  - **/comments/add**
     ```python 
-    Posts one comment
+    Posts new comment to the comments collection inside the database
     ```
-  - **/authentication/signup**
+  - **/ratings/add**
     ```python 
-    Posts user data 
+    Posts new rating to the ratings collection inside the database
+    ```
+  - **/user/signup**
+    ```python 
+    Posts new user to the users collection inside the database
     ```
   - **/authentication/login**
     ```python 
     Posts user data 
     ```
-<b>Delete</b>
-  - **/comments/d/id**
+    
+<b>PUT</b>
+  - **/books/update**
     ```python 
-    Deletes comment by comment id
+    Updates book data inside the database with book id
+    ```
+  - **/comments/update**
+    ```python 
+    Updates comment data inside the database with comment id
+    ```
+  - **/ratings/update**
+    ```python 
+    Updates rating data inside the database with rating id
+    ```
+  - **/users/update**
+    ```python 
+    Updates user data inside the database with object id
     ```
     
-<b>To do</b>
-- Rating </br>
--> Posts one rating
+<b>Delete</b>
+  - **/books/d**
+    ```python 
+    Deletes a book from the database with book id
+    ```
+  - **/comments/d**
+    ```python 
+    Deletes a comment from the database with comment id
+    ```
+  - **/ratings/d**
+    ```python 
+    Deletes a rating from the database with rating id
+    ```
+  - **/users/d**
+    ```python 
+    Deletes a user from the database with object id
+    ```
 
 ## Items
 
@@ -86,37 +137,35 @@ All items have some of the following properties, with required properties in bol
 Field | Description
 ------|------------
 **id** | The item's unique id.
-book_ID | The item's unique id.
-name | Name of the book.
-writer | Name of the author.
-year | Publication date.
-isbn | International Standard Book Number.
-rating | Books rating.
-about | What the book is about.
-tags | Descriptive keywords you can add to help users find similar books.
-description | Description of the book.
-loan_status | True or False value of the loan_status.
-loaner | User which has loaned the book.
-rating_count | How many times people have rated the book.
-rating_score | Sum of all the ratings.
+Book_ID | The item's unique id.
+Name | Name of the book.
+Writer | Name of the author.
+Year | Publication date.
+ISBN | International Standard Book Number.
+Rating | Books rating.
+Rating_count | Books rating count.
+About | What the book is about.
+Tags | Descriptive keywords you can add to help users find similar books.
+Description | Description of the book.
+Loan_Status | True or False value of the loan_status.
+Loaner | User which has loaned the book.
 
-For example: localhost:8000/api/status/7
+For example: localhost:5000/api/books/5b5b085cb60c48e28d304f3794ee9c15
 
 ```javascript
     {
-        "Book ID": "7",
-        "Name": "Web security for developers",
-        "Writer": "Malcolm MCDonald",
-        "Year": "2020",
-        "ISBN": "978-1-59327-994-3",
-        "Rating": 4,
-        "About": "Networking & Cloud Computing",
+        "Book_ID": "5b5b085cb60c48e28d304f3794ee9c15",
+        "Name": "Eloquent JavaScript",
+        "Writer": "Marjin Haverbeke",
+        "Year": 2018,
+        "ISBN": "978-1-59327-950-9",
+        "Rating": 0,
+        "Rating_count": 0,
+        "About": "Programming(JavaScript)",
         "Tags": "tags",
         "Description": "ksl",
-        "Loan Status": "False",
-        "Loaner": "None",
-        "Rating Count": "3",
-        "Rating Score": "11"
+        "Loaner": null,
+        "Loan_Status": false
     }
 ```
 
@@ -125,20 +174,49 @@ For example: localhost:8000/api/status/7
 Field | Description
 ------|------------
 **id** | The item's unique id.
-book_ID | The item's unique id.
-comment | body of user message.
-comment_ID | The item's unique id.
-user_ID | The item's unique id.
+Book_ID | The item's unique id.
+Username | The item's unique username.
+Comment_ID | The item's unique id.
+Comment | body of user message.
 
-For example: localhost:8000/api/comments/7
+For example: localhost:5000/api/comments/8e1d8750ca0a472c81ed09cfe73c76bd
 
 ```javascript
-{
-    "Book ID": "7",
-    "Comment": "I really love books",
-    "Comment ID": "1",
-    "User ID": "3000"
-}
+    {
+        "Book_ID": "8e1d8750ca0a472c81ed09cfe73c76bd",
+        "Username": "test",
+        "Comment_ID": "5b62d22a40db4cdaa650fafb1c7d6542",
+        "Comment": "hello"
+    }
+```
+
+### Ratings
+
+Field | Description
+------|------------
+**id** | The item's unique id.
+Rating_ID | The item's unique id.
+Username | The item's unique username.
+Book_ID | The item's unique id.
+Rating | The item's rating.
+
+For example: localhost:5000/api/comments/test
+
+```javascript
+[
+    {
+        "Rating_ID": "82c00051971f429f8de216fb2def6fbb",
+        "Rating": "3",
+        "Username": "test",
+        "Book_ID": "4683c2f518144971bd2c80aa13326174"
+    },
+    {
+        "Rating_ID": "da1fabc892e1441b84aef39c20babe70",
+        "Rating": "2",
+        "Username": "test",
+        "Book_ID": "bed1d61653a147a58176b22151ad3e89"
+    }
+]
 ```
 
 ### Users
@@ -146,5 +224,20 @@ For example: localhost:8000/api/comments/7
 Field | Description
 ------|------------
 **id** | The item's unique id.
-user_ID | The item's unique id.
-user_name | The item's unique name.
+Username | The item's unique name.
+Email | The item's unique email.
+Password | The item's unique hashed password.
+Mean_score | The item's mean score.
+Mean_count | The item's mean count.
+
+
+For example: localhost:5000/api/users/test
+
+```javascript
+    {
+        "Username": "test",
+        "Email": "test@gmail.com",
+        "Password": "$pbkdf2-sha256$29000$hRBiDGHMWSvl3FvLec.59w$0Qz0scu7yyYm5JEMiBN3oo/89Z83SD6kHc3YZMPcXX0",
+        "Mean_score": 2.6666666666666665,
+        "Mean_count": 3
+    }
