@@ -32,21 +32,23 @@ def get_comments():
     """Function that returns all comments."""
 
     retrieved = list(comment_collection.find({}, {'_id': False}))
-    return retrieved
+    if len(retrieved) > 0:
+        return retrieved
+    return "Error: Something went wrong!"
 
 
 def get_comments_by_book_id(book_id):
-    """Function that returns comment by book_id."""
+    """Function that returns comment's data by book id."""
 
     if is_book_id_inside_book_collection is False:
-        return "error: Not a valid book_id!"
+        return "Error: Not a valid book id!"
 
     retrieved = list(
         comment_collection.find({'Book_ID': book_id}, {'_id': False})
         )
     if len(retrieved) > 0:
         return retrieved
-    return "Something went wrong!"
+    return "Error: Something went wrong!"
 
 
 def post_comment():
@@ -61,26 +63,26 @@ def post_comment():
     args = parser.parse_args()
 
     values = {
-        'Book_ID': args['book_id'],
-        'Username': args["user_name"],
-        'Comment_ID': comment_id,
-        'Comment': args['comment']
+        "Book_ID": args["book_id"],
+        "Username": args["user_name"],
+        "Comment_ID": comment_id,
+        "Comment": args["comment"]
         }
 
     if is_book_id_inside_book_collection(values["Book_ID"]) and \
             is_user_name_inside_user_collection(values["Username"]):
         comment_collection.insert_one(values)
     else:
-        return "error: Not a valid book_id, username! " \
-                    "book_id and username must be inside the database!"
+        return "Error: Not a valid book id, username! " \
+            "book id and username must be inside the database!"
 
     if is_comment_id_inside_comment_collection(comment_id) is False:
-        return "Something went wrong!"
+        return "Error: Something went wrong!"
     return "Comment was posted succesfully!"
 
 
 def update_comment():
-    """Function that posts updated comment data to the database."""
+    """Function that updates comment data in the database."""
 
     old_book_id = ""
     old_user_name = ""
@@ -96,9 +98,8 @@ def update_comment():
     if is_comment_id_inside_comment_collection(args["comment_id"]) is False \
             or is_book_id_inside_book_collection(args["book_id"]) is False \
             or is_user_name_inside_user_collection(args["user_name"]) is False:
-        return "error: Not a valid book id, username or comment id! " \
-                    "book id, username and comment id " \
-                    "must be inside the database!"
+        return "Error: Not a valid book id, username or comment id! " \
+            "book id, username and comment id must be inside the database!"
 
     for comment in retrieved_comment_collection:
         if comment["Comment_ID"] == args["comment_id"]:
@@ -121,10 +122,10 @@ def update_comment():
             old_user_name != "" or old_user_name != args["user_name"] or \
             old_comment != "" or old_comment != args["comment"]:
         return "Comment was updated succesfully!"
-    return "Something went wrong!"
+    return "Error: Something went wrong!"
 
 
-def delete_comments_by_id():
+def delete_comments_by_comment_id():
     """Function that deletes comment by comment id."""
 
     parser.add_argument('comment_id', required=True, type=str)
@@ -132,11 +133,11 @@ def delete_comments_by_id():
     args = parser.parse_args()
 
     if is_comment_id_inside_comment_collection(args["comment_id"]) is False:
-        return "error: Not a valid comment id! " \
-                "Comment id must be inside the database!"
+        return "Error: Not a valid comment id! " \
+            "Comment id must be inside the database!"
 
     comment_collection.delete_one({"Comment_ID": args["comment_id"]})
 
     if is_comment_id_inside_comment_collection(args["comment_id"]):
-        return "Something went wrong!"
+        return "Error: Something went wrong!"
     return "Comment was deleted succesfully!"

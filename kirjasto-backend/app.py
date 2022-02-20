@@ -1,3 +1,5 @@
+"""app.py: The project's main file. The app will be run from here."""
+
 from functools import wraps
 from flask import Flask, Response, render_template, session, redirect
 from flask_restful import Resource, Api, reqparse
@@ -6,23 +8,23 @@ from pymongo.mongo_client import MongoClient
 from bson.objectid import ObjectId
 from books import (
     get_books,
-    get_book_by_id,
+    get_book_by_book_id,
     add_new_book,
-    delete_book_by_id,
+    delete_book_by_book_id,
     update_book,
-    loan_book_by_username_and_id
+    loan_book_by_username_and_book_id
     )
 from comments import (
-    delete_comments_by_id,
+    delete_comments_by_comment_id,
     get_comments,
     get_comments_by_book_id,
     post_comment,
     update_comment
     )
 from rating_system import (
-    get_retrieved_rating_collection,
-    get_retrieved_ratings_by_username,
-    get_retrieved_rating_by_username_and_id,
+    get_ratings,
+    get_ratings_by_username,
+    get_ratings_by_username_and_book_id,
     update_rating,
     give_rating,
     delete_rating
@@ -31,9 +33,9 @@ import db_secret
 from users import (
     get_user_by_username,
     get_users,
-    get_user_by_id,
+    get_user_by_object_id,
     update_user,
-    delete_user_by_id
+    delete_user_by_object_id
     )
 
 parser = reqparse.RequestParser()
@@ -107,14 +109,14 @@ class TesterData(Resource):
         return "Nice!"
 
 
-class Books(Resource):
+class BooksGet(Resource):
     """Class for returning book data from the database."""
 
     def get(self, book_id=None):
         """Function that returns book data depending on the url."""
 
         if book_id is not None:
-            return get_book_by_id(book_id)
+            return get_book_by_book_id(book_id)
         return get_books()
 
 
@@ -136,25 +138,25 @@ class BooksUpdateBook(Resource):
         return update_book()
 
 
-class BooksDeleteByID(Resource):
+class BooksDeleteByBookID(Resource):
     """Class for deleting book data from the database."""
 
     def delete(self):
         """Function that deletes book data from the database."""
 
-        return delete_book_by_id()
+        return delete_book_by_book_id()
 
 
-class BooksLoanByUsernameAndID(Resource):
-    """Class for changing book datas loan state."""
+class BooksLoanByUsernameAndBookID(Resource):
+    """Class for changing book's loan state."""
 
     def put(self):
         """Function that changes book's loan state."""
 
-        return loan_book_by_username_and_id()
+        return loan_book_by_username_and_book_id()
 
 
-class Comments(Resource):
+class CommentsGet(Resource):
     """Class for returning comment data from the database."""
 
     def get(self, book_id=None):
@@ -189,31 +191,31 @@ class CommentsDelete(Resource):
     def delete(self):
         """Function that deletes comment data from the database."""
 
-        return delete_comments_by_id()
+        return delete_comments_by_comment_id()
 
 
-class Ratings(Resource):
+class RatingsGet(Resource):
     """Class for returning rating data from the database."""
 
     def get(self, user_name=None, book_id=None):
         """Function that returns rating data depending on the url."""
 
         if book_id is not None:
-            return get_retrieved_rating_by_username_and_id(
+            return get_ratings_by_username_and_book_id(
                 user_name,
                 book_id
                 )
         elif user_name is not None:
-            return get_retrieved_ratings_by_username(
+            return get_ratings_by_username(
                 user_name)
-        return get_retrieved_rating_collection()
+        return get_ratings()
 
 
 class RatingsAddNewRating(Resource):
     """Class for posting rating data to the database."""
 
     def post(self):
-        """Function that posts comment data to the database."""
+        """Function that posts rating data to the database."""
 
         return give_rating()
 
@@ -236,14 +238,14 @@ class RatingsDeleteByUsernameAndBookID(Resource):
         return delete_rating()
 
 
-class Users(Resource):
+class UsersGet(Resource):
     """Class for returning user data from the database."""
 
     def get(self, user_name=None, object_id=None):
         """Function that returns user data depending on the url."""
 
         if object_id is not None:
-            return get_user_by_id(object_id)
+            return get_user_by_object_id(object_id)
         elif user_name is not None:
             return get_user_by_username(user_name)
         return get_users()
@@ -258,13 +260,13 @@ class UsersUpdateUser(Resource):
         return update_user()
 
 
-class UsersDeleteByID(Resource):
+class UsersDeleteByObjectID(Resource):
     """Class for deleting user data from the database."""
 
     def delete(self):
         """Function that deletes user data from the database."""
 
-        return delete_user_by_id()
+        return delete_user_by_object_id()
 
 
 class HomePage(Resource):
@@ -277,7 +279,7 @@ api.add_resource(TesterData, "/api/testerdata/<_id>")
 api.add_resource(HomePage, '/')
 # Works
 api.add_resource(
-    Books,
+    BooksGet,
     '/api/books',
     '/api/books/<book_id>'
     )
@@ -290,15 +292,15 @@ api.add_resource(
     BooksUpdateBook, '/api/books/update'
     )
 # Works but the error handling needs to be updated.
-api.add_resource(BooksDeleteByID, '/api/books/d')
+api.add_resource(BooksDeleteByBookID, '/api/books/d')
 # Works but the error handling needs to be updated.
 api.add_resource(
-    BooksLoanByUsernameAndID,
+    BooksLoanByUsernameAndBookID,
     '/api/books/loan'
     )
 # Works
 api.add_resource(
-    Comments,
+    CommentsGet,
     '/api/comments',
     '/api/comments/<book_id>'
     )
@@ -317,9 +319,10 @@ api.add_resource(
     CommentsDelete,
     '/api/comments/d'
     )
+#Ratings are now float which is why some functions may not work correctly
 # Works but when book is added doesn't work before reboot?
 api.add_resource(
-    Ratings,
+    RatingsGet,
     '/api/ratings',
     '/api/ratings/<user_name>',
     '/api/ratings/<user_name>/<book_id>'
@@ -341,7 +344,7 @@ api.add_resource(
     )
 # Works
 api.add_resource(
-    Users,
+    UsersGet,
     '/api/users',
     '/api/users/<user_name>',
     '/api/users/<user_name>/<object_id>'
@@ -353,7 +356,7 @@ api.add_resource(
     )
 # Works but ratings and comments made by the user should be deleted too
 api.add_resource(
-    UsersDeleteByID,
+    UsersDeleteByObjectID,
     '/api/users/d'
     )
 

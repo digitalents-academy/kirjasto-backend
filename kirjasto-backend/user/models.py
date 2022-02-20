@@ -2,6 +2,7 @@
 import uuid
 from flask import request, session, redirect
 from passlib.hash import pbkdf2_sha256
+#Why does this throw an error?
 from app import collection
 
 

@@ -1,4 +1,5 @@
 """rating_system.py: Contains Rating class."""
+
 import uuid
 from pymongo.mongo_client import MongoClient
 from flask_restful import reqparse
@@ -25,22 +26,22 @@ retrieved_rating_collection = list(rating_collection.find({}, {'_id': False}))
 parser = reqparse.RequestParser()
 
 
-def get_retrieved_rating_collection():
+def get_ratings():
     """
-    Function that returns a dictionary called retrieved_rating_collection
+    Function that returns a list called retrieved_rating_collection
     that contains retrieved rating collection.
     """
 
     if len(retrieved_rating_collection) > 0:
         return retrieved_rating_collection
-    return "Something went wrong!"
+    return "Error: Something went wrong!"
 
 
-def get_retrieved_ratings_by_username(user_name):
+def get_ratings_by_username(user_name):
     """Function that returns all of user's ratings."""
 
     if is_user_name_inside_user_collection(user_name) is False:
-        return "Incorrect username!"
+        return "Error: Incorrect username!"
 
     retrieved = list(
         rating_collection.find(
@@ -49,15 +50,15 @@ def get_retrieved_ratings_by_username(user_name):
         )
     if len(retrieved) > 0:
         return retrieved
-    return "Something went wrong!"
+    return "Error: Something went wrong!"
 
 
-def get_retrieved_rating_by_username_and_id(user_name, book_id):
-    """Function that returns user's ratings on a book."""
+def get_ratings_by_username_and_book_id(user_name, book_id):
+    """Function that returns all of user's ratings on a single book."""
 
     if is_book_id_inside_book_collection(book_id) is False or \
             is_user_name_inside_user_collection(user_name) is False:
-        return "Incorrect username or book id!"
+        return "Error: Incorrect username or book id!"
 
     retrieved = list(
         rating_collection.find(
@@ -69,7 +70,7 @@ def get_retrieved_rating_by_username_and_id(user_name, book_id):
         )
     if len(retrieved) > 0:
         return retrieved
-    return "Something went wrong!"
+    return "Error: Something went wrong!"
 
 
 def has_the_user_already_rated_this_book(user_name, book_id):
@@ -97,7 +98,7 @@ def give_rating():
 
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)
-    parser.add_argument('rating', required=True, type=int)
+    parser.add_argument('rating', required=True, type=float)
 
     args = parser.parse_args()
 
@@ -107,13 +108,13 @@ def give_rating():
         "Rating_ID": rating_id,
         "Username": args["user_name"],
         "Book_ID": args["book_id"],
-        "Rating": int(args["rating"])
+        "Rating": float(args["rating"])
         }
 
     if is_user_name_inside_user_collection(new_rating["Username"]) \
             is False or is_book_id_inside_book_collection(
                 new_rating["Book_ID"]) is False:
-        return "error: Not a valid username or book id. " \
+        return "Error: Not a valid username or book id. " \
             "Book id and username must exist"
 
 #Update_one?
@@ -128,7 +129,7 @@ def give_rating():
                 {'Rating_ID': rating_id},
                 {
                     "$set": {
-                        "Rating": int(args["rating"]),
+                        "Rating": float(args["rating"]),
                         }
                     }
                 )
@@ -140,16 +141,16 @@ def give_rating():
 
     if is_rating_id_inside_rating_collection(rating_id):
         return "Rating was posted succesfully!"
-    return "Something went wrong!"
+    return "Error: Something went wrong!"
 
 
 def update_rating():
-    """Function that posts updated rating data to the database."""
+    """Function that updates rating data in the database."""
 
     parser.add_argument('rating_id', required=True, type=str)
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)
-    parser.add_argument('new_rating', required=True, type=int)
+    parser.add_argument('new_rating', required=True, type=float)
 
     args = parser.parse_args()
 
@@ -159,14 +160,14 @@ def update_rating():
             is_user_name_inside_user_collection(args["user_name"]) \
             is False or is_book_id_inside_book_collection(args["book_id"])\
             is False:
-        return "error: Not a valid rating id, username or book id." \
+        return "Error: Not a valid rating id, username or book id." \
             "Book id, rating id and username must exist!"
 
     rating_collection.update(
         {'Rating_ID': args["rating_id"]},
         {
             "$set": {
-                "Rating": int(args["new_rating"])
+                "Rating": float(args["new_rating"])
                 }
             }
         )
@@ -176,7 +177,7 @@ def update_rating():
 
     if old_rating != args["new_rating"] or old_rating != "":
         return "Rating was updated succesfully!"
-    return "Something went wrong!"
+    return "Error: Something went wrong!"
 
 
 def delete_rating():
@@ -191,7 +192,7 @@ def delete_rating():
     if is_rating_id_inside_rating_collection(args["rating_id"]) is False or \
             is_book_id_inside_book_collection(args["book_id"]) is False or \
             is_user_name_inside_user_collection(args["user_name"]) is False:
-        return "error: Not a valid rating id, username or book id." \
+        return "Error: Not a valid rating id, username or book id." \
             "Book id, rating id and username must exist!"
 
     rating_collection.delete_one({"Rating_ID": args["rating_id"]})
@@ -200,13 +201,13 @@ def delete_rating():
     update_users_mean_score_data(args["user_name"])
 
     if is_rating_id_inside_rating_collection(args["rating_id"]):
-        return "Something went wrong!"
+        return "Error: Something went wrong!"
     return "Rating was deleted succesfully!"
 
 
 def get_books_rating_data(book_id):
     """
-    Function that returns single books rating
+    Function that returns a single books rating
     and the amount that the book has been rated.
     """
 
@@ -215,16 +216,16 @@ def get_books_rating_data(book_id):
     for rating in retrieved_rating_collection:
         if rating["Book_ID"] == book_id:
             count += 1
-            rating_sum += int(rating["Rating"])
+            rating_sum += float(rating["Rating"])
     if rating_sum == 0:
         return (0, 0)
     else:
         return (rating_sum / count, count)
 
 
-def get_users_mean_score(user_name):
+def get_users_mean_score_data(user_name):
     """
-    Function that returns single user's mean score
+    Function that returns a single user's mean score
     and the amount that the user has rated books.
     """
 
@@ -235,7 +236,7 @@ def get_users_mean_score(user_name):
         if rating["Username"] == user_name:
             if rating["Username"]:
                 count += 1
-                rating_sum += int(rating["Rating"])
+                rating_sum += float(rating["Rating"])
     if rating_sum == 0:
         return (0, 0)
     else:
@@ -243,7 +244,7 @@ def get_users_mean_score(user_name):
 
 
 def update_books_rating_data(book_id):
-    """Function that updates ratings in the dictionary called books."""
+    """Function that updates rating data in the database."""
 
     old_rating = ""
     new_rating = ""
@@ -268,11 +269,11 @@ def update_books_rating_data(book_id):
 
     if old_rating != new_rating or old_rating != "" or new_rating != "":
         return
-    return "Something went wrong!"
+    return "Error: Something went wrong!"
 
 
 def update_users_mean_score_data(user_name):
-    """Function that updates mean score in the dictionary called users."""
+    """Function that updates mean score data in the database."""
 
     old_mean_score = ""
     old_mean_count = ""
@@ -288,19 +289,19 @@ def update_users_mean_score_data(user_name):
         {'Username': user_name},
         {
             "$set": {
-                "Mean_score": float(get_users_mean_score(user_name)[0]),
-                "Mean_count": get_users_mean_score(user_name)[1]
+                "Mean_score": float(get_users_mean_score_data(user_name)[0]),
+                "Mean_count": get_users_mean_score_data(user_name)[1]
                 }
             }
         )
 
     for score in retrieved_user_collection:
-        if score['Username'] == user_name:
-            new_mean_score = score['Mean_score']
-            new_mean_count = score['Mean_count']
+        if score["Username"] == user_name:
+            new_mean_score = score["Mean_score"]
+            new_mean_count = score["Mean_count"]
 
     if old_mean_score != new_mean_score or old_mean_score != "" or \
             old_mean_count != new_mean_count or \
             new_mean_score != "" or new_mean_count != "":
         return
-    return "Something went wrong!"
+    return "Error: Something went wrong!"
