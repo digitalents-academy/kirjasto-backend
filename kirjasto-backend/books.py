@@ -16,7 +16,8 @@ from helpers import (
     is_user_name_inside_user_collection,
     is_book_id_inside_comment_collection,
     is_book_id_inside_rating_collection,
-    is_object_decimal
+    is_object_decimal,
+    is_year_acceptable
     )
 
 client = MongoClient(
@@ -36,7 +37,7 @@ def get_books():
 
     if len(retrieved_book_collection) > 0:
         return retrieved_book_collection
-    return "Error: Something went wrong!"
+    return "Error: There doesn't seem to be any books inside the database!"
 
 
 def get_book_by_book_id(book_id):
@@ -54,7 +55,7 @@ def get_book_by_book_id(book_id):
         )
     if len(retrieved) > 0:
         return retrieved
-    return "Error: Something went wrong!"
+    return "Error: There doesn't seem to be any books inside the database!"
 
 
 def add_new_book():
@@ -90,6 +91,9 @@ def add_new_book():
     if is_book_already_added(values["Name"], values["ISBN"]):
         return "Error: Book has already been added!"
 
+    if is_year_acceptable(values["Year"]) is False:
+        return "Error: The books year is incorrect!"
+
     book_collection.insert_one(values)
 
     if is_book_id_inside_book_collection(values["Book_ID"]) is False:
@@ -117,20 +121,16 @@ def update_book():
 
     args = parser.parse_args()
 
-    if args["loaner"] == "null":
-        args["loaner"] = None
-    elif args["loan_status"] == "false":
-        args["loan_status"] = False
-    elif args["loan_status"] == "true":
-        args["loan_status"] = True
-
-    elif is_book_id_inside_book_collection(args["book_id"]) is False or \
+    if is_book_id_inside_book_collection(args["book_id"]) is False or \
             is_book_already_added(args["name"], args["isbn"]) \
             is False or is_object_number(args["year"]) is False or \
             is_object_decimal(args["rating"]) is False or \
             is_object_number(args["rating_count"]) is False:
         return "Error: Not a valid book id, name, isbn or rating! " \
             "book_id, name and isbn must be inside the database!"
+
+    if is_year_acceptable(args["year"]) is False:
+        return "Error: The books year is incorrect!"
 
     #Better way for checking if the update worked is needed!
 
@@ -194,7 +194,6 @@ def update_book():
     return "Error: Something went wrong!"
 
 
-#It needs to be checked whether is book already loaned function works or not
 def loan_book_by_username_and_book_id():
     """Function that changes book's loan state."""
 
@@ -249,9 +248,9 @@ def delete_book_by_book_id():
 
     if is_book_id_inside_book_collection(args["book_id"]) is False:
         if is_book_id_inside_comment_collection(args["book_id"]):
-            comment_collection.delete_one({"Book_ID": args["book_id"]})
+            comment_collection.delete_many({"Book_ID": args["book_id"]})
         if is_book_id_inside_rating_collection(args["book_id"]):
-            rating_collection.delete_one({"Book_ID": args["book_id"]})
+            rating_collection.delete_many({"Book_ID": args["book_id"]})
     else:
         return "Error: Something went wrong!"
 

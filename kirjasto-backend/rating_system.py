@@ -6,6 +6,7 @@ from flask_restful import reqparse
 import db_secret
 from helpers import (
     is_book_id_inside_book_collection,
+    is_rating_acceptable,
     is_rating_id_inside_rating_collection,
     is_user_name_inside_user_collection
     )
@@ -34,7 +35,7 @@ def get_ratings():
 
     if len(retrieved_rating_collection) > 0:
         return retrieved_rating_collection
-    return "Error: Something went wrong!"
+    return "Error: There doesn't seem to be any ratings inside the database!"
 
 
 def get_ratings_by_username(user_name):
@@ -50,7 +51,7 @@ def get_ratings_by_username(user_name):
         )
     if len(retrieved) > 0:
         return retrieved
-    return "Error: Something went wrong!"
+    return "Error: There doesn't seem to be any ratings inside the database!"
 
 
 def get_ratings_by_username_and_book_id(user_name, book_id):
@@ -70,7 +71,7 @@ def get_ratings_by_username_and_book_id(user_name, book_id):
         )
     if len(retrieved) > 0:
         return retrieved
-    return "Error: Something went wrong!"
+    return "Error: There doesn't seem to be any ratings inside the database!"
 
 
 def has_the_user_already_rated_this_book(user_name, book_id):
@@ -102,10 +103,8 @@ def give_rating():
 
     args = parser.parse_args()
 
-    rating_id = uuid.uuid4().hex
-
     new_rating = {
-        "Rating_ID": rating_id,
+        "Rating_ID": uuid.uuid4().hex,
         "Username": args["user_name"],
         "Book_ID": args["book_id"],
         "Rating": float(args["rating"])
@@ -116,6 +115,9 @@ def give_rating():
                 new_rating["Book_ID"]) is False:
         return "Error: Not a valid username or book id. " \
             "Book id and username must exist"
+
+    elif is_rating_acceptable(new_rating["Rating"]) is False:
+        return "Error: The rating must be between 0-5"
 
 #Update_one?
     if has_the_user_already_rated_this_book(
@@ -133,13 +135,18 @@ def give_rating():
                         }
                     }
                 )
+        update_books_rating_data(args["book_id"])
+        update_users_mean_score_data(args["user_name"])
+
+        return "Rating was posted succesfully!"
+
     else:
         rating_collection.insert_one(new_rating)
 
     update_books_rating_data(args["book_id"])
     update_users_mean_score_data(args["user_name"])
 
-    if is_rating_id_inside_rating_collection(rating_id):
+    if is_rating_id_inside_rating_collection(new_rating["Rating_ID"]):
         return "Rating was posted succesfully!"
     return "Error: Something went wrong!"
 

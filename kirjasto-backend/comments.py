@@ -34,7 +34,7 @@ def get_comments():
     retrieved = list(comment_collection.find({}, {'_id': False}))
     if len(retrieved) > 0:
         return retrieved
-    return "Error: Something went wrong!"
+    return "Error: There doesn't seem to be any comments inside the database!"
 
 
 def get_comments_by_book_id(book_id):
@@ -48,7 +48,7 @@ def get_comments_by_book_id(book_id):
         )
     if len(retrieved) > 0:
         return retrieved
-    return "Error: Something went wrong!"
+    return "Error: There doesn't seem to be any comments inside the database!"
 
 
 def post_comment():

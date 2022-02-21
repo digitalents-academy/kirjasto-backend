@@ -5,13 +5,13 @@
         "Writer": "Marjin Haverbeke",
         "Year": 2018,
         "ISBN": "978-1-59327-950-9",
-        "Rating": 0,
+        "Rating": 0.0,
         "Rating_count": 0,
         "About": "Programming(JavaScript)",
         "Tags": "tags",
         "Description": "ksl",
-        "Loan Status": false,
-        "Loaner": null
+        "Loaner": null,
+        "Loan Status": false
     },
     {
         "Book ID": 2,
@@ -19,13 +19,13 @@
         "Writer": "Steve Krug",
         "Year": 2020,
         "ISBN": "978-0-321-96551-6",
-        "Rating": 0,
+        "Rating": 0.0,
         "Rating_count": 0,
         "About": "Web Development & Design",
         "Tags": "tags",
         "Description": "ksl",
-        "Loan Status": false,
-        "Loaner": null
+        "Loaner": null,
+        "Loan Status": false
     },
     {
         "Book ID": 3,
@@ -33,13 +33,13 @@
         "Writer": "Mark Myers",
         "Year": 2014,
         "ISBN": "978-1-49740-818-0",
-        "Rating": 0,
+        "Rating": 0.0,
         "Rating_count": 0,
         "About": "Computers % Technology (Javascript)",
         "Tags": "tags",
         "Description": "ksl",
-        "Loan Status": false,
-        "Loaner": null
+        "Loaner": null,
+        "Loan Status": false
     },
     {
         "Book ID": 4,
@@ -47,13 +47,13 @@
         "Writer": "Keith Grant",
         "Year": 2018,
         "ISBN": "978-1-61729-345-0",
-        "Rating": 0,
+        "Rating": 0.0,
         "Rating_count": 0,
         "About": "Programming (CSS)",
         "Tags": "tags",
         "Description": "ksl",
-        "Loan Status": false,
-        "Loaner": null
+        "Loaner": null,
+        "Loan Status": false
     },
     {
         "Book ID": 5,
@@ -61,13 +61,13 @@
         "Writer": "Eric Freeman & Elizabeth Robson",
         "Year": 2020,
         "ISBN": "978-1-49207-800-5",
-        "Rating": 0,
+        "Rating": 0.0,
         "Rating_count": 0,
         "About": "Programming",
         "Tags": "tags",
         "Description": "ksl",
-        "Loan Status": false,
-        "Loaner": null
+        "Loaner": null,
+        "Loan Status": false
     },
     {
         "Book ID": 6,
@@ -75,13 +75,13 @@
         "Writer": "Kathy Sierra & Bert Bates",
         "Year": 2005,
         "ISBN": "978-0-59600-920-5",
-        "Rating": 0,
+        "Rating": 0.0,
         "Rating_count": 0,
         "About": "Programming (Java)",
         "Tags": "tags",
         "Description": "ksl",
-        "Loan Status": false,
-        "Loaner": null
+        "Loaner": null,
+        "Loan Status": false
     },
     {
         "Book ID": 7,
@@ -89,12 +89,12 @@
         "Writer": "Malcolm MCDonald",
         "Year": 2020,
         "ISBN": "978-1-59327-994-3",
-        "Rating": 0,
+        "Rating": 0.0,
         "Rating_count": 0,
         "About": "Networking & Cloud Computing",
         "Tags": "tags",
         "Description": "ksl",
-        "Loan Status": false,
-        "Loaner": null
+        "Loaner": null,
+        "Loan Status": false
     }
 ]

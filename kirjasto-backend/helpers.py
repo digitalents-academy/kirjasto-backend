@@ -4,6 +4,7 @@ File that contains tester functions
 that are needed for the project's functions.
 """
 
+from datetime import date
 from pymongo.mongo_client import MongoClient
 from passlib.hash import pbkdf2_sha256
 import db_secret
@@ -65,6 +66,15 @@ def is_book_already_loaned(book_id):
             if book["Loan_Status"] == "false" or book["Loan_Status"] is False:
                 return False
     return True
+
+
+def is_year_acceptable(year):
+    """Function that checks whether book's year is acceptable."""
+
+    now = date.today().year
+    if float(year) <= float(now) and float(year) > 1990:
+        return True
+    return False
 
 
 def is_book_id_inside_book_collection(book_id):

@@ -24,7 +24,10 @@ class User:
             "Email": request.form.get('email'),
             "Password": request.form.get('password'),
             "Mean_score": 0,
-            "Mean_count": 0
+            "Mean_count": 0,
+            #Not needed
+            "Admin": False,
+            "User": True
         }
 
         # Encrypt the password

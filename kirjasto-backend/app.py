@@ -319,7 +319,6 @@ api.add_resource(
     CommentsDelete,
     '/api/comments/d'
     )
-#Ratings are now float which is why some functions may not work correctly
 # Works but when book is added doesn't work before reboot?
 api.add_resource(
     RatingsGet,

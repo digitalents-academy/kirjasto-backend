@@ -33,7 +33,7 @@ def get_users():
 
     if len(retrieved_user_collection) > 0:
         return retrieved_user_collection
-    return "Error: Something went wrong!"
+    return "Error: There doesn't seem to be any users inside the database!"
 
 
 def get_user_by_username(user_name):
@@ -51,7 +51,7 @@ def get_user_by_username(user_name):
 
     if len(retrieved) > 0:
         return retrieved
-    return "Error: Something went wrong!"
+    return "Error: There doesn't seem to be any users inside the database!"
 
 
 def get_user_by_object_id(object_id):
@@ -64,6 +64,39 @@ def get_user_by_object_id(object_id):
 
     if len(retrieved) > 0:
         return retrieved
+    return "Error: There doesn't seem to be any users inside the database!"
+
+
+#Not needed
+def promote_user_to_admin():
+    """Function that updates user's admin state."""
+
+    old_admin_state = ""
+
+    parser.add_argument('object_id', required=True, type=str)
+    parser.add_argument('admin', required=True, type=bool)
+
+    args = parser.parse_args()
+
+    if is_object_id_inside_user_collection(args["object_id"]) is False:
+        return "Error: Not a valid object id! " \
+            "Object id must be inside the database!"
+
+    for user in retrieved_user_collection:
+        if user["_id"] == args["object_id"]:
+            old_admin_state = user["Admin"]
+
+    user_collection.update(
+        {'_id': args["object_id"]},
+        {
+            "$set": {
+                'Admin': args['admin'],
+                }
+            }
+        )
+
+    if old_admin_state != "" or old_admin_state != args["admin"]:
+        return "User was updated succesfully!"
     return "Error: Something went wrong!"
 
 
@@ -126,9 +159,9 @@ def delete_user_by_object_id():
 
     if is_object_id_inside_user_collection(args["object_id"]) is False:
         if is_user_name_inside_comment_collection(args["user_name"]):
-            comment_collection.delete_one({"Username": args["user_name"]})
+            comment_collection.delete_many({"Username": args["user_name"]})
         if is_user_name_inside_rating_collection(args["user_name"]):
-            rating_collection.delete_one({"Username": args["user_name"]})
+            rating_collection.delete_many({"Username": args["user_name"]})
     else:
         return "Error: Something went wrong!"
     return "User was deleted succesfully!"
