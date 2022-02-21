@@ -28,6 +28,7 @@ retrieved_comment_collection = list(comment_collection.find({}))
 parser = reqparse.RequestParser()
 
 
+#Not needed?
 def get_users():
     """Function that returns all users."""
 

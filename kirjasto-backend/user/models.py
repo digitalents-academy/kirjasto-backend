@@ -34,8 +34,8 @@ class User:
         user['Password'] = pbkdf2_sha256.encrypt(user['Password'])
 
         # Check for existing email address
-        if collection.find_one({"Email": user['Email']}):
-            return {"error": "Email address already in use"}, 400
+        if collection.find_one({"Email": user['Email']}) or collection.find_one({"Username": user['Username']}):
+            return {"error": "Email address or username already in use"}, 400
 
         if collection.insert_one(user):
             return self.start_session(user)

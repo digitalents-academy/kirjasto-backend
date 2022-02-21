@@ -238,6 +238,7 @@ class RatingsDeleteByUsernameAndBookID(Resource):
         return delete_rating()
 
 
+#New authentication test
 class UsersGet(Resource):
     """Class for returning user data from the database."""
 
@@ -247,7 +248,12 @@ class UsersGet(Resource):
         if object_id is not None:
             return get_user_by_object_id(object_id)
         elif user_name is not None:
-            return get_user_by_username(user_name)
+            user = collection.find_one({
+                "Username": user_name
+                })
+            if session['user']['_id'] == user['_id']:
+                return get_user_by_username(user_name)
+            return "Error: You're not authorized!"
         return get_users()
 
 
