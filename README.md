@@ -10,11 +10,13 @@ Siim Laineste ([shiimu](https://github.com/shiimu))
 
 Sakhi Hashmat ([Sakhi97](https://github.com/Sakhi97))
 
+Roman Klemiato ([SweetCinnamonBun](https://github.com/SweetCinnamonBun)
+
 ## Tools and Libraries
 - [Flask](https://flask.palletsprojects.com/en/2.0.x/)
 - [MongoDB](https://www.mongodb.com/)
 - [flask-restful](https://flask-restful.readthedocs.io/en/latest/)
-- You can find required packets from Requirements.txt
+- You can find required packets from requirements.txt
 - Python 3.9
 
 ## Setup
