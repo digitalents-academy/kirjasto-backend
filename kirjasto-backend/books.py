@@ -6,6 +6,7 @@ sending, returning, editing and deleting book data from the database.
 
 import uuid
 from pymongo import MongoClient
+from flask import session
 from flask_restful import reqparse
 import db_secret
 from helpers import (
@@ -28,6 +29,7 @@ db = client['kirjasto-backend']
 book_collection = db['books']
 comment_collection = db['comments']
 rating_collection = db['ratings']
+user_collection = db['users']
 retrieved_book_collection = list(book_collection.find({}, {'_id': False}))
 parser = reqparse.RequestParser()
 
@@ -201,6 +203,12 @@ def loan_book_by_username_and_book_id():
     parser.add_argument('book_id', required=True, type=str)
 
     args = parser.parse_args()
+
+    user = user_collection.find_one({
+                "Username": args['user_name']
+                })
+    if session['user']['_id'] != user['_id']:
+        return "Access denied!"
 
     if is_user_name_inside_user_collection(args["user_name"]) is False or \
             is_book_id_inside_book_collection(args["book_id"]) is False or \

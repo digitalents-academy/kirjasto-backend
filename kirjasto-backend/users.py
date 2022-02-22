@@ -126,7 +126,15 @@ def update_user():
     parser.add_argument('email', required=True, type=str)
     parser.add_argument('password', required=True, type=str)
 
+
     args = parser.parse_args()
+
+    user = user_collection.find_one({
+                "Username": args['user_name']
+                })
+    if session['user']['_id'] != user['_id']:
+        return "Access denied!"
+
 
     if is_object_id_inside_user_collection(args["object_id"]) is False:
         return "Error: Not a valid object id! " \
@@ -162,6 +170,12 @@ def delete_user_by_object_id():
     parser.add_argument('object_id', required=True, type=str)
 
     args = parser.parse_args()
+
+    user = user_collection.find_one({
+                "_id": args['object_id']
+                })
+    if session['user']['_id'] != user['_id']:
+        return "Access denied!"
 
     if is_object_id_inside_user_collection(args["object_id"]) is False:
         return "Error: Not a valid object id! " \

@@ -3,6 +3,7 @@
 import uuid
 from pymongo.mongo_client import MongoClient
 from flask_restful import reqparse
+from flask import session
 import db_secret
 from helpers import (
     is_book_id_inside_book_collection,
@@ -103,6 +104,12 @@ def give_rating():
 
     args = parser.parse_args()
 
+    user = rating_collection.find_one({
+                "Username": args['user_name']
+                })
+    if session['user']['Username'] != user['Username']:
+        return "Access denied!"
+
     new_rating = {
         "Rating_ID": uuid.uuid4().hex,
         "Username": args["user_name"],
@@ -161,6 +168,12 @@ def update_rating():
 
     args = parser.parse_args()
 
+    user = rating_collection.find_one({
+                "Username": args['user_name']
+                })
+    if session['user']['Username'] != user['Username']:
+        return "Access denied!"
+
     old_rating = ""
 
     if is_rating_id_inside_rating_collection(args["rating_id"]) is False or \
@@ -195,6 +208,12 @@ def delete_rating():
     parser.add_argument('book_id', required=True, type=str)
 
     args = parser.parse_args()
+
+    user = rating_collection.find_one({
+                "Username": args['user_name']
+                })
+    if session['user']['Username'] != user['Username']:
+        return "Access denied!"
 
     if is_rating_id_inside_rating_collection(args["rating_id"]) is False or \
             is_book_id_inside_book_collection(args["book_id"]) is False or \

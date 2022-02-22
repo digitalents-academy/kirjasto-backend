@@ -5,6 +5,7 @@ for making comment system work as intended.
 """
 
 import uuid
+from flask import session
 from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
 import db_secret
@@ -21,6 +22,7 @@ client = MongoClient(
     "retryWrites=true&w=majority"
     )
 db = client['kirjasto-backend']
+user_collection = db['users']
 comment_collection = db['comments']
 retrieved_comment_collection = list(
     comment_collection.find({}, {'_id': False})
@@ -62,6 +64,12 @@ def post_comment():
 
     args = parser.parse_args()
 
+    user = user_collection.find_one({
+                "Username": args['user_name']
+                })
+    if session['user']['_id'] != user['_id']:
+        return "Access denied!"
+
     values = {
         "Book_ID": args["book_id"],
         "Username": args["user_name"],
@@ -94,6 +102,12 @@ def update_comment():
     parser.add_argument('comment', required=True, type=str)
 
     args = parser.parse_args()
+
+    comment = comment_collection.find_one({
+                "Username": args['user_name']
+                })
+    if session['user']['Username'] != comment['Username']:
+        return "Access denied!"
 
     if is_comment_id_inside_comment_collection(args["comment_id"]) is False \
             or is_book_id_inside_book_collection(args["book_id"]) is False \
@@ -131,6 +145,12 @@ def delete_comments_by_comment_id():
     parser.add_argument('comment_id', required=True, type=str)
 
     args = parser.parse_args()
+
+    comment = comment_collection.find_one({
+                "Comment_ID": args['comment_id']
+                })
+    if session['user']['Username'] != comment['Username']:
+        return "Access denied!"
 
     if is_comment_id_inside_comment_collection(args["comment_id"]) is False:
         return "Error: Not a valid comment id! " \
