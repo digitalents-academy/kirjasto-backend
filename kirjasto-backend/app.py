@@ -246,7 +246,13 @@ class UsersGet(Resource):
         """Function that returns user data depending on the url."""
 
         if object_id is not None:
+            user = collection.find_one({
+                "_id": object_id
+                })
+            if session['user']['_id'] != user['_id']:
+                return "Access denied!"
             return get_user_by_object_id(object_id)
+        
         elif user_name is not None:
             user = collection.find_one({
                 "Username": user_name
