@@ -5,6 +5,7 @@ for updating, editing and deleting user data from the database.
 
 from pymongo import MongoClient
 from flask_restful import reqparse
+from flask import session
 from passlib.hash import pbkdf2_sha256
 import db_secret
 from helpers import (
@@ -68,14 +69,24 @@ def get_user_by_object_id(object_id):
     return "Error: There doesn't seem to be any users inside the database!"
 
 
-#Not needed
+def get_token(object_id):
+    """Function that returns token depending on the object_id"""
+    user = user_collection.find_one({
+        "_id": object_id
+    })
+    if session['user']['_id'] == user['_id'] and user['Admin']:
+        return session['token']
+    else:
+        return "Error: You're not authorized!"
+
+
+#Needs token_required
 def promote_user_to_admin():
     """Function that updates user's admin state."""
 
     old_admin_state = ""
 
     parser.add_argument('object_id', required=True, type=str)
-    parser.add_argument('admin', required=True, type=bool)
 
     args = parser.parse_args()
 
@@ -91,13 +102,13 @@ def promote_user_to_admin():
         {'_id': args["object_id"]},
         {
             "$set": {
-                'Admin': args['admin'],
+                'Admin': True
                 }
             }
         )
 
     if old_admin_state != "" or old_admin_state != args["admin"]:
-        return "User was updated succesfully!"
+        return "User was promoted succesfully!"
     return "Error: Something went wrong!"
 
 

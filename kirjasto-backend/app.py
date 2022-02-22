@@ -1,11 +1,12 @@
 """app.py: The project's main file. The app will be run from here."""
 
 from functools import wraps
-from flask import Flask, Response, render_template, session, redirect
+from flask import Flask, Response, render_template, session, redirect, request
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
 from pymongo.mongo_client import MongoClient
 from bson.objectid import ObjectId
+import jwt
 from books import (
     get_books,
     get_book_by_book_id,
@@ -52,6 +53,27 @@ db = client['kirjasto-backend']
 collection = db['users']
 testcollection = db["testerdata"]
 retrieved_testcollection = list(testcollection.find({}, {'_id': False}))
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token:
+            return 'Error: Token is missing!'
+
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            #current_user = session["user"]
+            current_user = collection.find({'_id': data['object_id']})
+        except:
+            return 'Error: Token is invalid'
+        return f(current_user, *args, **kwargs)
+    return decorated
 
 
 def login_required(f):
@@ -112,6 +134,7 @@ class TesterData(Resource):
 class BooksGet(Resource):
     """Class for returning book data from the database."""
 
+    @token_required
     def get(self, book_id=None):
         """Function that returns book data depending on the url."""
 
