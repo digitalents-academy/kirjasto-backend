@@ -6,6 +6,7 @@ from flask_restful import reqparse
 from flask import session
 import db_secret
 from helpers import (
+    checking_if_user_is_authenticated_with_user_name,
     is_book_id_inside_book_collection,
     is_rating_acceptable,
     is_rating_id_inside_rating_collection,
@@ -28,6 +29,7 @@ retrieved_rating_collection = list(rating_collection.find({}, {'_id': False}))
 parser = reqparse.RequestParser()
 
 
+#Is this needed?
 def get_ratings():
     """
     Function that returns a list called retrieved_rating_collection
@@ -45,6 +47,9 @@ def get_ratings_by_username(user_name):
     if is_user_name_inside_user_collection(user_name) is False:
         return "Error: Incorrect username!"
 
+    if checking_if_user_is_authenticated_with_user_name(user_name) is False:
+        return "Error: Access denied!"
+
     retrieved = list(
         rating_collection.find(
             {'Username': user_name}, {'_id': False}
@@ -61,6 +66,9 @@ def get_ratings_by_username_and_book_id(user_name, book_id):
     if is_book_id_inside_book_collection(book_id) is False or \
             is_user_name_inside_user_collection(user_name) is False:
         return "Error: Incorrect username or book id!"
+
+    if checking_if_user_is_authenticated_with_user_name(user_name) is False:
+        return "Error: Access denied!"
 
     retrieved = list(
         rating_collection.find(
@@ -104,11 +112,8 @@ def give_rating():
 
     args = parser.parse_args()
 
-    user = rating_collection.find_one({
-                "Username": args['user_name']
-                })
-    if session['user']['Username'] != user['Username']:
-        return "Access denied!"
+    if checking_if_user_is_authenticated_with_user_name(user_name) is False:
+        return "Error: Access denied!"
 
     new_rating = {
         "Rating_ID": uuid.uuid4().hex,
@@ -168,11 +173,8 @@ def update_rating():
 
     args = parser.parse_args()
 
-    user = rating_collection.find_one({
-                "Username": args['user_name']
-                })
-    if session['user']['Username'] != user['Username']:
-        return "Access denied!"
+    if checking_if_user_is_authenticated_with_user_name(user_name) is False:
+        return "Error: Access denied!"
 
     old_rating = ""
 
@@ -209,11 +211,9 @@ def delete_rating():
 
     args = parser.parse_args()
 
-    user = rating_collection.find_one({
-                "Username": args['user_name']
-                })
-    if session['user']['Username'] != user['Username']:
-        return "Access denied!"
+    if checking_if_user_is_authenticated_with_user_name(
+            args["user_name"]) is False:
+        return "Error: Access denied!"
 
     if is_rating_id_inside_rating_collection(args["rating_id"]) is False or \
             is_book_id_inside_book_collection(args["book_id"]) is False or \

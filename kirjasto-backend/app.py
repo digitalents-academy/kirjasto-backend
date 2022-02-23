@@ -55,25 +55,26 @@ testcollection = db["testerdata"]
 retrieved_testcollection = list(testcollection.find({}, {'_id': False}))
 
 
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
+#Not ready yet
+# def token_required(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         token = None
 
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
+#         if 'x-access-token' in request.headers:
+#             token = request.headers['x-access-token']
 
-        if not token:
-            return 'Error: Token is missing!'
+#         if not token:
+#             return 'Error: Token is missing!'
 
-        try:
-            data = jwt.decode(token, app.config['SECRET_KEY'])
-            #current_user = session["user"]
-            current_user = collection.find({'_id': data['object_id']})
-        except:
-            return 'Error: Token is invalid'
-        return f(current_user, *args, **kwargs)
-    return decorated
+#         try:
+#             data = jwt.decode(token, app.config['SECRET_KEY'])
+#             #current_user = session["user"]
+#             current_user = collection.find({'_id': data['object_id']})
+#         except:
+#             return 'Error: Token is invalid'
+#         return f(current_user, *args, **kwargs)
+#     return decorated
 
 
 def login_required(f):
@@ -134,7 +135,6 @@ class TesterData(Resource):
 class BooksGet(Resource):
     """Class for returning book data from the database."""
 
-    @token_required
     def get(self, book_id=None):
         """Function that returns book data depending on the url."""
 
@@ -261,7 +261,6 @@ class RatingsDeleteByUsernameAndBookID(Resource):
         return delete_rating()
 
 
-#New authentication test
 class UsersGet(Resource):
     """Class for returning user data from the database."""
 
@@ -269,20 +268,9 @@ class UsersGet(Resource):
         """Function that returns user data depending on the url."""
 
         if object_id is not None:
-            user = collection.find_one({
-                "_id": object_id
-                })
-            if session['user']['_id'] != user['_id']:
-                return "Access denied!"
             return get_user_by_object_id(object_id)
-        
         elif user_name is not None:
-            user = collection.find_one({
-                "Username": user_name
-                })
-            if session['user']['_id'] == user['_id']:
-                return get_user_by_username(user_name)
-            return "Error: You're not authorized!"
+            return get_user_by_username(user_name)
         return get_users()
 
 

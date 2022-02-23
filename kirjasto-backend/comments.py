@@ -10,9 +10,11 @@ from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
 import db_secret
 from helpers import (
+    checking_if_user_is_authenticated_with_user_name,
     is_book_id_inside_book_collection,
     is_comment_id_inside_comment_collection,
-    is_user_name_inside_user_collection
+    is_user_name_inside_user_collection,
+
     )
 
 client = MongoClient(
@@ -64,11 +66,9 @@ def post_comment():
 
     args = parser.parse_args()
 
-    user = user_collection.find_one({
-                "Username": args['user_name']
-                })
-    if session['user']['_id'] != user['_id']:
-        return "Access denied!"
+    if checking_if_user_is_authenticated_with_user_name(
+            args["user_name"]) is False:
+        return "Error: Access denied!"
 
     values = {
         "Book_ID": args["book_id"],
@@ -103,11 +103,9 @@ def update_comment():
 
     args = parser.parse_args()
 
-    comment = comment_collection.find_one({
-                "Username": args['user_name']
-                })
-    if session['user']['Username'] != comment['Username']:
-        return "Access denied!"
+    if checking_if_user_is_authenticated_with_user_name(
+            args["user_name"]) is False:
+        return "Error: Access denied!"
 
     if is_comment_id_inside_comment_collection(args["comment_id"]) is False \
             or is_book_id_inside_book_collection(args["book_id"]) is False \
@@ -146,11 +144,15 @@ def delete_comments_by_comment_id():
 
     args = parser.parse_args()
 
+    # Checking if user is authenticated
+    # by first getting a users comment from comment_collection
+    # And then checking whether that user's username matches
+    # with the one that is logged in.
     comment = comment_collection.find_one({
                 "Comment_ID": args['comment_id']
                 })
     if session['user']['Username'] != comment['Username']:
-        return "Access denied!"
+        return "Error: Access denied!"
 
     if is_comment_id_inside_comment_collection(args["comment_id"]) is False:
         return "Error: Not a valid comment id! " \

@@ -8,6 +8,7 @@ from datetime import date
 from pymongo.mongo_client import MongoClient
 from passlib.hash import pbkdf2_sha256
 import db_secret
+from flask import session
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":"
@@ -281,4 +282,54 @@ def is_object_id_inside_user_collection(object_id):
     for user in retrieved:
         if user["_id"] == object_id:
             return True
+    return False
+
+
+def checking_if_user_is_authenticated_with_object_id(object_id):
+    """
+    Function that checks
+    whether user is authenticated with the help of object id.
+    """
+
+    user = user_collection.find_one({
+        "_id": object_id
+        })
+    if session['user']['_id'] == user['_id']:
+        return True
+    return False
+
+
+def checking_if_user_is_authenticated_with_user_name(user_name):
+    """
+    Function that checks
+    whether user is authenticated with the help of username.
+    """
+
+    user = user_collection.find_one({
+        "_id": user_name
+        })
+    if session['user']['_id'] == user['_id']:
+        return True
+    return False
+
+
+def is_current_user_admin():
+    """
+    Function that checks
+    whether current user is admin.
+    """
+
+    if session['user']['Admin']:
+        return True
+    return False
+
+
+def is_user_logged_in():
+    """
+    Function that checks
+    whether someone is logged in or not.
+    """
+
+    if 'logged_in' in session:
+        return True
     return False

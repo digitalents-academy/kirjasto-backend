@@ -2,11 +2,12 @@
 import uuid
 from flask import request, session, redirect
 from passlib.hash import pbkdf2_sha256
+import jwt
 #Why does this throw an error?
 from app import collection
-import jwt
 import datetime
-from app import app
+#Not needed atm
+#from app import app
 
 
 class User:
@@ -15,20 +16,20 @@ class User:
         del user['Password']
         session['logged_in'] = True
         session['user'] = user
-        #Editing this
-        if user["Admin"]:
+        #Not ready yet
+        # if user["Admin"]:
             #Secret_key needs to be checked
-            token = jwt.encode(
-                {
-                    'object_id': user["_id"],
-                    'exp': datetime.datetime.utcnow() + datetime.timedelta(
-                        minutes=30
-                        )
-                    },
-                app.config['SECRET_KEY']
-                )
-            session['token'] = token
-            print(token)
+            # token = jwt.encode(
+            #     {
+            #         'object_id': user["_id"],
+            #         'exp': datetime.datetime.utcnow() + datetime.timedelta(
+            #             minutes=30
+            #             )
+            #         },
+            #     app.config['SECRET_KEY']
+            #     )
+            # session['token'] = token
+            # print(token)
         # return jsonify(user), 200
         return user, 200
 
