@@ -5,14 +5,16 @@ for updating, editing and deleting user data from the database.
 
 from pymongo import MongoClient
 from flask_restful import reqparse
-from flask import session
+#from flask import session
 from passlib.hash import pbkdf2_sha256
 import db_secret
 from helpers import (
+    checking_if_user_is_authenticated_with_object_id,
     is_object_id_inside_user_collection,
     is_user_name_inside_comment_collection,
     is_user_name_inside_rating_collection,
-    is_user_name_inside_user_collection
+    is_user_name_inside_user_collection,
+    checking_if_user_is_authenticated_with_user_name
     )
 
 client = MongoClient(
@@ -47,6 +49,9 @@ def get_user_by_username(user_name):
     if is_user_name_inside_user_collection(user_name) is False:
         return 'Error: Not a valid username! Username must exist!'
 
+    if checking_if_user_is_authenticated_with_user_name(user_name) is False:
+        return "Error: Access denied!"
+
     retrieved = list(
         user_collection.find({'Username': user_name}, {'_id': False})
         )
@@ -62,6 +67,9 @@ def get_user_by_object_id(object_id):
     if is_object_id_inside_user_collection(object_id) is False:
         return 'Error: Not a valid object id! Object id must exist!'
 
+    if checking_if_user_is_authenticated_with_object_id(object_id) is False:
+        return "Error: Access denied!"
+
     retrieved = list(user_collection.find({'_id': object_id}))
 
     if len(retrieved) > 0:
@@ -69,15 +77,16 @@ def get_user_by_object_id(object_id):
     return "Error: There doesn't seem to be any users inside the database!"
 
 
-def get_token(object_id):
-    """Function that returns token depending on the object_id"""
-    user = user_collection.find_one({
-        "_id": object_id
-    })
-    if session['user']['_id'] == user['_id'] and user['Admin']:
-        return session['token']
-    else:
-        return "Error: You're not authorized!"
+#Not needed atm
+# def get_token(object_id):
+#     """Function that returns token depending on the object_id"""
+#     user = user_collection.find_one({
+#         "_id": object_id
+#     })
+#     if session['user']['_id'] == user['_id'] and user['Admin']:
+#         return session['token']
+#     else:
+#         return "Error: You're not authorized!"
 
 
 #Needs token_required
@@ -112,7 +121,7 @@ def promote_user_to_admin():
     return "Error: Something went wrong!"
 
 
-#The error handling for checking whether update was succesful
+#The error handling for checking whether update was succesfull
 #needs to be edited.
 def update_user():
     """Function that posts updated user data to the database."""
@@ -126,15 +135,11 @@ def update_user():
     parser.add_argument('email', required=True, type=str)
     parser.add_argument('password', required=True, type=str)
 
-
     args = parser.parse_args()
 
-    user = user_collection.find_one({
-                "Username": args['user_name']
-                })
-    if session['user']['_id'] != user['_id']:
-        return "Access denied!"
-
+    if checking_if_user_is_authenticated_with_object_id(
+            args["object_id"]) is False:
+        return "Error: Access denied!"
 
     if is_object_id_inside_user_collection(args["object_id"]) is False:
         return "Error: Not a valid object id! " \
@@ -171,11 +176,9 @@ def delete_user_by_object_id():
 
     args = parser.parse_args()
 
-    user = user_collection.find_one({
-                "_id": args['object_id']
-                })
-    if session['user']['_id'] != user['_id']:
-        return "Access denied!"
+    if checking_if_user_is_authenticated_with_object_id(
+            args["object_id"]) is False:
+        return "Error: Access denied!"
 
     if is_object_id_inside_user_collection(args["object_id"]) is False:
         return "Error: Not a valid object id! " \

@@ -18,7 +18,9 @@ from helpers import (
     is_book_id_inside_comment_collection,
     is_book_id_inside_rating_collection,
     is_object_decimal,
-    is_year_acceptable
+    is_year_acceptable,
+    is_current_user_admin,
+    is_user_logged_in
     )
 
 client = MongoClient(
@@ -63,6 +65,12 @@ def get_book_by_book_id(book_id):
 def add_new_book():
     """Function that posts new book to the database."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
+    if is_current_user_admin() is False:
+        return "Error: You're not authorized!"
+
     book_id = uuid.uuid4().hex
 
     parser.add_argument('name', required=True, type=str)
@@ -103,10 +111,16 @@ def add_new_book():
     return "Book was added succesfully!"
 
 
-#The error handling for checking whether update was succesful
+#The error handling for checking whether update was succesfull
 #needs to be edited.
 def update_book():
     """Function that posts updated book data to the database."""
+
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
+    if is_current_user_admin() is False:
+        return "Error: You're not authorized!"
 
     parser.add_argument('book_id', required=True, type=str)
     parser.add_argument('name', required=True, type=str)
@@ -133,8 +147,6 @@ def update_book():
 
     if is_year_acceptable(args["year"]) is False:
         return "Error: The books year is incorrect!"
-
-    #Better way for checking if the update worked is needed!
 
     old_name = ""
     old_writer = ""
@@ -199,6 +211,12 @@ def update_book():
 def loan_book_by_username_and_book_id():
     """Function that changes book's loan state."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
+    if is_current_user_admin() is False:
+        return "Error: You're not authorized!"
+
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)
 
@@ -243,6 +261,12 @@ def loan_book_by_username_and_book_id():
 
 def delete_book_by_book_id():
     """Function that deletes a book from the database."""
+
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
+    if is_current_user_admin() is False:
+        return "Error: You're not authorized!"
 
     parser.add_argument('book_id', required=True, type=str)
 
