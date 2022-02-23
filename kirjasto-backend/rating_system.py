@@ -104,10 +104,10 @@ def give_rating():
 
     args = parser.parse_args()
 
-    user = rating_collection.find_one({
-                "Username": args['user_name']
-                })
-    if session['user']['Username'] != user['Username']:
+    user = user_collection.find_one({
+                    "Username": args['user_name']
+                    })
+    if session['user']['_id'] != user['_id']:
         return "Access denied!"
 
     new_rating = {
@@ -168,10 +168,10 @@ def update_rating():
 
     args = parser.parse_args()
 
-    user = rating_collection.find_one({
+    user = user_collection.find_one({
                 "Username": args['user_name']
                 })
-    if session['user']['Username'] != user['Username']:
+    if session['user']['_id'] != user['_id']:
         return "Access denied!"
 
     old_rating = ""

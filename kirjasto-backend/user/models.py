@@ -1,6 +1,6 @@
 # from flask import Flask, jsonify
 import uuid
-from flask import request, session, redirect
+from flask import request, session, redirect, jsonify
 from passlib.hash import pbkdf2_sha256
 #Why does this throw an error?
 from app import collection
@@ -20,15 +20,16 @@ class User:
             #Secret_key needs to be checked
             token = jwt.encode(
                 {
-                    'object_id': user["_id"],
-                    'exp': datetime.datetime.utcnow() + datetime.timedelta(
+                    'Username': user['Username'],
+                    'exp': str(datetime.datetime.utcnow() + datetime.timedelta(
                         minutes=30
-                        )
+                        ))
                     },
                 app.config['SECRET_KEY']
                 )
             session['token'] = token
             print(token)
+            #return jsonify({'token': token.decode('utf-8')})
         # return jsonify(user), 200
         return user, 200
 

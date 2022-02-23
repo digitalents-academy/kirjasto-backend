@@ -42,7 +42,8 @@ from users import (
 parser = reqparse.RequestParser()
 
 app = Flask(__name__)
-app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
+#app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
+app.config['SECRET_KEY'] = 'mysecretkey'
 api = Api(app)
 
 client = MongoClient(
@@ -58,21 +59,18 @@ retrieved_testcollection = list(testcollection.find({}, {'_id': False}))
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = None
-
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
+        token = request.args.get('token')
 
         if not token:
             return 'Error: Token is missing!'
 
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            jwt.decode(token, app.config['SECRET_KEY'])
             #current_user = session["user"]
-            current_user = collection.find({'_id': data['object_id']})
+            #current_user = collection.find({'_id': data['object_id']})
         except:
-            return 'Error: Token is invalid'
-        return f(current_user, *args, **kwargs)
+            return f'Error: Token is invalid, {token}'
+        return f(*args, **kwargs)
     return decorated
 
 

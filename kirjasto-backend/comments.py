@@ -103,10 +103,10 @@ def update_comment():
 
     args = parser.parse_args()
 
-    comment = comment_collection.find_one({
+    user = user_collection.find_one({
                 "Username": args['user_name']
                 })
-    if session['user']['Username'] != comment['Username']:
+    if session['user']['_id'] != user['_id']:
         return "Access denied!"
 
     if is_comment_id_inside_comment_collection(args["comment_id"]) is False \
