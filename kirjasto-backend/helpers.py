@@ -7,8 +7,8 @@ that are needed for the project's functions.
 from datetime import date
 from pymongo.mongo_client import MongoClient
 from passlib.hash import pbkdf2_sha256
-import db_secret
 from flask import session
+import db_secret
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":"

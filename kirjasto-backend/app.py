@@ -35,6 +35,7 @@ from users import (
     get_user_by_username,
     get_users,
     get_user_by_object_id,
+    promote_user_to_admin,
     update_user,
     delete_user_by_object_id
     )
@@ -61,9 +62,8 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = request.args.get('token')
 
-#         if not token:
-#             return 'Error: Token is missing!'
-
+        if not token:
+            return 'Error: Token is missing!'
         try:
             jwt.decode(token, app.secret_key)
             #current_user = session["user"]
@@ -280,6 +280,15 @@ class UsersUpdateUser(Resource):
         return update_user()
 
 
+class UsersPromoteUser(Resource):
+    """Class for promoting user to admin."""
+
+    def put(self):
+        """Function that promotes user to admin."""
+
+        return promote_user_to_admin()
+
+
 class UsersDeleteByObjectID(Resource):
     """Class for deleting user data from the database."""
 
@@ -373,7 +382,12 @@ api.add_resource(
     UsersUpdateUser,
     '/api/users/update'
     )
-# Works but ratings and comments made by the user should be deleted too
+# Works
+api.add_resource(
+    UsersPromoteUser,
+    '/api/users/promote'
+    )
+# Works
 api.add_resource(
     UsersDeleteByObjectID,
     '/api/users/d'

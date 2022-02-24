@@ -112,7 +112,8 @@ def give_rating():
 
     args = parser.parse_args()
 
-    if checking_if_user_is_authenticated_with_user_name(user_name) is False:
+    if checking_if_user_is_authenticated_with_user_name(
+            args["user_name"]) is False:
         return "Error: Access denied!"
 
     new_rating = {
@@ -173,7 +174,8 @@ def update_rating():
 
     args = parser.parse_args()
 
-    if checking_if_user_is_authenticated_with_user_name(user_name) is False:
+    if checking_if_user_is_authenticated_with_user_name(
+            args["user_name"]) is False:
         return "Error: Access denied!"
 
     old_rating = ""

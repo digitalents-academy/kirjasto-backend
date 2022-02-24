@@ -8,7 +8,6 @@ from app import collection, app
 import datetime
 
 
-
 class User:
     # Needs to be edited
     def start_session(self, user):
