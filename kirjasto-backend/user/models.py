@@ -4,10 +4,9 @@ from flask import request, session, redirect, jsonify
 from passlib.hash import pbkdf2_sha256
 import jwt
 #Why does this throw an error?
-from app import collection
+from app import collection, app
 import datetime
-#Not needed atm
-#from app import app
+
 
 
 class User:
@@ -26,7 +25,7 @@ class User:
                         minutes=30
                         ))
                     },
-                app.config['SECRET_KEY']
+                app.secret_key
                 )
             session['token'] = token
             print(token)

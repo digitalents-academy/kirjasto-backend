@@ -42,7 +42,7 @@ from users import (
 parser = reqparse.RequestParser()
 
 app = Flask(__name__)
-#app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
+app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 app.config['SECRET_KEY'] = 'mysecretkey'
 api = Api(app)
 
@@ -65,7 +65,7 @@ def token_required(f):
 #             return 'Error: Token is missing!'
 
         try:
-            jwt.decode(token, app.config['SECRET_KEY'])
+            jwt.decode(token, app.secret_key)
             #current_user = session["user"]
             #current_user = collection.find({'_id': data['object_id']})
         except:
@@ -131,7 +131,7 @@ class TesterData(Resource):
 
 class BooksGet(Resource):
     """Class for returning book data from the database."""
-
+    @token_required
     def get(self, book_id=None):
         """Function that returns book data depending on the url."""
 
