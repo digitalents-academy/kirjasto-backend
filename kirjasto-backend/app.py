@@ -43,7 +43,7 @@ from users import (
 parser = reqparse.RequestParser()
 
 app = Flask(__name__)
-app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
+#app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 app.config['SECRET_KEY'] = 'mysecretkey'
 api = Api(app)
 
@@ -61,15 +61,14 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.args.get('token')
-
+        
         if not token:
             return 'Error: Token is missing!'
         try:
-            jwt.decode(token, app.secret_key)
-            #current_user = session["user"]
-            #current_user = collection.find({'_id': data['object_id']})
+            jwt.decode(token, app.config['SECRET_KEY'],  algorithms=["HS256"])
         except:
-            return f'Error: Token is invalid, {token}'
+            
+            return "Error: Token is invalid!"
         return f(*args, **kwargs)
     return decorated
 
@@ -142,7 +141,7 @@ class BooksGet(Resource):
 
 class BooksAddNewBook(Resource):
     """Class for posting book data to the database."""
-
+    @token_required
     def post(self):
         """Function that posts book data to the database."""
 
@@ -151,7 +150,7 @@ class BooksAddNewBook(Resource):
 
 class BooksUpdateBook(Resource):
     """Class for updating book data to the database."""
-
+    @token_required
     def put(self):
         """Function that updates book data to the database."""
 
@@ -160,7 +159,7 @@ class BooksUpdateBook(Resource):
 
 class BooksDeleteByBookID(Resource):
     """Class for deleting book data from the database."""
-
+    @token_required
     def delete(self):
         """Function that deletes book data from the database."""
 

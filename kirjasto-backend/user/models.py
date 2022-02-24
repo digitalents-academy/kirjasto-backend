@@ -17,18 +17,9 @@ class User:
         #Not ready yet
         if user["Admin"]:
             #Secret_key needs to be checked
-            token = jwt.encode(
-                {
-                    'Username': user['Username'],
-                    'exp': str(datetime.datetime.utcnow() + datetime.timedelta(
-                        minutes=30
-                        ))
-                    },
-                app.secret_key
-                )
+            token = jwt.encode({'Username': user['Username'], 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
             session['token'] = token
-            print(token)
-            #return jsonify({'token': token.decode('utf-8')})
+            #return jsonify({'token':token.decode('UTF-8')})
         # return jsonify(user), 200
         return user, 200
 
