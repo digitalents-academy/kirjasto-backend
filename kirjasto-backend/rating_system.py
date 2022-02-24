@@ -3,7 +3,6 @@
 import uuid
 from pymongo.mongo_client import MongoClient
 from flask_restful import reqparse
-from flask import session
 import db_secret
 from helpers import (
     checking_if_user_is_authenticated_with_user_name,

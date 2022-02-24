@@ -61,13 +61,12 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.args.get('token')
-        
+
         if not token:
             return 'Error: Token is missing!'
         try:
             jwt.decode(token, app.config['SECRET_KEY'],  algorithms=["HS256"])
         except:
-            
             return "Error: Token is invalid!"
         return f(*args, **kwargs)
     return decorated
@@ -130,7 +129,7 @@ class TesterData(Resource):
 
 class BooksGet(Resource):
     """Class for returning book data from the database."""
-    @token_required
+
     def get(self, book_id=None):
         """Function that returns book data depending on the url."""
 
@@ -141,6 +140,7 @@ class BooksGet(Resource):
 
 class BooksAddNewBook(Resource):
     """Class for posting book data to the database."""
+
     @token_required
     def post(self):
         """Function that posts book data to the database."""
@@ -150,6 +150,7 @@ class BooksAddNewBook(Resource):
 
 class BooksUpdateBook(Resource):
     """Class for updating book data to the database."""
+
     @token_required
     def put(self):
         """Function that updates book data to the database."""
@@ -159,6 +160,7 @@ class BooksUpdateBook(Resource):
 
 class BooksDeleteByBookID(Resource):
     """Class for deleting book data from the database."""
+
     @token_required
     def delete(self):
         """Function that deletes book data from the database."""
