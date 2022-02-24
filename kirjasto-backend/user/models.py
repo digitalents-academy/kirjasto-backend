@@ -4,10 +4,8 @@ from flask import request, session, redirect, jsonify
 from passlib.hash import pbkdf2_sha256
 import jwt
 #Why does this throw an error?
-from app import collection
+from app import collection, app
 import datetime
-#Not needed atm
-#from app import app
 
 
 class User:
@@ -17,19 +15,19 @@ class User:
         session['logged_in'] = True
         session['user'] = user
         #Not ready yet
-        if user["Admin"]:
-            #Secret_key needs to be checked
-            token = jwt.encode(
-                {
-                    'Username': user['Username'],
-                    'exp': str(datetime.datetime.utcnow() + datetime.timedelta(
-                        minutes=30
-                        ))
-                    },
-                app.config['SECRET_KEY']
-                )
-            session['token'] = token
-            print(token)
+        # if user["Admin"]:
+        #     #Secret_key needs to be checked
+        #     token = jwt.encode(
+        #         {
+        #             'Username': user['Username'],
+        #             'exp': str(datetime.datetime.utcnow() + datetime.timedelta(
+        #                 minutes=30
+        #                 ))
+        #             },
+        #         app.config['SECRET_KEY']
+        #         )
+        #     session['token'] = token
+        #     print(token)
             #return jsonify({'token': token.decode('utf-8')})
         # return jsonify(user), 200
         return user, 200
