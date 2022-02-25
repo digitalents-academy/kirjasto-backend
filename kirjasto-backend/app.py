@@ -13,7 +13,8 @@ from books import (
     add_new_book,
     delete_book_by_book_id,
     update_book,
-    loan_book_by_username_and_book_id
+    loan_book_by_username_and_book_id,
+    return_book_by_username_and_book_id
     )
 from comments import (
     delete_comments_by_comment_id,
@@ -43,6 +44,7 @@ from users import (
 parser = reqparse.RequestParser()
 
 app = Flask(__name__)
+#Not needed?
 #app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 app.config['SECRET_KEY'] = 'mysecretkey'
 api = Api(app)
@@ -175,6 +177,15 @@ class BooksLoanByUsernameAndBookID(Resource):
         """Function that changes book's loan state."""
 
         return loan_book_by_username_and_book_id()
+
+
+class BooksReturnByUsernameAndBookID(Resource):
+    """Class for changing book's loan state."""
+
+    def put(self):
+        """Function that changes book's loan state."""
+
+        return return_book_by_username_and_book_id()
 
 
 class CommentsGet(Resource):
@@ -327,6 +338,11 @@ api.add_resource(BooksDeleteByBookID, '/api/books/d')
 api.add_resource(
     BooksLoanByUsernameAndBookID,
     '/api/books/loan'
+    )
+# Needs to be checked whether this works or not.
+api.add_resource(
+    BooksReturnByUsernameAndBookID,
+    '/api/books/return'
     )
 # Works
 api.add_resource(

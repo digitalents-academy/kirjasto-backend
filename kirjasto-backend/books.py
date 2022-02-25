@@ -6,10 +6,10 @@ sending, returning, editing and deleting book data from the database.
 
 import uuid
 from pymongo import MongoClient
-from flask import session
 from flask_restful import reqparse
 import db_secret
 from helpers import (
+    checking_if_user_is_authenticated_with_user_name,
     is_book_already_added,
     is_book_already_loaned,
     is_book_id_inside_book_collection,
@@ -222,10 +222,8 @@ def loan_book_by_username_and_book_id():
 
     args = parser.parse_args()
 
-    user = user_collection.find_one({
-                "Username": args['user_name']
-                })
-    if session['user']['_id'] != user['_id']:
+    if checking_if_user_is_authenticated_with_user_name(
+            args["user_name"]) is False:
         return "Access denied!"
 
     if is_user_name_inside_user_collection(args["user_name"]) is False or \
@@ -256,6 +254,55 @@ def loan_book_by_username_and_book_id():
             old_loaner != "" or old_loan_status is not False \
             or old_loan_status != "":
         return "Book was loaned succesfully!"
+    return "Error: Something went wrong!"
+
+
+def return_book_by_username_and_book_id():
+    """Function that changes book's loan state."""
+
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
+    if is_current_user_admin() is False:
+        return "Error: You're not authorized!"
+
+    parser.add_argument('user_name', required=True, type=str)
+    parser.add_argument('book_id', required=True, type=str)
+
+    args = parser.parse_args()
+
+    if checking_if_user_is_authenticated_with_user_name(
+            args["user_name"]) is False:
+        return "Access denied!"
+
+    if is_user_name_inside_user_collection(args["user_name"]) is False or \
+            is_book_id_inside_book_collection(args["book_id"]) is False or \
+            is_book_already_loaned(args["book_id"]):
+        return "Error: Not a valid username or book id." \
+            "Book id and username must exist and book musn't be available!"
+
+    old_loaner = ""
+    old_loan_status = ""
+
+    for book in retrieved_book_collection:
+        if book["Book_ID"] == args["book_id"]:
+            old_loaner = book["Loaner"]
+            old_loan_status = book["Loan_Status"]
+
+    book_collection.update(
+        {'Book_ID': args["book_id"]},
+        {
+            "$set": {
+                "Loaner": None,
+                "Loan_Status": False
+                }
+            }
+        )
+
+    if old_loaner is not None or \
+            old_loaner != "" or old_loan_status is False \
+            or old_loan_status != "":
+        return "Book was returned succesfully!"
     return "Error: Something went wrong!"
 
 
