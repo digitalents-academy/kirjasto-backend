@@ -99,6 +99,7 @@ def dashboard():
     return render_template('dashboard.html')
 
 
+#Not used atm
 class TesterData(Resource):
     """Class for testing sending and returning data."""
     # def get(self):
@@ -310,14 +311,15 @@ class UsersDeleteByObjectID(Resource):
         return delete_user_by_object_id()
 
 
+# Not used atm
 class HomePage(Resource):
     def get(self):
         return Response(response=render_template("index.html"))
 
 
 api.add_resource(TesterData, "/api/testerdata/<_id>")
-# Works
-api.add_resource(HomePage, '/')
+# Not used atm
+#api.add_resource(HomePage, '/')
 # Works
 api.add_resource(
     BooksGet,

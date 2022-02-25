@@ -214,6 +214,9 @@ def loan_book_by_username_and_book_id():
     if is_user_logged_in() is False:
         return "Error: You have to be logged in!"
 
+    if checking_if_user_is_authenticated_with_user_name is False:
+        return "Error: Access denied!"
+
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)
 
@@ -255,6 +258,9 @@ def return_book_by_username_and_book_id():
 
     if is_user_logged_in() is False:
         return "Error: You have to be logged in!"
+
+    if checking_if_user_is_authenticated_with_user_name is False:
+        return "Error: Access denied!"
 
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)

@@ -28,4 +28,5 @@
 */venv/
 */ENV/
 
-kirjasto-backend-v2/kirjasto-backend-v2/db_secret.py
+# db_secret
+kirjasto-backend/kirjasto-backend/db_secret.py

@@ -5,7 +5,7 @@ for updating, editing and deleting user data from the database.
 
 from pymongo import MongoClient
 from flask_restful import reqparse
-#from flask import session
+from flask import session
 from passlib.hash import pbkdf2_sha256
 import db_secret
 from helpers import (
@@ -186,6 +186,7 @@ def delete_user_by_object_id():
         return "Error: You have to be logged in!"
 
     parser.add_argument('object_id', required=True, type=str)
+    parser.add_argument('user_name', required=True, type=str)
 
     args = parser.parse_args()
 
@@ -198,7 +199,7 @@ def delete_user_by_object_id():
             "Object id must be inside the database!"
 
     user_collection.delete_one({"_id": args["object_id"]})
-    #Gives KeyError: 'user_name'
+
     if is_object_id_inside_user_collection(args["object_id"]) is False:
         if is_user_name_inside_comment_collection(args["user_name"]):
             comment_collection.delete_many({"Username": args["user_name"]})
@@ -206,4 +207,10 @@ def delete_user_by_object_id():
             rating_collection.delete_many({"Username": args["user_name"]})
     else:
         return "Error: Something went wrong!"
+    #session needs to be terminated
+    session['logged_in'] = False
+    #or
+    #session.clear()
+    #When front is ready
+    #return User().signout()
     return "User was deleted succesfully!"

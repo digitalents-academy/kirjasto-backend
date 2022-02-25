@@ -1,7 +1,7 @@
 # from flask import Flask, jsonify
 import uuid
 import datetime
-from flask import request, session, redirect, jsonify
+from flask import request, session, redirect
 from passlib.hash import pbkdf2_sha256
 import jwt
 #Why does this throw an error?
