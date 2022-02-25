@@ -47,11 +47,11 @@ def get_ratings_by_username(user_name):
     if is_user_logged_in() is False:
         return "Error: You have to be logged in!"
 
-    if is_user_name_inside_user_collection(user_name) is False:
-        return "Error: Incorrect username!"
-
     if checking_if_user_is_authenticated_with_user_name(user_name) is False:
         return "Error: Access denied!"
+
+    if is_user_name_inside_user_collection(user_name) is False:
+        return "Error: Incorrect username!"
 
     retrieved = list(
         rating_collection.find(
@@ -112,14 +112,14 @@ def give_rating():
     the old one will be updated.
     """
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)
     parser.add_argument('rating', required=True, type=float)
 
     args = parser.parse_args()
-
-    if is_user_logged_in() is False:
-        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:
@@ -148,9 +148,9 @@ def give_rating():
         for retrieved in retrieved_rating_collection:
             if retrieved["Username"] == args["user_name"] and \
                     retrieved["Book_ID"] == args["book_id"]:
-                rating_id = retrieved["Rating_ID"]
+                new_rating["Rating_ID"] = retrieved["Rating_ID"]
             rating_collection.update(
-                {'Rating_ID': rating_id},
+                {'Rating_ID': new_rating["Rating_ID"]},
                 {
                     "$set": {
                         "Rating": float(args["rating"]),
@@ -176,15 +176,15 @@ def give_rating():
 def update_rating():
     """Function that updates rating data in the database."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     parser.add_argument('rating_id', required=True, type=str)
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)
     parser.add_argument('new_rating', required=True, type=float)
 
     args = parser.parse_args()
-
-    if is_user_logged_in() is False:
-        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:
@@ -219,14 +219,14 @@ def update_rating():
 def delete_rating():
     """Function that deletes a rating and updates data after."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     parser.add_argument('rating_id', required=True, type=str)
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)
 
     args = parser.parse_args()
-
-    if is_user_logged_in() is False:
-        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:

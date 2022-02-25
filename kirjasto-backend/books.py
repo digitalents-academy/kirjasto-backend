@@ -214,17 +214,10 @@ def loan_book_by_username_and_book_id():
     if is_user_logged_in() is False:
         return "Error: You have to be logged in!"
 
-    if is_current_user_admin() is False:
-        return "Error: You're not authorized!"
-
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)
 
     args = parser.parse_args()
-
-    if checking_if_user_is_authenticated_with_user_name(
-            args["user_name"]) is False:
-        return "Access denied!"
 
     if is_user_name_inside_user_collection(args["user_name"]) is False or \
             is_book_id_inside_book_collection(args["book_id"]) is False or \
@@ -263,17 +256,10 @@ def return_book_by_username_and_book_id():
     if is_user_logged_in() is False:
         return "Error: You have to be logged in!"
 
-    if is_current_user_admin() is False:
-        return "Error: You're not authorized!"
-
     parser.add_argument('user_name', required=True, type=str)
     parser.add_argument('book_id', required=True, type=str)
 
     args = parser.parse_args()
-
-    if checking_if_user_is_authenticated_with_user_name(
-            args["user_name"]) is False:
-        return "Access denied!"
 
     if is_user_name_inside_user_collection(args["user_name"]) is False or \
             is_book_id_inside_book_collection(args["book_id"]) is False or \
@@ -321,7 +307,7 @@ def delete_book_by_book_id():
 
     if is_book_id_inside_book_collection(args["book_id"]) is False:
         return "Error: Not a valid book id! " \
-                "Book id must be inside the database!"
+            "Book id must be inside the database!"
 
     book_collection.delete_one({"Book_ID": args["book_id"]})
 

@@ -133,6 +133,9 @@ def promote_user_to_admin():
 def update_user():
     """Function that posts updated user data to the database."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     old_user_name = ""
     old_email = ""
     old_password = ""
@@ -143,9 +146,6 @@ def update_user():
     parser.add_argument('password', required=True, type=str)
 
     args = parser.parse_args()
-
-    if is_user_logged_in() is False:
-        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_object_id(
             args["object_id"]) is False:
@@ -182,12 +182,12 @@ def update_user():
 def delete_user_by_object_id():
     """Function that deletes a user from the database."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     parser.add_argument('object_id', required=True, type=str)
 
     args = parser.parse_args()
-
-    if is_user_logged_in() is False:
-        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_object_id(
             args["object_id"]) is False:
@@ -198,7 +198,7 @@ def delete_user_by_object_id():
             "Object id must be inside the database!"
 
     user_collection.delete_one({"_id": args["object_id"]})
-
+    #Gives KeyError: 'user_name'
     if is_object_id_inside_user_collection(args["object_id"]) is False:
         if is_user_name_inside_comment_collection(args["user_name"]):
             comment_collection.delete_many({"Username": args["user_name"]})

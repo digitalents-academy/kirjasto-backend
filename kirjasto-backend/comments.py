@@ -58,6 +58,9 @@ def get_comments_by_book_id(book_id):
 def post_comment():
     """Function that posts new comment to the database."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     comment_id = uuid.uuid4().hex
 
     parser.add_argument('book_id', required=True, type=str)
@@ -65,9 +68,6 @@ def post_comment():
     parser.add_argument('comment', required=True, type=str)
 
     args = parser.parse_args()
-
-    if is_user_logged_in() is False:
-        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:
@@ -95,6 +95,9 @@ def post_comment():
 def update_comment():
     """Function that updates comment data in the database."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     old_book_id = ""
     old_user_name = ""
     old_comment = ""
@@ -105,9 +108,6 @@ def update_comment():
     parser.add_argument('comment', required=True, type=str)
 
     args = parser.parse_args()
-
-    if is_user_logged_in() is False:
-        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:
@@ -146,12 +146,16 @@ def update_comment():
 def delete_comments_by_comment_id():
     """Function that deletes comment by comment id."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     parser.add_argument('comment_id', required=True, type=str)
 
     args = parser.parse_args()
 
-    if is_user_logged_in() is False:
-        return "Error: You have to be logged in!"
+    if is_comment_id_inside_comment_collection(args["comment_id"]) is False:
+        return "Error: Not a valid comment id! " \
+            "Comment id must be inside the database!"
 
     # Checking if user is authenticated
     # by first getting a users comment from comment_collection
@@ -162,10 +166,6 @@ def delete_comments_by_comment_id():
                 })
     if session['user']['Username'] != comment['Username']:
         return "Error: Access denied!"
-
-    if is_comment_id_inside_comment_collection(args["comment_id"]) is False:
-        return "Error: Not a valid comment id! " \
-            "Comment id must be inside the database!"
 
     comment_collection.delete_one({"Comment_ID": args["comment_id"]})
 
