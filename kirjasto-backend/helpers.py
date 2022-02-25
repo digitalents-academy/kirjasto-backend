@@ -306,8 +306,9 @@ def checking_if_user_is_authenticated_with_user_name(user_name):
     """
 
     user = user_collection.find_one({
-        "_id": user_name
+        "Username": user_name
         })
+
     if session['user']['_id'] == user['_id']:
         return True
     return False

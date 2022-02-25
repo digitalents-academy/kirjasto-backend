@@ -14,7 +14,7 @@ from helpers import (
     is_book_id_inside_book_collection,
     is_comment_id_inside_comment_collection,
     is_user_name_inside_user_collection,
-
+    is_user_logged_in
     )
 
 client = MongoClient(
@@ -66,6 +66,9 @@ def post_comment():
 
     args = parser.parse_args()
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:
         return "Error: Access denied!"
@@ -102,6 +105,9 @@ def update_comment():
     parser.add_argument('comment', required=True, type=str)
 
     args = parser.parse_args()
+
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:
@@ -143,6 +149,9 @@ def delete_comments_by_comment_id():
     parser.add_argument('comment_id', required=True, type=str)
 
     args = parser.parse_args()
+
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
 
     # Checking if user is authenticated
     # by first getting a users comment from comment_collection

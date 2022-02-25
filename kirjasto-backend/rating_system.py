@@ -9,7 +9,8 @@ from helpers import (
     is_book_id_inside_book_collection,
     is_rating_acceptable,
     is_rating_id_inside_rating_collection,
-    is_user_name_inside_user_collection
+    is_user_name_inside_user_collection,
+    is_user_logged_in
     )
 
 client = MongoClient(
@@ -43,6 +44,9 @@ def get_ratings():
 def get_ratings_by_username(user_name):
     """Function that returns all of user's ratings."""
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     if is_user_name_inside_user_collection(user_name) is False:
         return "Error: Incorrect username!"
 
@@ -62,12 +66,15 @@ def get_ratings_by_username(user_name):
 def get_ratings_by_username_and_book_id(user_name, book_id):
     """Function that returns all of user's ratings on a single book."""
 
-    if is_book_id_inside_book_collection(book_id) is False or \
-            is_user_name_inside_user_collection(user_name) is False:
-        return "Error: Incorrect username or book id!"
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(user_name) is False:
         return "Error: Access denied!"
+
+    if is_book_id_inside_book_collection(book_id) is False or \
+            is_user_name_inside_user_collection(user_name) is False:
+        return "Error: Incorrect username or book id!"
 
     retrieved = list(
         rating_collection.find(
@@ -110,6 +117,9 @@ def give_rating():
     parser.add_argument('rating', required=True, type=float)
 
     args = parser.parse_args()
+
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:
@@ -173,6 +183,9 @@ def update_rating():
 
     args = parser.parse_args()
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:
         return "Error: Access denied!"
@@ -211,6 +224,9 @@ def delete_rating():
     parser.add_argument('book_id', required=True, type=str)
 
     args = parser.parse_args()
+
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(
             args["user_name"]) is False:

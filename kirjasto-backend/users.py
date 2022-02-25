@@ -14,7 +14,8 @@ from helpers import (
     is_user_name_inside_comment_collection,
     is_user_name_inside_rating_collection,
     is_user_name_inside_user_collection,
-    checking_if_user_is_authenticated_with_user_name
+    checking_if_user_is_authenticated_with_user_name,
+    is_user_logged_in
     )
 
 client = MongoClient(
@@ -46,11 +47,14 @@ def get_user_by_username(user_name):
     depending on the username.
     """
 
-    if is_user_name_inside_user_collection(user_name) is False:
-        return 'Error: Not a valid username! Username must exist!'
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_user_name(user_name) is False:
         return "Error: Access denied!"
+
+    if is_user_name_inside_user_collection(user_name) is False:
+        return 'Error: Not a valid username! Username must exist!'
 
     retrieved = list(
         user_collection.find({'Username': user_name}, {'_id': False})
@@ -64,11 +68,14 @@ def get_user_by_username(user_name):
 def get_user_by_object_id(object_id):
     """Function that returns user data depending on the object id."""
 
-    if is_object_id_inside_user_collection(object_id) is False:
-        return 'Error: Not a valid object id! Object id must exist!'
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_object_id(object_id) is False:
         return "Error: Access denied!"
+
+    if is_object_id_inside_user_collection(object_id) is False:
+        return 'Error: Not a valid object id! Object id must exist!'
 
     retrieved = list(user_collection.find({'_id': object_id}))
 
@@ -137,6 +144,9 @@ def update_user():
 
     args = parser.parse_args()
 
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
     if checking_if_user_is_authenticated_with_object_id(
             args["object_id"]) is False:
         return "Error: Access denied!"
@@ -175,6 +185,9 @@ def delete_user_by_object_id():
     parser.add_argument('object_id', required=True, type=str)
 
     args = parser.parse_args()
+
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
 
     if checking_if_user_is_authenticated_with_object_id(
             args["object_id"]) is False:
