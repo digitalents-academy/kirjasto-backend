@@ -104,9 +104,8 @@ class TesterData(Resource):
 
     def get(self, _id):
         """Function that returns data with object id."""
-
-        retrieved = testcollection.find_one({"_id": ObjectId(_id)})
-
+        
+        retrieved = list(testcollection.find_one({"_id": ObjectId(_id)}))
         return retrieved
 
     def post(self):

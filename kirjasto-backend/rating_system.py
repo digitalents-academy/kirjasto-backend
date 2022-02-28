@@ -226,7 +226,7 @@ def update_rating_username(new_username, old_username):
 
 
     if checking_if_user_is_authenticated_with_user_name(
-            old_username) is False:
+            new_username) is False:
         return "Error: Access denied!"
 
 
