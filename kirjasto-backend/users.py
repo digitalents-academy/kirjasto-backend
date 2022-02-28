@@ -160,7 +160,7 @@ def update_user():
     if old_user_name != "" or old_user_name != args["user_name"] or \
             old_email != "" or old_email != args["email"] or \
             old_password != "" or old_password != args["password"]:
-        
+
         update_comment_username(args['user_name'], old_user_name)
         #update_rating_username(args['user_name'], old_user_name)
         return "User was updated succesfully!"
