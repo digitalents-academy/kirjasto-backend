@@ -37,7 +37,7 @@ def get_retrieved_rating_collection():
 
 
 def get_retrieved_user_collection():
-    return list(user_collection.find({}, {'_id': False}))
+    return list(user_collection.find({}))
 
 
 def is_object_number(object):
@@ -300,6 +300,12 @@ def checking_if_user_is_authenticated_with_user_name(user_name):
     user = user_collection.find_one({
         "Username": user_name
         })
+    
+
+    if 'logged_in' in session:
+        print("logged in!")
+        print(user)
+        print(session)
 
     if session['user']['_id'] == user['_id']:
         return True

@@ -19,6 +19,9 @@ from helpers import (
     is_user_logged_in
     )
 
+from comments import update_comment_username
+from rating_system import update_rating_username
+
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
     "@cluster0.6se1s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
@@ -157,6 +160,9 @@ def update_user():
     if old_user_name != "" or old_user_name != args["user_name"] or \
             old_email != "" or old_email != args["email"] or \
             old_password != "" or old_password != args["password"]:
+        
+        update_comment_username(args['user_name'], old_user_name)
+        #update_rating_username(args['user_name'], old_user_name)
         return "User was updated succesfully!"
     return "Error: Something went wrong!"
 

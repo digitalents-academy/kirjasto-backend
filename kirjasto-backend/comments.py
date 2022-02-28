@@ -141,6 +141,30 @@ def update_comment():
     return "Error: Something went wrong!"
 
 
+def update_comment_username(new_username, old_username):
+    """Function that updates comment data in the database."""
+
+    if is_user_logged_in() is False:
+        return "Error: You have to be logged in!"
+
+    if checking_if_user_is_authenticated_with_user_name(
+            old_username) is False:
+        return "Error: Access denied!"
+    
+    print(old_username)
+    print(new_username)
+
+
+    comment_collection.update(
+        {'Username': old_username},
+        {
+            "$set": {
+                "Username": new_username    
+                }
+            }
+        )
+    
+
 def delete_comments_by_comment_id():
     """Function that deletes comment by comment id."""
 
