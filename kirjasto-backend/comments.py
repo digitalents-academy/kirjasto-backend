@@ -10,6 +10,7 @@ from flask_restful import reqparse
 from pymongo.mongo_client import MongoClient
 import db_secret
 from helpers import (
+    get_retrieved_comment_collection,
     checking_if_user_is_authenticated_with_user_name,
     is_book_id_inside_book_collection,
     is_comment_id_inside_comment_collection,
@@ -26,9 +27,6 @@ client = MongoClient(
 db = client['kirjasto-backend']
 user_collection = db['users']
 comment_collection = db['comments']
-retrieved_comment_collection = list(
-    comment_collection.find({}, {'_id': False})
-    )
 parser = reqparse.RequestParser()
 
 
@@ -119,7 +117,7 @@ def update_comment():
         return "Error: Not a valid book id, username or comment id! " \
             "book id, username and comment id must be inside the database!"
 
-    for comment in retrieved_comment_collection:
+    for comment in get_retrieved_comment_collection():
         if comment["Comment_ID"] == args["comment_id"]:
             old_book_id = comment["Book_ID"]
             old_user_name = comment["Username"]
@@ -164,7 +162,7 @@ def delete_comments_by_comment_id():
     comment = comment_collection.find_one({
                 "Comment_ID": args['comment_id']
                 })
-    if session['user']['Username'] != comment['Username']:
+    if session['user']['Username'] != comment["Username"]:
         return "Error: Access denied!"
 
     comment_collection.delete_one({"Comment_ID": args["comment_id"]})

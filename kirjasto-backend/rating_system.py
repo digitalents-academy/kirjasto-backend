@@ -5,6 +5,9 @@ from pymongo.mongo_client import MongoClient
 from flask_restful import reqparse
 import db_secret
 from helpers import (
+    get_retrieved_book_collection,
+    get_retrieved_rating_collection,
+    get_retrieved_user_collection,
     checking_if_user_is_authenticated_with_user_name,
     is_book_id_inside_book_collection,
     is_rating_acceptable,
@@ -23,9 +26,6 @@ db = client['kirjasto-backend']
 book_collection = db['books']
 user_collection = db['users']
 rating_collection = db['ratings']
-retrieved_book_collection = list(book_collection.find({}, {'_id': False}))
-retrieved_user_collection = list(user_collection.find({}, {'_id': False}))
-retrieved_rating_collection = list(rating_collection.find({}, {'_id': False}))
 parser = reqparse.RequestParser()
 
 
@@ -36,8 +36,8 @@ def get_ratings():
     that contains retrieved rating collection.
     """
 
-    if len(retrieved_rating_collection) > 0:
-        return retrieved_rating_collection
+    if len(get_retrieved_rating_collection()) > 0:
+        return get_retrieved_rating_collection()
     return "Error: There doesn't seem to be any ratings inside the database!"
 
 
@@ -141,11 +141,10 @@ def give_rating():
     elif is_rating_acceptable(new_rating["Rating"]) is False:
         return "Error: The rating must be between 0-5"
 
-#Update_one?
     if has_the_user_already_rated_this_book(
             args["user_name"],
             args["book_id"]):
-        for retrieved in retrieved_rating_collection:
+        for retrieved in get_retrieved_rating_collection():
             if retrieved["Username"] == args["user_name"] and \
                     retrieved["Book_ID"] == args["book_id"]:
                 new_rating["Rating_ID"] = retrieved["Rating_ID"]
@@ -256,7 +255,7 @@ def get_books_rating_data(book_id):
 
     count = 0
     rating_sum = 0
-    for rating in retrieved_rating_collection:
+    for rating in get_retrieved_rating_collection():
         if rating["Book_ID"] == book_id:
             count += 1
             rating_sum += float(rating["Rating"])
@@ -275,7 +274,7 @@ def get_users_mean_score_data(user_name):
     count = 0
     rating_sum = 0
 
-    for rating in retrieved_rating_collection:
+    for rating in get_retrieved_rating_collection():
         if rating["Username"] == user_name:
             if rating["Username"]:
                 count += 1
@@ -292,7 +291,7 @@ def update_books_rating_data(book_id):
     old_rating = ""
     new_rating = ""
 
-    for rating in retrieved_book_collection:
+    for rating in get_retrieved_book_collection():
         if rating['Book_ID'] == book_id:
             old_rating = rating["Rating"]
 
@@ -306,7 +305,7 @@ def update_books_rating_data(book_id):
             }
         )
 
-    for rating in retrieved_book_collection:
+    for rating in get_retrieved_book_collection():
         if rating['Book_ID'] == book_id:
             new_rating = rating["Rating"]
 
@@ -323,7 +322,7 @@ def update_users_mean_score_data(user_name):
     new_mean_score = ""
     new_mean_count = ""
 
-    for score in retrieved_user_collection:
+    for score in get_retrieved_user_collection():
         if score["Username"] == user_name:
             old_mean_score = score["Mean_score"]
             old_mean_count = score["Mean_count"]
@@ -338,7 +337,7 @@ def update_users_mean_score_data(user_name):
             }
         )
 
-    for score in retrieved_user_collection:
+    for score in get_retrieved_user_collection():
         if score["Username"] == user_name:
             new_mean_score = score["Mean_score"]
             new_mean_count = score["Mean_count"]

@@ -44,8 +44,6 @@ from users import (
 parser = reqparse.RequestParser()
 
 app = Flask(__name__)
-#Not needed?
-#app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 app.config['SECRET_KEY'] = 'mysecretkey'
 api = Api(app)
 
@@ -63,7 +61,6 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.args.get('token')
-
         if not token:
             return 'Error: Token is missing!'
         try:
@@ -108,7 +105,9 @@ class TesterData(Resource):
     def get(self, _id):
         """Function that returns data with object id."""
 
-        return testcollection.find_one({"_id": ObjectId(_id)})
+        retrieved = testcollection.find_one({"_id": ObjectId(_id)})
+
+        return retrieved
 
     def post(self):
         """
@@ -296,6 +295,7 @@ class UsersUpdateUser(Resource):
 class UsersPromoteUser(Resource):
     """Class for promoting user to admin."""
 
+    @token_required
     def put(self):
         """Function that promotes user to admin."""
 
@@ -326,22 +326,22 @@ api.add_resource(
     '/api/books',
     '/api/books/<book_id>'
     )
-# Works but the error handling needs to be updated.
+# Works
 api.add_resource(
     BooksAddNewBook,
     '/api/books/add')
-# Works but the error handling needs to be updated.
+# Works
 api.add_resource(
     BooksUpdateBook, '/api/books/update'
     )
-# Works but the error handling needs to be updated.
+# Works
 api.add_resource(BooksDeleteByBookID, '/api/books/d')
-# Works but the error handling needs to be updated.
+# Works
 api.add_resource(
     BooksLoanByUsernameAndBookID,
     '/api/books/loan'
     )
-# Needs to be checked whether this works or not.
+# Works
 api.add_resource(
     BooksReturnByUsernameAndBookID,
     '/api/books/return'
@@ -352,17 +352,17 @@ api.add_resource(
     '/api/comments',
     '/api/comments/<book_id>'
     )
-# Works but the error handling needs to be updated.
+# Works
 api.add_resource(
     CommentsAddNewComment,
     '/api/comments/add'
     )
-# Works but the error handling needs to be updated.
+# Works
 api.add_resource(
     CommentsUpdateComment,
     '/api/comments/update'
     )
-# Works but the error handling needs to be updated.
+# Works
 api.add_resource(
     CommentsDelete,
     '/api/comments/d'
@@ -413,17 +413,9 @@ api.add_resource(
     )
 
 
-# Runs on port 8000!!
+# Runs on port 5000!!
 if __name__ == "__main__":
     #api urls work with this
     app.run(debug=True)
     #api urls work with this without authentication
-    #app.run(debug=True, host='127.0.0.1', port=8000)
-    #for testing
-    #app.run(
-    #    debug=True,
-    #    use_debugger=False,
-    #    use_reloader=False,
-    #    host='127.0.0.1',
-    #    port=8000
-    #    )
+    #app.run(debug=True, host='127.0.0.1', port=5000)

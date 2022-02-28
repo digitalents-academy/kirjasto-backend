@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from flask_restful import reqparse
 import db_secret
 from helpers import (
+    get_retrieved_book_collection,
     checking_if_user_is_authenticated_with_user_name,
     is_book_already_added,
     is_book_already_loaned,
@@ -32,15 +33,14 @@ book_collection = db['books']
 comment_collection = db['comments']
 rating_collection = db['ratings']
 user_collection = db['users']
-retrieved_book_collection = list(book_collection.find({}, {'_id': False}))
 parser = reqparse.RequestParser()
 
 
 def get_books():
     """Function that returns all books."""
 
-    if len(retrieved_book_collection) > 0:
-        return retrieved_book_collection
+    if len(get_retrieved_book_collection()) > 0:
+        return get_retrieved_book_collection()
     return "Error: There doesn't seem to be any books inside the database!"
 
 
@@ -111,8 +111,6 @@ def add_new_book():
     return "Book was added succesfully!"
 
 
-#The error handling for checking whether update was succesfull
-#needs to be edited.
 def update_book():
     """Function that posts updated book data to the database."""
 
@@ -160,7 +158,7 @@ def update_book():
     old_loaner = ""
     old_loan_status = ""
 
-    for book in retrieved_book_collection:
+    for book in get_retrieved_book_collection():
         if book["Book_ID"] == args["book_id"]:
             old_name = book["Name"]
             old_writer = book["Writer"]
@@ -231,7 +229,7 @@ def loan_book_by_username_and_book_id():
     old_loaner = ""
     old_loan_status = ""
 
-    for book in retrieved_book_collection:
+    for book in get_retrieved_book_collection():
         if book["Book_ID"] == args["book_id"]:
             old_loaner = book["Loaner"]
             old_loan_status = book["Loan_Status"]
@@ -276,7 +274,7 @@ def return_book_by_username_and_book_id():
     old_loaner = ""
     old_loan_status = ""
 
-    for book in retrieved_book_collection:
+    for book in get_retrieved_book_collection():
         if book["Book_ID"] == args["book_id"]:
             old_loaner = book["Loaner"]
             old_loan_status = book["Loan_Status"]
@@ -318,10 +316,11 @@ def delete_book_by_book_id():
     book_collection.delete_one({"Book_ID": args["book_id"]})
 
     if is_book_id_inside_book_collection(args["book_id"]) is False:
-        if is_book_id_inside_comment_collection(args["book_id"]):
-            comment_collection.delete_many({"Book_ID": args["book_id"]})
-        if is_book_id_inside_rating_collection(args["book_id"]):
-            rating_collection.delete_many({"Book_ID": args["book_id"]})
+        comment_collection.delete_many({"Book_ID": args["book_id"]})
+        rating_collection.delete_many({"Book_ID": args["book_id"]})
+        if is_book_id_inside_comment_collection(args["book_id"]) or \
+                is_book_id_inside_rating_collection(args["book_id"]):
+            return "Error: Something went wrong!"
     else:
         return "Error: Something went wrong!"
 

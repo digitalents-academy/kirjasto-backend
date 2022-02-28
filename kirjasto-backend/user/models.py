@@ -1,4 +1,3 @@
-# from flask import Flask, jsonify
 import uuid
 import datetime
 from flask import request, session, redirect
@@ -11,15 +10,15 @@ from app import collection, app
 class User:
     # Needs to be edited
     def start_session(self, user):
-        del user['Password']
+        del user["Password"]
         session['logged_in'] = True
         session['user'] = user
 
         if user["Admin"]:
             token = jwt.encode(
                 {
-                    'Username': user['Username'],
-                    'exp': datetime.datetime.utcnow() + datetime.timedelta(
+                    "Username": user["Username"],
+                    "exp": datetime.datetime.utcnow() + datetime.timedelta(
                         minutes=30)
                     },
                 app.config['SECRET_KEY']
@@ -37,18 +36,17 @@ class User:
             "Password": request.form.get('password'),
             "Mean_score": 0,
             "Mean_count": 0,
-            #Not needed
             "Admin": False
         }
 
         # Encrypt the password
-        user['Password'] = pbkdf2_sha256.encrypt(user['Password'])
+        user["Password"] = pbkdf2_sha256.encrypt(user["Password"])
 
         # Check for existing email address
         if collection.find_one({
-            "Email": user['Email']
+            "Email": user["Email"]
             }) or collection.find_one({
-                "Username": user['Username']
+                "Username": user["Username"]
                 }):
             return {"error": "Email address or username already in use"}, 400
 
@@ -69,7 +67,7 @@ class User:
 
         if user and pbkdf2_sha256.verify(
                 request.form.get('password'),
-                user['Password']):
+                user["Password"]):
             return self.start_session(user)
 
         return {"error": "Invalid login credentials"}, 401

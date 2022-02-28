@@ -18,9 +18,26 @@ client = MongoClient(
     )
 db = client['kirjasto-backend']
 book_collection = db['books']
-user_collection = db['users']
-rating_collection = db['ratings']
 comment_collection = db['comments']
+rating_collection = db['ratings']
+user_collection = db['users']
+
+
+#Does _id need to be false?
+def get_retrieved_book_collection():
+    return list(book_collection.find({}, {'_id': False}))
+
+
+def get_retrieved_comment_collection():
+    return list(comment_collection.find({}, {'_id': False}))
+
+
+def get_retrieved_rating_collection():
+    return list(rating_collection.find({}, {'_id': False}))
+
+
+def get_retrieved_user_collection():
+    return list(user_collection.find({}, {'_id': False}))
 
 
 def is_object_number(object):
@@ -48,21 +65,16 @@ def is_object_decimal(object):
 def is_book_already_added(name, isbn):
     """Function that checks whether book is already inside the database."""
 
-    retrieved_book_collection = list(book_collection.find({}, {'_id': False}))
-
-    for book in retrieved_book_collection:
+    for book in get_retrieved_book_collection():
         if book["Name"] == name or book["ISBN"] == isbn:
             return True
     return False
 
 
-#Editing this
 def is_book_already_loaned(book_id):
     """Function that checks whether book is already inside the database."""
 
-    retrieved_book_collection = list(book_collection.find({}, {'_id': False}))
-
-    for book in retrieved_book_collection:
+    for book in get_retrieved_book_collection():
         if book["Book_ID"] == book_id:
             if book["Loan_Status"] == "false" or book["Loan_Status"] is False:
                 return False
@@ -84,9 +96,7 @@ def is_book_id_inside_book_collection(book_id):
     from the books collection.
     """
 
-    retrieved_book_collection = list(book_collection.find({}, {'_id': False}))
-
-    for book in retrieved_book_collection:
+    for book in get_retrieved_book_collection():
         if book["Book_ID"] == book_id:
             return True
     return False
@@ -98,10 +108,7 @@ def is_book_id_inside_comment_collection(book_id):
     from the comments collection.
     """
 
-    retrieved_comment_collection = \
-        list(comment_collection.find({}, {'_id': False}))
-
-    for comment in retrieved_comment_collection:
+    for comment in get_retrieved_comment_collection():
         if comment["Book_ID"] == book_id:
             return True
     return False
@@ -113,10 +120,7 @@ def is_book_id_inside_rating_collection(book_id):
     the ratings collection.
     """
 
-    retrieved_rating_collection = \
-        list(rating_collection.find({}, {'_id': False}))
-
-    for rating in retrieved_rating_collection:
+    for rating in get_retrieved_rating_collection():
         if rating["Book_ID"] == book_id:
             return True
     return False
@@ -141,10 +145,7 @@ def is_comment_id_inside_comment_collection(comment_id):
     whether comment id can be found inside the comments collection.
     """
 
-    retrieved_comment_collection = \
-        list(comment_collection.find({}, {'_id': False}))
-
-    for comment in retrieved_comment_collection:
+    for comment in get_retrieved_comment_collection():
         if comment["Comment_ID"] == comment_id:
             return True
     return False
@@ -193,10 +194,7 @@ def is_rating_id_inside_rating_collection(rating_id):
     whether rating id can be found inside ratings collection.
     """
 
-    retrieved_rating_collection = \
-        list(rating_collection.find({}, {'_id': False}))
-
-    for rating in retrieved_rating_collection:
+    for rating in get_retrieved_rating_collection():
         if rating["Rating_ID"] == rating_id:
             return True
     return False
@@ -234,9 +232,7 @@ def is_user_name_inside_user_collection(user_name):
     whether username can be found inside the users collection.
     """
 
-    retrieved_user_collection = list(user_collection.find({}, {'_id': False}))
-
-    for user in retrieved_user_collection:
+    for user in get_retrieved_user_collection():
         if user["Username"] == user_name:
             return True
     return False
@@ -248,9 +244,7 @@ def is_email_inside_user_collection(email):
     whether email can be found inside the users collection.
     """
 
-    retrieved_user_collection = list(user_collection.find({}, {'_id': False}))
-
-    for user in retrieved_user_collection:
+    for user in get_retrieved_user_collection():
         if user["Email"] == email:
             return True
     return False
@@ -262,12 +256,10 @@ def is_password_inside_user_collection(password):
     whether password can be found inside the users collection.
     """
 
-    retrieved_user_collection = list(user_collection.find({}, {'_id': False}))
-
-    for user in retrieved_user_collection:
+    for user in get_retrieved_user_collection():
         if pbkdf2_sha256.verify(
                 password,
-                user['Password']):
+                user["Password"]):
             return True
     return False
 
