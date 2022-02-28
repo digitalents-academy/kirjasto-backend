@@ -162,7 +162,7 @@ def update_user():
             old_password != "" or old_password != args["password"]:
 
         update_comment_username(args['user_name'], old_user_name)
-        #update_rating_username(args['user_name'], old_user_name)
+        update_rating_username(args['user_name'], old_user_name)
         return "User was updated succesfully!"
     return "Error: Something went wrong!"
 

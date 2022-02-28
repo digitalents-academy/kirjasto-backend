@@ -1,6 +1,8 @@
 """app.py: The project's main file. The app will be run from here."""
 
 from functools import wraps
+import json
+from json import JSONEncoder
 from flask import Flask, Response, render_template, session, redirect, request
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
@@ -42,7 +44,6 @@ from users import (
     )
 
 parser = reqparse.RequestParser()
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
 api = Api(app)
@@ -55,6 +56,23 @@ db = client['kirjasto-backend']
 collection = db['users']
 testcollection = db["testerdata"]
 retrieved_testcollection = list(testcollection.find({}, {'_id': False}))
+
+
+#testing the use of object id
+class MongoEncoder(JSONEncoder):
+    def default(self, obj, **kwargs):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        else:
+            return JSONEncoder.default(obj, **kwargs)
+
+
+#testing the use of object id
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
 
 
 def token_required(f):
@@ -107,7 +125,8 @@ class TesterData(Resource):
 
         retrieved = testcollection.find_one({"_id": ObjectId(_id)})
 
-        return retrieved
+        #return JSONEncoder().encode(retrieved)
+        return json.dumps(retrieved, cls=MongoEncoder)
 
     def post(self):
         """
