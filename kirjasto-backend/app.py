@@ -1,6 +1,8 @@
 """app.py: The project's main file. The app will be run from here."""
 
 from functools import wraps
+import json
+from json import JSONEncoder
 from flask import Flask, Response, render_template, session, redirect, request
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
@@ -42,7 +44,6 @@ from users import (
     )
 
 parser = reqparse.RequestParser()
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
 api = Api(app)
@@ -55,6 +56,23 @@ db = client['kirjasto-backend']
 collection = db['users']
 testcollection = db["testerdata"]
 retrieved_testcollection = list(testcollection.find({}, {'_id': False}))
+
+
+#testing the use of object id
+# class MongoEncoder(JSONEncoder):
+#     def default(self, obj, **kwargs):
+#         if isinstance(obj, ObjectId):
+#             return str(obj)
+#         else:
+#             return JSONEncoder.default(obj, **kwargs)
+
+
+# #testing the use of object id
+# class JSONEncoder(json.JSONEncoder):
+#     def default(self, o):
+#         if isinstance(o, ObjectId):
+#             return str(o)
+#         return json.JSONEncoder.default(self, o)
 
 
 def token_required(f):
@@ -97,35 +115,37 @@ def dashboard():
 
 
 #Not used atm
-class TesterData(Resource):
-    """Class for testing sending and returning data."""
-    # def get(self):
-    #     return list(testcollection.find())
+# class TesterData(Resource):
+#     """Class for testing sending and returning data."""
+#     # def get(self):
+#     #     return list(testcollection.find())
 
-    def get(self, _id):
-        """Function that returns data with object id."""
-        
-        retrieved = list(testcollection.find_one({"_id": ObjectId(_id)}))
-        return retrieved
+#     def get(self, _id):
+#         """Function that returns data with object id."""
 
-    def post(self):
-        """
-        Function that posts data depending on
-        what is writed on the frontend form.
-        """
+#         retrieved = testcollection.find_one({"_id": ObjectId(_id)})
 
-        parser.add_argument("name", type=str)
-        parser.add_argument("writer", type=str)
-        parser.add_argument("year", type=int)
-        args = parser.parse_args()
+#         #return JSONEncoder().encode(retrieved)
+#         return json.dumps(retrieved, cls=MongoEncoder)
 
-        item = {
-            "name": args["name"],
-            "writer": args["writer"],
-            "year": args["year"]
-            }
-        testcollection.insert_one(item)
-        return "Nice!"
+#     def post(self):
+#         """
+#         Function that posts data depending on
+#         what is writed on the frontend form.
+#         """
+
+#         parser.add_argument("name", type=str)
+#         parser.add_argument("writer", type=str)
+#         parser.add_argument("year", type=int)
+#         args = parser.parse_args()
+
+#         item = {
+#             "name": args["name"],
+#             "writer": args["writer"],
+#             "year": args["year"]
+#             }
+#         testcollection.insert_one(item)
+#         return "Nice!"
 
 
 class BooksGet(Resource):
@@ -311,9 +331,9 @@ class UsersDeleteByObjectID(Resource):
 
 
 # Not used atm
-class HomePage(Resource):
-    def get(self):
-        return Response(response=render_template("index.html"))
+# class HomePage(Resource):
+#     def get(self):
+#         return Response(response=render_template("index.html"))
 
 
 api.add_resource(TesterData, "/api/testerdata/<_id>")

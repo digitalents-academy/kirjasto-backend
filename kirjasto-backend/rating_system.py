@@ -29,7 +29,6 @@ rating_collection = db['ratings']
 parser = reqparse.RequestParser()
 
 
-#Is this needed?
 def get_ratings():
     """
     Function that returns a list called retrieved_rating_collection
@@ -215,26 +214,21 @@ def update_rating():
     return "Error: Something went wrong!"
 
 
-
-
 def update_rating_username(new_username, old_username):
     """Function that updates comment data in the database."""
 
     if is_user_logged_in() is False:
         return "Error: You have to be logged in!"
 
-
-
     if checking_if_user_is_authenticated_with_user_name(
             new_username) is False:
         return "Error: Access denied!"
-
 
     rating_collection.update(
         {'Username': old_username},
         {
             "$set": {
-                "Username": new_username    
+                "Username": new_username
                 }
             }
         )
