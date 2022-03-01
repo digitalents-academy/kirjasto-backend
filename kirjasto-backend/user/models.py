@@ -3,8 +3,11 @@ import datetime
 from flask import request, session, redirect
 from passlib.hash import pbkdf2_sha256
 import jwt
+from flask_restful import reqparse
 #Why does this throw an error?
 from app import collection, app
+
+parser = reqparse.RequestParser()
 
 
 class User:
@@ -61,12 +64,17 @@ class User:
 
     def login(self):
 
+        parser.add_argument('email', required=True, type=str)
+        parser.add_argument('password', required=True, type=str)
+
+        args = parser.parse_args()
+
         user = collection.find_one({
-            "Email": request.form.get('email')
+            "Email": args['email']
         })
 
         if user and pbkdf2_sha256.verify(
-                request.form.get('password'),
+                args['password'],
                 user["Password"]):
             return self.start_session(user)
 

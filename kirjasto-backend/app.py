@@ -338,7 +338,7 @@ class UsersDeleteByObjectID(Resource):
 #         return Response(response=render_template("index.html"))
 
 
-# api.add_resource(TesterData, "/api/testerdata/<_id>")
+#api.add_resource(TesterData, "/api/testerdata/<_id>")
 # Not used atm
 #api.add_resource(HomePage, '/')
 # Works
