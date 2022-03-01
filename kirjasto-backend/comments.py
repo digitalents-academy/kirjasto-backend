@@ -30,16 +30,6 @@ comment_collection = db['comments']
 parser = reqparse.RequestParser()
 
 
-# Not needed?
-def get_comments():
-    """Function that returns all comments."""
-
-    retrieved = list(comment_collection.find({}, {'_id': False}))
-    if len(retrieved) > 0:
-        return retrieved
-    return "Error: There doesn't seem to be any comments inside the database!"
-
-
 def get_comments_by_book_id(book_id):
     """Function that returns comment's data by book id."""
 

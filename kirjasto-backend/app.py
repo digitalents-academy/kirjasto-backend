@@ -18,13 +18,11 @@ from books import (
     )
 from comments import (
     delete_comments_by_comment_id,
-    get_comments,
     get_comments_by_book_id,
     post_comment,
     update_comment
     )
 from rating_system import (
-    get_ratings,
     get_ratings_by_username,
     get_ratings_by_username_and_book_id,
     update_rating,
@@ -158,12 +156,10 @@ class BooksReturnByUsernameAndBookID(Resource):
 class CommentsGet(Resource):
     """Class for returning comment data from the database."""
 
-    def get(self, book_id=None):
+    def get(self, book_id):
         """Function that returns comment data depending on the url."""
 
-        if book_id is not None:
-            return get_comments_by_book_id(book_id)
-        return get_comments()
+        return get_comments_by_book_id(book_id)
 
 
 class CommentsAddNewComment(Resource):
@@ -196,7 +192,7 @@ class CommentsDelete(Resource):
 class RatingsGet(Resource):
     """Class for returning rating data from the database."""
 
-    def get(self, user_name=None, book_id=None):
+    def get(self, user_name, book_id=None):
         """Function that returns rating data depending on the url."""
 
         if book_id is not None:
@@ -204,10 +200,9 @@ class RatingsGet(Resource):
                 user_name,
                 book_id
                 )
-        elif user_name is not None:
+        else:
             return get_ratings_by_username(
                 user_name)
-        return get_ratings()
 
 
 class RatingsAddNewRating(Resource):
@@ -237,17 +232,26 @@ class RatingsDeleteByUsernameAndBookID(Resource):
         return delete_rating()
 
 
+class UsersGetAll(Resource):
+    """Class for returning all user data from the database."""
+
+    @token_required
+    def get(self):
+        """Function that returns all user data."""
+
+        return get_users()
+
+
 class UsersGet(Resource):
     """Class for returning user data from the database."""
 
-    def get(self, user_name=None, object_id=None):
+    def get(self, user_name, object_id=None):
         """Function that returns user data depending on the url."""
 
         if object_id is not None:
             return get_user_by_object_id(object_id)
-        elif user_name is not None:
+        else:
             return get_user_by_username(user_name)
-        return get_users()
 
 
 class UsersUpdateUser(Resource):
@@ -300,7 +304,6 @@ api.add_resource(
     )
 api.add_resource(
     CommentsGet,
-    '/api/comments',
     '/api/comments/<book_id>'
     )
 api.add_resource(
@@ -317,7 +320,6 @@ api.add_resource(
     )
 api.add_resource(
     RatingsGet,
-    '/api/ratings',
     '/api/ratings/<user_name>',
     '/api/ratings/<user_name>/<book_id>'
     )
@@ -333,9 +335,9 @@ api.add_resource(
     RatingsDeleteByUsernameAndBookID,
     '/api/ratings/d'
     )
+api.add_resource(UsersGetAll, '/api/users')
 api.add_resource(
     UsersGet,
-    '/api/users',
     '/api/users/<user_name>',
     '/api/users/<user_name>/<object_id>'
     )

@@ -29,18 +29,6 @@ rating_collection = db['ratings']
 parser = reqparse.RequestParser()
 
 
-# Not needed?
-def get_ratings():
-    """
-    Function that returns a list called retrieved_rating_collection
-    that contains retrieved rating collection.
-    """
-
-    if len(get_retrieved_rating_collection()) > 0:
-        return get_retrieved_rating_collection()
-    return "Error: There doesn't seem to be any ratings inside the database!"
-
-
 def get_ratings_by_username(user_name):
     """Function that returns all of user's ratings."""
 
