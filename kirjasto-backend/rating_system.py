@@ -29,6 +29,7 @@ rating_collection = db['ratings']
 parser = reqparse.RequestParser()
 
 
+# Not needed?
 def get_ratings():
     """
     Function that returns a list called retrieved_rating_collection

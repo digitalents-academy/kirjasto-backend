@@ -30,6 +30,7 @@ comment_collection = db['comments']
 parser = reqparse.RequestParser()
 
 
+# Not needed?
 def get_comments():
     """Function that returns all comments."""
 
