@@ -4,19 +4,16 @@ from flask import request, session, redirect
 from passlib.hash import pbkdf2_sha256
 import jwt
 from flask_restful import reqparse
-#Why does this throw an error?
 from app import collection, app
 
 parser = reqparse.RequestParser()
 
 
 class User:
-    # Needs to be edited
     def start_session(self, user):
         del user["Password"]
         session['logged_in'] = True
         session['user'] = user
-        session['token'] = "No token"
         session['user']['token'] = "No token"
 
         if user["Admin"]:
@@ -28,11 +25,8 @@ class User:
                     },
                 app.config['SECRET_KEY']
                 )
-            #Not needed?
-            session['token'] = token
             session['user']['token'] = token
 
-        # return jsonify(user), 200
         return session['user'], 200
 
     def signup(self):

@@ -23,7 +23,7 @@ rating_collection = db['ratings']
 user_collection = db['users']
 
 
-#Does _id need to be false?
+# Does _id need to be false?
 def get_retrieved_book_collection():
     return list(book_collection.find({}, {'_id': False}))
 

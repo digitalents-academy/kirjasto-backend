@@ -196,10 +196,10 @@ def delete_user_by_object_id():
             return "Error: Something went wrong!"
     else:
         return "Error: Something went wrong!"
-    #session needs to be terminated
-    session['logged_in'] = False
-    #or
-    #session.clear()
-    #When front is ready
-    #return User().signout()
+    # session needs to be terminated
+    # session['logged_in'] = False
+    # or
+    session.clear()
+    # When front is ready
+    # return User().signout()
     return "User was deleted succesfully!"
