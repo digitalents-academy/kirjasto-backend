@@ -1,6 +1,7 @@
 """app.py: The project's main file. The app will be run from here."""
 
 from functools import wraps
+from flask_cors import CORS
 import json
 from json import JSONEncoder
 from flask import Flask, Response, render_template, session, redirect, request
@@ -47,6 +48,7 @@ parser = reqparse.RequestParser()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
 api = Api(app)
+CORS(app)
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
