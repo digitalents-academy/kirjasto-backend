@@ -16,6 +16,8 @@ class User:
         del user["Password"]
         session['logged_in'] = True
         session['user'] = user
+        session['token'] = "No token"
+        session['user']['token'] = "No token"
 
         if user["Admin"]:
             token = jwt.encode(
@@ -26,21 +28,32 @@ class User:
                     },
                 app.config['SECRET_KEY']
                 )
+            #Not needed?
             session['token'] = token
+            session['user']['token'] = token
+
         # return jsonify(user), 200
-        return user, 200
+        return session['user'], 200
 
     def signup(self):
+
+        parser.add_argument('name', required=True, type=str)
+        parser.add_argument('email', required=True, type=str)
+        parser.add_argument('password', required=True, type=str)
+
+        args = parser.parse_args()
+
         # Create the user object
+
         user = {
             "_id": uuid.uuid4().hex,
-            "Username": request.form.get('name'),
-            "Email": request.form.get('email'),
-            "Password": request.form.get('password'),
+            "Username": args['name'],
+            "Email": args['email'],
+            "Password": args['password'],
             "Mean_score": 0,
             "Mean_count": 0,
             "Admin": False
-        }
+            }
 
         # Encrypt the password
         user["Password"] = pbkdf2_sha256.encrypt(user["Password"])
