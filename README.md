@@ -1,7 +1,7 @@
 # kirjasto-backend 📚
 
 ## Description
-This is the backend repo for the Digitalents Academy Library Application 📚 Kirjasto is a Digitalents Academy project made by the workshop interns in collaboration. The main repositiory for the project is at [digitalents-academy/kirjasto](https://github.com/digitalents-academy/kirjasto)
+This is the backend repo for the Digitalents Academy Library Application 📚 Kirjasto is a Digitalents Academy project made by the workshop interns in collaboration. The main repositiory for the project is at [digitalents-academy/kirjasto](https://github.com/digitalents-academy/kirjasto).
 
 ## Authors
 Boris Hiltunen ([BorisHiltunen](https://github.com/BorisHiltunen))
@@ -155,6 +155,7 @@ Loaner | User which has loaned the book.
 For example: localhost:5000/api/books/5b5b085cb60c48e28d304f3794ee9c15
 
 ```javascript
+[
     {
         "Book_ID": "5b5b085cb60c48e28d304f3794ee9c15",
         "Name": "Eloquent JavaScript",
@@ -169,6 +170,7 @@ For example: localhost:5000/api/books/5b5b085cb60c48e28d304f3794ee9c15
         "Loaner": null,
         "Loan_Status": false
     }
+]
 ```
 
 ### Comments
@@ -184,12 +186,14 @@ Comment | body of user message.
 For example: localhost:5000/api/comments/8e1d8750ca0a472c81ed09cfe73c76bd
 
 ```javascript
+[
     {
         "Book_ID": "8e1d8750ca0a472c81ed09cfe73c76bd",
         "Username": "test",
         "Comment_ID": "5b62d22a40db4cdaa650fafb1c7d6542",
         "Comment": "hello"
     }
+]
 ```
 
 ### Ratings
@@ -202,21 +206,15 @@ Username | The item's unique username.
 Book_ID | The item's unique id.
 Rating | The item's rating.
 
-For example: localhost:5000/api/comments/test
+For example: localhost:5000/api/ratings/test5
 
 ```javascript
 [
     {
-        "Rating_ID": "82c00051971f429f8de216fb2def6fbb",
-        "Rating": "3",
-        "Username": "test",
-        "Book_ID": "4683c2f518144971bd2c80aa13326174"
-    },
-    {
-        "Rating_ID": "da1fabc892e1441b84aef39c20babe70",
-        "Rating": "2",
-        "Username": "test",
-        "Book_ID": "bed1d61653a147a58176b22151ad3e89"
+        "Rating_ID": "2996a284656b4ad7b9b9afb3d5e1436a",
+        "Username": "test5",
+        "Book_ID": "4ddf7b708df14cdd9d3df5193e839722",
+        "Rating": 3.0
     }
 ]
 ```
@@ -231,15 +229,19 @@ Email | The item's unique email.
 Password | The item's unique hashed password.
 Mean_score | The item's mean score.
 Mean_count | The item's mean count.
+Token | The item's token.
 
 
-For example: localhost:5000/api/users/test
+For example: localhost:5000/api/users/test5
 
 ```javascript
+[
     {
+        "_id": "2701a485794542069dfbd31272f1a7ba",
         "Username": "test",
         "Email": "test@gmail.com",
-        "Password": "$pbkdf2-sha256$29000$hRBiDGHMWSvl3FvLec.59w$0Qz0scu7yyYm5JEMiBN3oo/89Z83SD6kHc3YZMPcXX0",
-        "Mean_score": 2.6666666666666665,
-        "Mean_count": 3
+        "Mean_count": 0,
+        "Mean_score": 0,
+        "token": "No token"
     }
+]
