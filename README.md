@@ -115,7 +115,7 @@ localhost:5000/api/
     Field | Description
     ------|------------
     Email | The user's unique email.
-    Password | The user's hashed password.
+    Password | The user's password.
     
 <b>PUT</b>
   - **/books/update (Admin rights required)**
@@ -130,8 +130,8 @@ localhost:5000/api/
     Writer | Name of the author.
     Year | Publication date.
     ISBN | International Standard Book Number.
-    Rating | Books rating.
-    Rating_count | Books rating count.
+    Rating | Book's rating.
+    Rating_count | Book's rating count.
     About | What the book is about.
     Tags | Descriptive keywords you can add to help users find similar books.
     Description | Description of the book.
@@ -165,7 +165,7 @@ localhost:5000/api/
     Book_ID | The book's unique id.
     Username | The user's unique username.
     Comment_ID | The comment's unique id.
-    Comment | body of user message.
+    Comment | body of the user message.
   - **/ratings/update**
     ```python 
     Updates rating data inside the database with rating id (User needs to be logged in)
@@ -250,8 +250,8 @@ Name | Name of the book.
 Writer | Name of the author.
 Year | Publication date.
 ISBN | International Standard Book Number.
-Rating | Books rating.
-Rating_count | Books rating count.
+Rating | Book's rating.
+Rating_count | Book's rating count.
 About | What the book is about.
 Tags | Descriptive keywords you can add to help users find similar books.
 Description | Description of the book.
@@ -287,7 +287,7 @@ Field | Description
 Book_ID | The item's unique id.
 Username | The item's unique username.
 Comment_ID | The item's unique id.
-Comment | body of user message.
+Comment | body of the user message.
 
 For example: localhost:5000/api/comments/8e1d8750ca0a472c81ed09cfe73c76bd
 
