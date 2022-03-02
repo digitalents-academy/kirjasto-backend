@@ -1,6 +1,8 @@
+"""models.py: File that contains user class."""
+
 import uuid
 import datetime
-from flask import request, session, redirect
+from flask import session, redirect
 from passlib.hash import pbkdf2_sha256
 import jwt
 from flask_restful import reqparse
@@ -10,7 +12,11 @@ parser = reqparse.RequestParser()
 
 
 class User:
+    """Class that contains necessary user functions."""
+
     def start_session(self, user):
+        """Function that starts session."""
+
         del user["Password"]
         session['logged_in'] = True
         session['user'] = user
@@ -30,6 +36,7 @@ class User:
         return session['user'], 200
 
     def signup(self):
+        """Function that creates a new user and starts the session."""
 
         parser.add_argument('name', required=True, type=str)
         parser.add_argument('email', required=True, type=str)
@@ -38,7 +45,6 @@ class User:
         args = parser.parse_args()
 
         # Create the user object
-
         user = {
             "_id": uuid.uuid4().hex,
             "Username": args['name'],
@@ -66,10 +72,16 @@ class User:
         return {"error": "Signup failed"}, 400
 
     def signout(self):
+        """
+        Function that clears the session
+        and redirects the user to the home page.
+        """
+
         session.clear()
         return redirect('/')
 
     def login(self):
+        """Function that starts a new session for a old user."""
 
         parser.add_argument('email', required=True, type=str)
         parser.add_argument('password', required=True, type=str)

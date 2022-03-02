@@ -14,11 +14,11 @@ from helpers import (
     is_book_already_added,
     is_book_already_loaned,
     is_book_id_inside_book_collection,
-    is_object_number,
+    is_item_number,
     is_user_name_inside_user_collection,
     is_book_id_inside_comment_collection,
     is_book_id_inside_rating_collection,
-    is_object_decimal,
+    is_item_decimal,
     is_year_acceptable,
     is_current_user_admin,
     is_user_logged_in
@@ -137,9 +137,9 @@ def update_book():
 
     if is_book_id_inside_book_collection(args["book_id"]) is False or \
             is_book_already_added(args["name"], args["isbn"]) \
-            is False or is_object_number(args["year"]) is False or \
-            is_object_decimal(args["rating"]) is False or \
-            is_object_number(args["rating_count"]) is False:
+            is False or is_item_number(args["year"]) is False or \
+            is_item_decimal(args["rating"]) is False or \
+            is_item_number(args["rating_count"]) is False:
         return "Error: Not a valid book id, name, isbn or rating! " \
             "book_id, name and isbn must be inside the database!"
 

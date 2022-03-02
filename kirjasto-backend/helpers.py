@@ -23,39 +23,46 @@ rating_collection = db['ratings']
 user_collection = db['users']
 
 
-# Does _id need to be false?
 def get_retrieved_book_collection():
+    """Function that returns retrieved book collection."""
+
     return list(book_collection.find({}, {'_id': False}))
 
 
 def get_retrieved_comment_collection():
+    """Function that returns retrieved comment collection."""
+
     return list(comment_collection.find({}, {'_id': False}))
 
 
 def get_retrieved_rating_collection():
+    """Function that returns retrieved rating collection."""
+
     return list(rating_collection.find({}, {'_id': False}))
 
 
 def get_retrieved_user_collection():
+    """Function that returns retrieved user collection."""
+
     return list(user_collection.find({}))
 
 
-def is_object_number(object):
+def is_item_number(item):
     """Function that checks whether object is a number."""
 
     numbers = "0123456789"
-    for letter in str(object):
+    for letter in str(item):
         if letter not in numbers:
             return False
     return True
 
 
-def is_object_decimal(object):
+def is_item_decimal(item):
     """Function that checks whether object is a number."""
 
     count = 0
     numbers = "0123456789"
-    for letter in str(object):
+    for letter in str(item):
         if letter not in numbers and count != 1:
             return False
         count += 1

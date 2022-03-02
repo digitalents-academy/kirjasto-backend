@@ -4,7 +4,6 @@ from functools import wraps
 from flask_cors import CORS
 from flask import Flask, render_template, session, redirect, request
 from flask_restful import Resource, Api, reqparse
-from pymongo import MongoClient
 from pymongo.mongo_client import MongoClient
 import jwt
 from books import (
