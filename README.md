@@ -37,96 +37,202 @@ localhost:5000/api/
     ```python 
     Returns book data by book id
     ```
-  - **/comments**
-    ```python 
-    Returns all comments
-    ```
   - **/comments/book_id**
     ```python 
     Returns comments by book id
     ```
-  - **/ratings**
-    ```python 
-    Returns every rating's data
-    ```
   - **/ratings/user_name**
     ```python 
-    Returns rating data by username
+    Returns rating data by username (Users can only see their own ratings)
     ```
   - **/ratings/user_name/book_id**
     ```python 
-    Returns rating data by username and book id
+    Returns rating data by username and book id (Users can only see their own ratings)
     ```
-  - **/users**
+  - **/users (Admin rights required)**
     ```python 
     Returns every users's data
     ```
   - **/users/user_name**
     ```python 
-    Returns user data by username
+    Returns user data by username (Users can only see their own data)
     ```
   - **/users/user_name/object_id**
     ```python 
-    Returns user data by object id
+    Returns user data by object id (Users can only see their own data)
     ```
     
 <b>POST</b>
-  - **/books/add**
+  - **/books/add (Admin rights required)**
     ```python 
     Posts new book to the books collection inside the database
     ```
+    Necessary data needed to add a book
+    Field | Description
+    ------|------------
+    Name | Name of the book.
+    Writer | Name of the author.
+    Year | Publication date.
+    ISBN | International Standard Book Number.
+    About | What the book is about.
+    Tags | Descriptive keywords you can add to help users find similar books.
+    Description | Description of the book.
   - **/comments/add**
     ```python 
-    Posts new comment to the comments collection inside the database
+    Posts new comment to the comments collection inside the database (User needs to be logged in)
     ```
+    Necessary data needed to add a comment
+    Field | Description
+    ------|------------
+    Book_ID | The book's unique id.
+    Username | The user's unique username.
+    Comment | body of user message.
   - **/ratings/add**
     ```python 
-    Posts new rating to the ratings collection inside the database
+    Posts new rating to the ratings collection inside the database (User needs to be logged in)
     ```
+    Necessary data needed to add a rating
+    Field | Description
+    ------|------------
+    Username | The user's unique username.
+    Book_ID | The book's unique id.
+    Rating | The item's rating.
   - **/user/signup**
     ```python 
     Posts new user to the users collection inside the database
     ```
+    Necessary data needed to signup
+    Field | Description
+    ------|------------
+    Username | A unique name.
+    Email | A unique email.
+    Password | password.
   - **/authentication/login**
     ```python 
     Posts user data 
     ```
+    Necessary data needed to login
+    Field | Description
+    ------|------------
+    Email | The user's unique email.
+    Password | The user's hashed password.
     
 <b>PUT</b>
-  - **/books/update**
+  - **/books/update (Admin rights required)**
     ```python 
     Updates book data inside the database with book id
     ```
+    Necessary data needed to update book's data
+    Field | Description
+    ------|------------
+    Book_ID | The book's unique id.
+    Name | Name of the book.
+    Writer | Name of the author.
+    Year | Publication date.
+    ISBN | International Standard Book Number.
+    Rating | Books rating.
+    Rating_count | Books rating count.
+    About | What the book is about.
+    Tags | Descriptive keywords you can add to help users find similar books.
+    Description | Description of the book.
+    Loan_Status | True or False value of the loan_status.
+    Loaner | User which has loaned the book.
+  - **/books/loan**
+    ```python 
+    Changes book's loan state (User needs to be logged in)
+    ```
+    Necessary data needed to loan a book
+    Field | Description
+    ------|------------
+    Username | The user's unique username.
+    Book_ID | The book's unique id.
+  - **/books/return**
+    ```python 
+    Changes book's loan state (User needs to be logged in)
+    ```
+    Necessary data needed to return a book
+    Field | Description
+    ------|------------
+    Username | The user's unique username.
+    Book_ID | The user's unique id.
   - **/comments/update**
     ```python 
-    Updates comment data inside the database with comment id
+    Updates comment data inside the database with comment id (User needs to be logged in)
     ```
+    Necessary data needed to update comment's data
+    Field | Description
+    ------|------------
+    Book_ID | The book's unique id.
+    Username | The user's unique username.
+    Comment_ID | The comment's unique id.
+    Comment | body of user message.
   - **/ratings/update**
     ```python 
-    Updates rating data inside the database with rating id
+    Updates rating data inside the database with rating id (User needs to be logged in)
     ```
+    Necessary data needed to update rating's data
+    Field | Description
+    ------|------------
+    Rating_ID | The rating's unique id.
+    Username | The user's unique username.
+    Book_ID | The book's unique id.
+    New_Rating | New rating that will be added.
   - **/users/update**
     ```python 
-    Updates user data inside the database with object id
+    Updates user data inside the database with object id (User needs to be logged in)
     ```
+    Necessary data needed to update user's data
+    Field | Description
+    ------|------------
+    **id** | The user's unique id.
+    Username | The user's unique name.
+    Email | The user's unique email.
+    Password | The user's password.
+  - **/users/promote**
+    ```python 
+    Changes user's admin state (Admin rights required)
+    ```
+    Necessary data needed to update user's data
+    Field | Description
+    ------|------------
+    **id** | The user's unique id.
     
 <b>Delete</b>
-  - **/books/d**
+  - **/books/d (Admin rights required)**
     ```python 
     Deletes a book from the database with book id
     ```
+    Necessary data needed to delete a book
+    Field | Description
+    ------|------------
+    Book_ID | The book's unique id.
   - **/comments/d**
     ```python 
-    Deletes a comment from the database with comment id
+    Deletes a comment from the database with comment id (User needs to be logged in)
     ```
+    Necessary data needed to delete a comment
+    Field | Description
+    ------|------------
+    Comment_ID | The comment's unique id.
   - **/ratings/d**
     ```python 
-    Deletes a rating from the database with rating id
+    Deletes a rating from the database with rating id (User needs to be logged in)
     ```
+    Necessary data needed to delete a rating
+    Field | Description
+    ------|------------
+    Rating_ID | The rating's unique id.
+    Username | The user's unique username.
+    Book_ID | The book's unique id.
   - **/users/d**
     ```python 
-    Deletes a user from the database with object id
+    Deletes a user from the database with object id (User needs to be logged in)
     ```
+    Necessary data needed to update user's data
+    Field | Description
+    ------|------------
+    **id** | The user's unique id.
+    Username | The user's unique name.
 
 ## Items
 
@@ -226,7 +332,7 @@ Field | Description
 **id** | The item's unique id.
 Username | The item's unique name.
 Email | The item's unique email.
-Password | The item's unique hashed password.
+Password | The item's hashed password.
 Mean_score | The item's mean score.
 Mean_count | The item's mean count.
 Token | The item's token.
