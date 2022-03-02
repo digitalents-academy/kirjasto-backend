@@ -70,13 +70,13 @@ localhost:5000/api/
     Necessary data needed to add a book
     Field | Description
     ------|------------
-    Name | Name of the book.
-    Writer | Name of the author.
-    Year | Publication date.
-    ISBN | International Standard Book Number.
-    About | What the book is about.
-    Tags | Descriptive keywords you can add to help users find similar books.
-    Description | Description of the book.
+    name | Name of the book.
+    writer | Name of the author.
+    year | Publication date.
+    isbn | International Standard Book Number.
+    about | What the book is about.
+    tags | Descriptive keywords you can add to help users find similar books.
+    description | Description of the book.
   - **/comments/add**
     ```python 
     Posts new comment to the comments collection inside the database (User needs to be logged in)
@@ -84,9 +84,9 @@ localhost:5000/api/
     Necessary data needed to add a comment
     Field | Description
     ------|------------
-    Book_ID | The book's unique id.
-    Username | The user's unique username.
-    Comment | body of user message.
+    book_id | The book's unique id.
+    user_name | The user's unique username.
+    comment | body of user message.
   - **/ratings/add**
     ```python 
     Posts new rating to the ratings collection inside the database (User needs to be logged in)
@@ -94,9 +94,9 @@ localhost:5000/api/
     Necessary data needed to add a rating
     Field | Description
     ------|------------
-    Username | The user's unique username.
-    Book_ID | The book's unique id.
-    Rating | The item's rating.
+    user_name | The user's unique username.
+    book_id | The book's unique id.
+    rating | The item's rating.
   - **/user/signup**
     ```python 
     Posts new user to the users collection inside the database
@@ -104,9 +104,9 @@ localhost:5000/api/
     Necessary data needed to signup
     Field | Description
     ------|------------
-    Username | A unique name.
-    Email | A unique email.
-    Password | password.
+    name | A unique name.
+    email | A unique email.
+    password | password.
   - **/authentication/login**
     ```python 
     Posts user data 
@@ -114,8 +114,8 @@ localhost:5000/api/
     Necessary data needed to login
     Field | Description
     ------|------------
-    Email | The user's unique email.
-    Password | The user's password.
+    email | The user's unique email.
+    password | The user's password.
     
 <b>PUT</b>
   - **/books/update (Admin rights required)**
@@ -125,18 +125,18 @@ localhost:5000/api/
     Necessary data needed to update book's data
     Field | Description
     ------|------------
-    Book_ID | The book's unique id.
-    Name | Name of the book.
-    Writer | Name of the author.
-    Year | Publication date.
-    ISBN | International Standard Book Number.
-    Rating | Book's rating.
-    Rating_count | Book's rating count.
-    About | What the book is about.
-    Tags | Descriptive keywords you can add to help users find similar books.
-    Description | Description of the book.
-    Loan_Status | True or False value of the loan_status.
-    Loaner | User which has loaned the book.
+    book_id | The book's unique id.
+    name | Name of the book.
+    writer | Name of the author.
+    year | Publication date.
+    isbn | International Standard Book Number.
+    rating | Book's rating.
+    rating_count | Book's rating count.
+    about | What the book is about.
+    tags | Descriptive keywords you can add to help users find similar books.
+    description | Description of the book.
+    loaner | User which has loaned the book.
+    loan_status | True or False value of the loan_status.
   - **/books/loan**
     ```python 
     Changes book's loan state (User needs to be logged in)
@@ -144,8 +144,8 @@ localhost:5000/api/
     Necessary data needed to loan a book
     Field | Description
     ------|------------
-    Username | The user's unique username.
-    Book_ID | The book's unique id.
+    user_name | The user's unique username.
+    book_id | The book's unique id.
   - **/books/return**
     ```python 
     Changes book's loan state (User needs to be logged in)
@@ -153,8 +153,8 @@ localhost:5000/api/
     Necessary data needed to return a book
     Field | Description
     ------|------------
-    Username | The user's unique username.
-    Book_ID | The user's unique id.
+    user_name | The user's unique username.
+    book_id | The user's unique id.
   - **/comments/update**
     ```python 
     Updates comment data inside the database with comment id (User needs to be logged in)
@@ -162,10 +162,10 @@ localhost:5000/api/
     Necessary data needed to update comment's data
     Field | Description
     ------|------------
-    Book_ID | The book's unique id.
-    Username | The user's unique username.
-    Comment_ID | The comment's unique id.
-    Comment | body of the user message.
+    book_id | The book's unique id.
+    user_name | The user's unique username.
+    comment_id | The comment's unique id.
+    comment | body of the user message.
   - **/ratings/update**
     ```python 
     Updates rating data inside the database with rating id (User needs to be logged in)
@@ -173,10 +173,10 @@ localhost:5000/api/
     Necessary data needed to update rating's data
     Field | Description
     ------|------------
-    Rating_ID | The rating's unique id.
-    Username | The user's unique username.
-    Book_ID | The book's unique id.
-    New_Rating | New rating that will be added.
+    rating_id | The rating's unique id.
+    user_name | The user's unique username.
+    book_id | The book's unique id.
+    new_rating | New rating that will be added.
   - **/users/update**
     ```python 
     Updates user data inside the database with object id (User needs to be logged in)
@@ -184,10 +184,10 @@ localhost:5000/api/
     Necessary data needed to update user's data
     Field | Description
     ------|------------
-    **id** | The user's unique id.
-    Username | The user's unique name.
-    Email | The user's unique email.
-    Password | The user's password.
+    **object_id** | The user's unique id.
+    user_name | The user's unique name.
+    email | The user's unique email.
+    password | The user's password.
   - **/users/promote**
     ```python 
     Changes user's admin state (Admin rights required)
@@ -195,7 +195,7 @@ localhost:5000/api/
     Necessary data needed to update user's data
     Field | Description
     ------|------------
-    **id** | The user's unique id.
+    **object_id** | The user's unique id.
     
 <b>Delete</b>
   - **/books/d (Admin rights required)**
@@ -205,7 +205,7 @@ localhost:5000/api/
     Necessary data needed to delete a book
     Field | Description
     ------|------------
-    Book_ID | The book's unique id.
+    book_id | The book's unique id.
   - **/comments/d**
     ```python 
     Deletes a comment from the database with comment id (User needs to be logged in)
@@ -213,7 +213,7 @@ localhost:5000/api/
     Necessary data needed to delete a comment
     Field | Description
     ------|------------
-    Comment_ID | The comment's unique id.
+    comment_id | The comment's unique id.
   - **/ratings/d**
     ```python 
     Deletes a rating from the database with rating id (User needs to be logged in)
@@ -221,9 +221,9 @@ localhost:5000/api/
     Necessary data needed to delete a rating
     Field | Description
     ------|------------
-    Rating_ID | The rating's unique id.
-    Username | The user's unique username.
-    Book_ID | The book's unique id.
+    rating_id | The rating's unique id.
+    user_name | The user's unique username.
+    book_id | The book's unique id.
   - **/users/d**
     ```python 
     Deletes a user from the database with object id (User needs to be logged in)
@@ -231,8 +231,8 @@ localhost:5000/api/
     Necessary data needed to update user's data
     Field | Description
     ------|------------
-    **id** | The user's unique id.
-    Username | The user's unique name.
+    **object_id** | The user's unique id.
+    user_name | The user's unique name.
 
 ## Items
 
@@ -255,8 +255,8 @@ Rating_count | Book's rating count.
 About | What the book is about.
 Tags | Descriptive keywords you can add to help users find similar books.
 Description | Description of the book.
-Loan_Status | True or False value of the loan_status.
 Loaner | User which has loaned the book.
+Loan_Status | True or False value of the loan_status.
 
 For example: localhost:5000/api/books/5b5b085cb60c48e28d304f3794ee9c15
 
