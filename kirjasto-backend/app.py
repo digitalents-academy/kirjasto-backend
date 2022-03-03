@@ -1,13 +1,10 @@
 """app.py: The project's main file. The app will be run from here."""
 
 from functools import wraps
-import json
-from json import JSONEncoder
-from flask import Flask, Response, render_template, session, redirect, request
+from flask_cors import CORS
+from flask import Flask, render_template, session, redirect, request
 from flask_restful import Resource, Api, reqparse
-from pymongo import MongoClient
 from pymongo.mongo_client import MongoClient
-from bson.objectid import ObjectId
 import jwt
 from books import (
     get_books,
@@ -20,13 +17,11 @@ from books import (
     )
 from comments import (
     delete_comments_by_comment_id,
-    get_comments,
     get_comments_by_book_id,
     post_comment,
     update_comment
     )
 from rating_system import (
-    get_ratings,
     get_ratings_by_username,
     get_ratings_by_username_and_book_id,
     update_rating,
@@ -47,6 +42,7 @@ parser = reqparse.RequestParser()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
 api = Api(app)
+CORS(app)
 
 client = MongoClient(
     "mongodb+srv://" + db_secret.secret_id + ":" + db_secret.secret_key +
@@ -56,23 +52,6 @@ db = client['kirjasto-backend']
 collection = db['users']
 testcollection = db["testerdata"]
 retrieved_testcollection = list(testcollection.find({}, {'_id': False}))
-
-
-#testing the use of object id
-# class MongoEncoder(JSONEncoder):
-#     def default(self, obj, **kwargs):
-#         if isinstance(obj, ObjectId):
-#             return str(obj)
-#         else:
-#             return JSONEncoder.default(obj, **kwargs)
-
-
-# #testing the use of object id
-# class JSONEncoder(json.JSONEncoder):
-#     def default(self, o):
-#         if isinstance(o, ObjectId):
-#             return str(o)
-#         return json.JSONEncoder.default(self, o)
 
 
 def token_required(f):
@@ -112,40 +91,6 @@ def home():
 @login_required
 def dashboard():
     return render_template('dashboard.html')
-
-
-#Not used atm
-# class TesterData(Resource):
-#     """Class for testing sending and returning data."""
-#     # def get(self):
-#     #     return list(testcollection.find())
-
-#     def get(self, _id):
-#         """Function that returns data with object id."""
-
-#         retrieved = testcollection.find_one({"_id": ObjectId(_id)})
-
-#         #return JSONEncoder().encode(retrieved)
-#         return json.dumps(retrieved, cls=MongoEncoder)
-
-#     def post(self):
-#         """
-#         Function that posts data depending on
-#         what is writed on the frontend form.
-#         """
-
-#         parser.add_argument("name", type=str)
-#         parser.add_argument("writer", type=str)
-#         parser.add_argument("year", type=int)
-#         args = parser.parse_args()
-
-#         item = {
-#             "name": args["name"],
-#             "writer": args["writer"],
-#             "year": args["year"]
-#             }
-#         testcollection.insert_one(item)
-#         return "Nice!"
 
 
 class BooksGet(Resource):
@@ -210,12 +155,10 @@ class BooksReturnByUsernameAndBookID(Resource):
 class CommentsGet(Resource):
     """Class for returning comment data from the database."""
 
-    def get(self, book_id=None):
+    def get(self, book_id):
         """Function that returns comment data depending on the url."""
 
-        if book_id is not None:
-            return get_comments_by_book_id(book_id)
-        return get_comments()
+        return get_comments_by_book_id(book_id)
 
 
 class CommentsAddNewComment(Resource):
@@ -248,7 +191,7 @@ class CommentsDelete(Resource):
 class RatingsGet(Resource):
     """Class for returning rating data from the database."""
 
-    def get(self, user_name=None, book_id=None):
+    def get(self, user_name, book_id=None):
         """Function that returns rating data depending on the url."""
 
         if book_id is not None:
@@ -256,10 +199,9 @@ class RatingsGet(Resource):
                 user_name,
                 book_id
                 )
-        elif user_name is not None:
+        else:
             return get_ratings_by_username(
                 user_name)
-        return get_ratings()
 
 
 class RatingsAddNewRating(Resource):
@@ -289,17 +231,26 @@ class RatingsDeleteByUsernameAndBookID(Resource):
         return delete_rating()
 
 
+class UsersGetAll(Resource):
+    """Class for returning all user data from the database."""
+
+    @token_required
+    def get(self):
+        """Function that returns all user data."""
+
+        return get_users()
+
+
 class UsersGet(Resource):
     """Class for returning user data from the database."""
 
-    def get(self, user_name=None, object_id=None):
+    def get(self, user_name, object_id=None):
         """Function that returns user data depending on the url."""
 
         if object_id is not None:
             return get_user_by_object_id(object_id)
-        elif user_name is not None:
+        else:
             return get_user_by_username(user_name)
-        return get_users()
 
 
 class UsersUpdateUser(Resource):
@@ -330,102 +281,73 @@ class UsersDeleteByObjectID(Resource):
         return delete_user_by_object_id()
 
 
-# Not used atm
-# class HomePage(Resource):
-#     def get(self):
-#         return Response(response=render_template("index.html"))
-
-
-#api.add_resource(TesterData, "/api/testerdata/<_id>")
-# Not used atm
-#api.add_resource(HomePage, '/')
-# Works
 api.add_resource(
     BooksGet,
     '/api/books',
     '/api/books/<book_id>'
     )
-# Works
 api.add_resource(
     BooksAddNewBook,
     '/api/books/add')
-# Works
 api.add_resource(
     BooksUpdateBook, '/api/books/update'
     )
-# Works
 api.add_resource(BooksDeleteByBookID, '/api/books/d')
-# Works
 api.add_resource(
     BooksLoanByUsernameAndBookID,
     '/api/books/loan'
     )
-# Works
 api.add_resource(
     BooksReturnByUsernameAndBookID,
     '/api/books/return'
     )
-# Works
 api.add_resource(
     CommentsGet,
-    '/api/comments',
     '/api/comments/<book_id>'
     )
-# Works
 api.add_resource(
     CommentsAddNewComment,
     '/api/comments/add'
     )
-# Works
 api.add_resource(
     CommentsUpdateComment,
     '/api/comments/update'
     )
-# Works
 api.add_resource(
     CommentsDelete,
     '/api/comments/d'
     )
-# Works but when book is added doesn't work before reboot?
 api.add_resource(
     RatingsGet,
-    '/api/ratings',
     '/api/ratings/<user_name>',
     '/api/ratings/<user_name>/<book_id>'
     )
-# Works
 api.add_resource(
     RatingsAddNewRating,
     '/api/ratings/add'
     )
-# Works
 api.add_resource(
     RatingsUpdateRating,
     '/api/ratings/update'
     )
-# Works
 api.add_resource(
     RatingsDeleteByUsernameAndBookID,
     '/api/ratings/d'
     )
-# Works
+api.add_resource(UsersGetAll, '/api/users')
 api.add_resource(
     UsersGet,
-    '/api/users',
     '/api/users/<user_name>',
     '/api/users/<user_name>/<object_id>'
     )
-# Works
 api.add_resource(
     UsersUpdateUser,
     '/api/users/update'
     )
-# Works
 api.add_resource(
     UsersPromoteUser,
     '/api/users/promote'
     )
-# Works
 api.add_resource(
     UsersDeleteByObjectID,
     '/api/users/d'
@@ -434,7 +356,7 @@ api.add_resource(
 
 # Runs on port 5000!!
 if __name__ == "__main__":
-    #api urls work with this
+    # api urls work with this
     app.run(debug=True)
-    #api urls work with this without authentication
-    #app.run(debug=True, host='127.0.0.1', port=5000)
+    # api urls work with this without authentication
+    # app.run(debug=True, host='127.0.0.1', port=5000)

@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify, session, make_response
+"""routes.py: File that contains app's authentication routes."""
+
 from app import app
 from user.models import User
 
