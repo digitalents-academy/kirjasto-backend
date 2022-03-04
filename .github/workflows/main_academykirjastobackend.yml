@@ -1,0 +1,19 @@
+name: deploying backend to azure
+
+on:
+  push:
+    branches:
+      - ict
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy to Az Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'academykirjastobackend'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9A512B224188465AAAE3F10E5C2198F8 }}
