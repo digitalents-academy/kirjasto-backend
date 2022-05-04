@@ -3,7 +3,7 @@ name: deploying backend to azure
 on:
   push:
     branches:
-      - ict
+      - main
 
 jobs:
   deploy:
